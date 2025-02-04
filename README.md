@@ -1,13 +1,12 @@
-# pump_sniper
+# Pump.fun Migration Sniper
 Post migration pump.fun sniper bot
 
 To-do list:
-1. Look into changing the listener websocket event from logSubscribe to perhaps accountSubscribe. I suspect that some trades are not included in the logs and are there not picked up by the code (https://www.quicknode.com/docs/solana/logsSubscribe)
-2. Use the Anchor IDL to decode the websocket response to improve stability of the instruction decoding
-3. In execute_swap function, determine if I should filter for multiple routes - currently defauls to first route
-4. Add additional route logging for when a swap route is found
-5. Figure out how to get token name and symbol
-6. Understand why it fails sometimes!
+1. Use the Anchor IDL to decode the websocket response to improve stability of the instruction decoding
+2. In execute_swap function, determine if I should filter for multiple routes - currently defauls to first route
+3. Add additional route logging for when a swap route is found
+4. Figure out how to get token name and symbol
+5. Understand why it fails sometimes!
     - Sometimes it appears to have executed (and I get a signature) but nothing happened. Issues with the route? Preflight fail?
     - Sometimes the trade executes, but tokens received and confirmation are none. Code runs faster than propagation? Seems like this happens when chain is very slow
 
