@@ -78,7 +78,7 @@ class ColoredFormatter(logging.Formatter):
     def format(self, record):
         message = super().format(record)
         if record.levelno >= logging.ERROR:
-            message = f'{self.RED}0{message}0{self.RESET}0'
+            message = f'{self.RED}{message}{self.RESET}'
         return message
 
 # Define the logger formats

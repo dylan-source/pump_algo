@@ -61,7 +61,7 @@ async def get_transaction_details(rpc_client, signature, wallet_address: str, in
 
     # Log the error if no response is found
     if data['result'] is None:
-        trade_logger.error(f'Error fetching transaction details for Signature: {signature} - inputMint: {input_mint} and outputMint: {output_mint}0')
+        trade_logger.error(f'Error fetching transaction details for Signature: {signature} - inputMint: {input_mint} and outputMint: {output_mint}')
         return
     
     # Extract the relevant data points
@@ -358,6 +358,8 @@ async def get_jupiter_quote(httpx_client:httpx.AsyncClient, input_address:str, o
 # Execute a swap based upon quote
 async def execute_swap(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, quote, priority_fee:int):
 
+    trade_logger.debug(f"Quote response: {quote}")
+
     payload = {
         "quoteResponse": quote,
         "userPublicKey": WALLET_ADDRESS,
@@ -371,7 +373,12 @@ async def execute_swap(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, q
         # swap_response = await httpx_client.post(JUPITER_SWAP_URL, headers={'Accept': 'application/json'}, json=payload)
         swap_response = await httpx_client.post(swap_url, headers={'Accept': 'application/json'}, json=payload)
         swap_data = swap_response.json()
+        
+        trade_logger.debug(f"Swap_data: {swap_data}")
+        
         swap_transaction = swap_data.get('swapTransaction')  
+        
+        trade_logger.debug(f"Swap_transaction: {swap_transaction}")
 
         # swapTransaction contains the serialized instructions to execute the swap. Return none, if no instructions were found
         if not swap_transaction:
@@ -534,7 +541,7 @@ async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, r
                 sell_confirm_result = await confirm_tx(rpc_client=rpc_client, signature=sell_swap_response, commitment=Finalized)
 
                 # If the trade fails, log it and try again with a high priority fee                 
-                if sell_confirm_result is None or sell_confirm_result["Status"] != "Confirmed":
+                if sell_confirm_result is None or sell_confirm_result["Status"] != "Ok":
                     trade_logger.error(f"Sell trade failed for SOL - {risky_address} - {risky_amount} - {sell_slippage}")
                     sell_loop_count += 1
                     trade_logger.error(f"Sleeping for {SELL_LOOP_DELAY} seconds")
@@ -619,7 +626,7 @@ async def execute_buy(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, re
             return False
         else:
             confirm_result = await confirm_tx(rpc_client=rpc_client, signature=buy_swap_response, commitment=Finalized)
-            if confirm_result is None or confirm_result["Status"] != "Confirmed":
+            if confirm_result is None or confirm_result["Status"] != "Ok":
                 trade_logger.error(f"Buy trade failed for SOL - {risky_address} - {trade_amount} - {buy_slippage}")
                 return False
 
@@ -705,6 +712,6 @@ if __name__ == "__main__":
     redis_client_tokens = redis.Redis(host='localhost', port=6379, db=0)
     redis_client_trades = redis.Redis(host='localhost', port=6379, db=1)
 
-    asyncio.run(trade_wrapper(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, risky_address=USDC_MINT, 
+    asyncio.run(trade_wrapper(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, risky_address=BTC_MINT, 
                               sol_address=SOL_MINT, trade_amount=SOL_AMOUNT_LAMPORTS, buy_slippage=BUY_SLIPPAGE, sell_slippage=SELL_SLIPPAGE))
     
