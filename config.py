@@ -3,8 +3,8 @@ import sys
 import logging
 import base58
 from dotenv import load_dotenv
-from solders.pubkey import Pubkey
-from solders.keypair import Keypair
+from solders.pubkey import Pubkey     # type: ignore
+from solders.keypair import Keypair   # type: ignore
 
 load_dotenv()
 
