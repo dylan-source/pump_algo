@@ -692,19 +692,19 @@ async def trade_wrapper(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, 
         
 
 
-# if __name__ == "__main__":
-#     # Instantiate the relevant objects
-#     rpc_client = AsyncClient(RPC_URL)
-#     httpx_client = httpx.AsyncClient()
+if __name__ == "__main__":
+    # Instantiate the relevant objects
+    rpc_client = AsyncClient(RPC_URL)
+    httpx_client = httpx.AsyncClient()
 
-#     # Test tokens
-#     USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-#     BTC_MINT = "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij"
+    # Test tokens
+    USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+    BTC_MINT = "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij"
     
-#     # Instantiate Redis caches
-#     redis_client_tokens = redis.Redis(host='localhost', port=6379, db=0)
-#     redis_client_trades = redis.Redis(host='localhost', port=6379, db=1)
+    # Instantiate Redis caches
+    redis_client_tokens = redis.Redis(host='localhost', port=6379, db=0)
+    redis_client_trades = redis.Redis(host='localhost', port=6379, db=1)
 
-#     asyncio.run(trade_wrapper(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, risky_address=BTC_MINT, 
-#                               sol_address=SOL_MINT, trade_amount=SOL_AMOUNT_LAMPORTS, buy_slippage=BUY_SLIPPAGE, sell_slippage=SELL_SLIPPAGE))
+    asyncio.run(trade_wrapper(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, risky_address=USDC_MINT, 
+                              sol_address=SOL_MINT, trade_amount=SOL_AMOUNT_LAMPORTS, buy_slippage=BUY_SLIPPAGE, sell_slippage=SELL_SLIPPAGE))
     

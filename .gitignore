@@ -1,3 +1,8 @@
-## Ignore Visual Studio temporary files, build results, and
+## Files to no upload
 
 .env
+.DS_Store
+__pycache__
+migrations.log
+trade.log
+.venv
