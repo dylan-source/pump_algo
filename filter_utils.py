@@ -10,7 +10,7 @@ import asyncio
 import time
 import httpx
 import requests
-from config import WALLET_ADDRESS, SIGNATURE, TWEET_SCOUT_KEY, TIME_TO_SLEEP, TIMEOUT, migrations_logger
+from config import WALLET_ADDRESS, SIGNATURE, TWEET_SCOUT_KEY, TIME_TO_SLEEP, TIMEOUT, PRIVATE_KEY, migrations_logger
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
 
 # TweetScout endpoint to get twitter ID from the username. The also have the reverse endpoing (get handle from ID)
@@ -67,8 +67,9 @@ async def tweet_scout_get_score(twitter_handle):
         return {}
 
 
-# Using TweetScout get the top followers of a Twitter handle
+# Get top20 followers - ranked by TweetScout score
 async def tweet_scout_get_top_followers(twitter_handle):
+    # response is a list of dictionaries with followers details
     try:
         headers = {'Accept': 'application/json', 'ApiKey': TWEET_SCOUT_KEY}
         url = f'https://api.tweetscout.io/v2/top-followers/{twitter_handle}'
@@ -81,7 +82,9 @@ async def tweet_scout_get_top_followers(twitter_handle):
         return []
 
 
+# Provides info about the user account
 async def tweet_scout_get_user_info(twitter_handle):
+    # dictionary response with these keys: {'id', 'name', 'screen_name', 'description', 'followers_count', 'friends_count', 'register_date', 'tweets_count', 'banner', 'verified', 'avatar', 'can_dm'}
     try:
         headers = {'Accept': 'application/json', 'ApiKey': TWEET_SCOUT_KEY}
         url = f'https://api.tweetscout.io/v2/info/{twitter_handle}'
@@ -93,127 +96,253 @@ async def tweet_scout_get_user_info(twitter_handle):
         time.sleep(TIME_TO_SLEEP)
         return {}
 
+
+# Checks to see if a twitter handle has been recycled
 async def tweet_scout_get_recycled_handles(twitter_handle):
     try:
         querystring = {'link': twitter_handle}
         headers = {'Accept': 'application/json', 'ApiKey': TWEET_SCOUT_KEY}
         url = 'https://api.tweetscout.io/v2/handle-history'
+
         response = requests.get(url=url, headers=headers, params=querystring)
         handle_info = response.json()
+        
         if handle_info.get('message', ''):
             return {'handles_count': 1, 'previous_handles': []}
-        handles = handle_info['handles']
-        count = len(handles)
-        return {'handles_count': count, 'previous_handles': handles}
+        else:
+            handles = handle_info['handles']
+            count = len(handles)
+            return {'handles_count': count, 'previous_handles': handles}
     except Exception as e:
         migrations_logger.error(f'TweetScout get_user_info error: {e}0')
         time.sleep(TIME_TO_SLEEP)
         return {}
+    
 
+# CoinGecko scraper
 async def get_gecko_terminal_data(pool_id: str, headless=True, timeout=TIMEOUT):
-    """\n    Fetches three data points from GeckoTerminal for a given Solana pool:\n      1) \'Bundled Buy %\' (li:nth-child(2))\n      2) \'Creator\'s Token Launches\' (li:nth-child(5))\n      3) \'CoinGecko Score\' (span.text-sell.!leading-none.text-2xl)\n\n    Returns a dict with \'bundled_buy_percent\', \'creator_token_launches\', \'coingecko_score\'.\n    If a timeout occurs on any data point, returns None for that specific value.\n    """  # inserted
-    url = f'https://www.geckoterminal.com/solana/pools/{pool_id}0'
-    bundled_buy_selector = '#__next > div > main > div.flex.w-full.flex-col.gap-y-2.md\\:flex-row.md\\:gap-x-4.md\\:gap-y-0.md\\:px-4 > div.scrollbar-thin.flex.flex-col.md\\:overflow-x-hidden.md\\:overflow-y-hidden.gap-2.px-4.pt-4.md\\:px-0.w-full.shrink-0.md\\:max-w-\\[22\\.5rem\\] > div.hidden.flex-col.gap-2.md\\:flex > div.rounded.border.border-gray-800.p-4.flex.flex-col.gap-y-3 > div.flex-col.gap-y-3.flex > div.flex.scroll-mt-40.flex-col.gap-y-2.sm\\:scroll-mt-24 > ul > li:nth-child(2) > div.ml-auto.flex.shrink-0.items-center.gap-1.truncate.pl-2 > span'
-    creator_token_launches_selector = '#__next > div > main > div.flex.w-full.flex-col.gap-y-2.md\\:flex-row.md\\:gap-x-4.md\\:gap-y-0.md\\:px-4 > div.scrollbar-thin.flex.flex-col.md\\:overflow-x-hidden.md\\:overflow-y-hidden.gap-2.px-4.pt-4.md\\:px-0.w-full.shrink-0.md\\:max-w-\\[22\\.5rem\\] > div.hidden.flex-col.gap-2.md\\:flex > div.rounded.border.border-gray-800.p-4.flex.flex-col.gap-y-3 > div.flex-col.gap-y-3.flex > div.flex.scroll-mt-40.flex-col.gap-y-2.sm\\:scroll-mt-24 > ul > li:nth-child(5) > div.ml-auto.flex.shrink-0.items-center.gap-1.truncate.pl-2 > span'
+    """
+    Fetches three data points from GeckoTerminal for a given Solana pool:
+      1) 'Bundled Buy %' (li:nth-child(2))
+      2) 'Creator's Token Launches' (li:nth-child(5))
+      3) 'CoinGecko Score' (span.text-sell.!leading-none.text-2xl)
+
+    Returns a dict with 'bundled_buy_percent', 'creator_token_launches', 'coingecko_score'.
+    If a timeout occurs on any data point, returns None for that specific value.
+    """
+    url = f"https://www.geckoterminal.com/solana/pools/{pool_id}"
+
+    # CSS selectors for the three data points
+    bundled_buy_selector = (
+        "#__next > div > main > "
+        "div.flex.w-full.flex-col.gap-y-2.md\\:flex-row.md\\:gap-x-4."
+        "md\\:gap-y-0.md\\:px-4 > "
+        "div.scrollbar-thin.flex.flex-col.md\\:overflow-x-hidden."
+        "md\\:overflow-y-hidden.gap-2.px-4.pt-4.md\\:px-0."
+        "w-full.shrink-0.md\\:max-w-\\[22\\.5rem\\] > "
+        "div.hidden.flex-col.gap-2.md\\:flex > "
+        "div.rounded.border.border-gray-800.p-4.flex.flex-col.gap-y-3 > "
+        "div.flex-col.gap-y-3.flex > "
+        "div.flex.scroll-mt-40.flex-col.gap-y-2.sm\\:scroll-mt-24 > "
+        "ul > li:nth-child(2) > "
+        "div.ml-auto.flex.shrink-0.items-center.gap-1.truncate.pl-2 > span"
+    )
+    creator_token_launches_selector = (
+        "#__next > div > main > "
+        "div.flex.w-full.flex-col.gap-y-2.md\\:flex-row.md\\:gap-x-4."
+        "md\\:gap-y-0.md\\:px-4 > "
+        "div.scrollbar-thin.flex.flex-col.md\\:overflow-x-hidden."
+        "md\\:overflow-y-hidden.gap-2.px-4.pt-4.md\\:px-0."
+        "w-full.shrink-0.md\\:max-w-\\[22\\.5rem\\] > "
+        "div.hidden.flex-col.gap-2.md\\:flex > "
+        "div.rounded.border.border-gray-800.p-4.flex.flex-col.gap-y-3 > "
+        "div.flex-col.gap-y-3.flex > "
+        "div.flex.scroll-mt-40.flex-col.gap-y-2.sm\\:scroll-mt-24 > "
+        "ul > li:nth-child(5) > "
+        "div.ml-auto.flex.shrink-0.items-center.gap-1.truncate.pl-2 > span"
+    )
+
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=headless, args=['--disable-blink-features=AutomationControlled'])
-        context = await browser.new_context(user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5735.110 Safari/537.36')
+        # Launch browser in headless mode with some stealth-friendly args
+        browser = await p.chromium.launch(
+            headless=headless,
+            args=["--disable-blink-features=AutomationControlled"]
+        )
+        context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                       "AppleWebKit/537.36 (KHTML, like Gecko) "
+                       "Chrome/114.0.5735.110 Safari/537.36"
+        )
         page = await context.new_page()
+
+        # Optionally set default timeouts (milliseconds)
         page.set_default_timeout(timeout)
         page.set_default_navigation_timeout(timeout)
+
         try:
+            # Navigate to the page
             await page.goto(url, timeout=timeout)
+
+            # BUNDLED BUY %
+            try:
                 await page.wait_for_selector(bundled_buy_selector, timeout=timeout)
                 bundled_buy_percent = await page.locator(bundled_buy_selector).nth(0).inner_text()
-                migrations_logger.error(f'[{pool_id}] Timed out waiting for Bundled Buy % selector')
+            except PlaywrightTimeoutError:
+                migrations_logger.error(f"{pool_id} Timed out waiting for Bundled Buy % selector")
                 bundled_buy_percent = None
+
+            # CREATOR TOKEN LAUNCHES
+            try:
                 await page.wait_for_selector(creator_token_launches_selector, timeout=timeout)
                 creator_token_launches = await page.locator(creator_token_launches_selector).nth(0).inner_text()
-                migrations_logger.error(f'[{pool_id}] Timed out waiting for Creator\'s Token Launches selector.')
+            except PlaywrightTimeoutError:
+                migrations_logger.error(f"{pool_id} Timed out waiting for Creator's Token Launches selector.")
                 creator_token_launches = None
-            return {'bundled_buy_percent': bundled_buy_percent, 'creator_token_launches': creator_token_launches}
+
+            return {"bundled_buy_percent": bundled_buy_percent, "creator_token_launches": creator_token_launches}
+
         except PlaywrightTimeoutError:
-            pass  # postinserted
-        else:  # inserted
-            try:
-                pass  # postinserted
-            except PlaywrightTimeoutError:
-                pass  # postinserted
-        else:  # inserted
-            try:
-                pass  # postinserted
-            except PlaywrightTimeoutError:
-                pass  # postinserted
-        else:  # inserted
-            await browser.close()
-                migrations_logger.error('Timeout error on CoinGecko')
-                return {'bundled_buy_percent': None, 'creator_token_launches': None}
-            except Exception as e:
-                migrations_logger.error(f'CoinGecko scraper error: {e}0')
-                return {'bundled_buy_percent': None, 'creator_token_launches': None}
-
-async def gatekept_data(token_mint, timeout=120000, headless=False):
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=headless)
-        context = await browser.new_context(user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5735.110 Safari/537.36')
-        page = await context.new_page()
-        try:
-            await page.goto('https://gatekept.io/', wait_until='networkidle')
-            await page.get_by_placeholder('Enter A Solana Token').fill(token_mint)
-            await asyncio.sleep(3)
-            await page.locator('.search-button').click()
-            await page.wait_for_function('\n                () => {\n                    const el = document.querySelector(\"p.cabal-chance-value\");\n                    return el && el.textContent.trim() !== \"Loading...\";\n                }\n                ', timeout=timeout)
-            cabal_chance = await page.inner_text('p.cabal-chance-value')
-            fake_volume = await page.inner_text('div.meta-value-container')
-            return (cabal_chance, fake_volume)
-        except TimeoutError as e:
-            pass  # postinserted
-        else:  # inserted
-            await browser.close()
-            migrations_logger.error('GateKept timeout occurred:')
-            return (None, None)
+            migrations_logger.error("Timeout error on CoinGecko")
+            return {"bundled_buy_percent": None, "creator_token_launches": None}
+        
         except Exception as e:
-            migrations_logger.error('GateKept other error occurred:')
-            return (None, None)
+            migrations_logger.error(f"CoinGecko scraper error: {e}")
+            return {"bundled_buy_percent": None, "creator_token_launches": None}
 
+        finally:
+            await browser.close()
+
+
+# Get the "Chance of Cabal Coin" and Fake Volume from GateKept
+async def gatekept_data(token_mint, timeout=120_000, headless=False):
+
+    async with async_playwright() as p:
+       
+       # Launch browser in headless mode
+        browser = await p.chromium.launch(headless=headless)
+
+        context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                       "AppleWebKit/537.36 (KHTML, like Gecko) "
+                       "Chrome/114.0.5735.110 Safari/537.36"
+        )
+        page = await context.new_page()
+
+        # page = await browser.new_page()
+        # await page.set_extra_http_headers({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"}) # -> set custom headers to mimick normal browser
+
+        try:
+            # Go to GateKept
+            await page.goto("https://gatekept.io/", wait_until="networkidle")
+
+            # Fill the input using the placeholder text and click the "Search" button
+            await page.get_by_placeholder("Enter A Solana Token").fill(token_mint)
+
+            await asyncio.sleep(3)
+            await page.locator(".search-button").click()
+
+            # Wait for the "Loading" text in p.cabal-chance-value to finish
+            await page.wait_for_function(
+                """
+                () => {
+                    const el = document.querySelector("p.cabal-chance-value");
+                    return el && el.textContent.trim() !== "Loading...";
+                }
+                """,
+                timeout=timeout
+            )
+
+            # Once finished loading, get the value from p.cabal-chance-value
+            cabal_chance = await page.inner_text("p.cabal-chance-value")
+
+            # Next, wait for the container with class="meta-value-container" to appear
+            # await page.wait_for_selector("div.meta-value-container", timeout=timeout)
+            fake_volume = await page.inner_text("div.meta-value-container")
+
+            return cabal_chance, fake_volume
+
+        except TimeoutError as e:
+            migrations_logger.error("GateKept timeout occurred:")
+            return None, None
+        
+        except Exception as e:
+            migrations_logger.error("GateKept other error occurred:")
+            return None, None
+
+        finally:
+            # Ensure the browser is always closed
+            await browser.close()
+
+
+# Function to get the RugCheck.xyz authentication message
 async def generate_rugcheck_signature():
-    """\n    Generates the signature and wallet address for Rugcheck authentication,\n    and stores them in the .env file as RUGCHECK_SIGNATURE and WALLET_ADDRESS.\n    """  # inserted
-    private_key_base58 = os.getenv('PRIVATE_KEY')
-    if not private_key_base58:
-        migrations_logger.error('Private key not found in .env file.')
-        return
-    try:
-        private_key_bytes = base58.b58decode(private_key_base58)
-    except Exception as e:
-        migrations_logger.error('Invalid private key format. Ensure it\'s base58-encoded.')
-        return
-    keypair = Keypair.from_bytes(private_key_bytes)
+    """
+    Generates the signature and wallet address for Rugcheck authentication,
+    and stores them in the .env file as RUGCHECK_SIGNATURE and WALLET_ADDRESS.
+    """
+    # private_key_base58 = os.getenv('PRIVATE_KEY')
+    # if not private_key_base58:
+    #     migrations_logger.error('Private key not found in .env file.')
+    #     return
+    # try:
+    #     private_key_bytes = base58.b58decode(private_key_base58)
+    # except Exception as e:
+    #     migrations_logger.error('Invalid private key format. Ensure it\'s base58-encoded.')
+    #     return
+    # keypair = Keypair.from_bytes(private_key_bytes)
+
+    # Fetch the private key to sign the challenge message
+    keypair = PRIVATE_KEY
+    
+    # Challenge message received from Rugcheck.xyz
     challenge_message = 'Please sign this message for authentication.'
     message_bytes = challenge_message.encode('utf-8')
     signature = keypair.sign_message(message_bytes)
+
+    # Convert the Signature object to raw bytes and then base64 encode it
     signature_base64 = base64.b64encode(bytes(signature)).decode('utf-8')
     wallet_address = str(keypair.pubkey())
-    migrations_logger.info(f'Wallet Address: {wallet_address}0')
-    migrations_logger.info(f'Signature: {signature_base64}0')
-    return (signature_base64, wallet_address)
 
+    # Log and return the result
+    migrations_logger.info(f'Wallet Address: {wallet_address}')
+    migrations_logger.info(f'Signature: {signature_base64}')
+    return signature_base64, wallet_address
+
+
+# Fetches token details from RugCheck.xyz
 async def fetch_token_details(httpx_client: httpx.AsyncClient, token_mint_address: str):
-    """\n    Fetches token details from the Rugcheck \"Tokens\" endpoint.\n\n    Args:\n        httpx_client (httpx.AsyncClient): The async HTTP client instance from main.py.\n        token_mint_address (str): The token mint address to query.\n\n    Returns:\n        dict: The response from the Rugcheck API containing token details.\n    """  # inserted
+    """
+    Fetches token details from the Rugcheck "Tokens" endpoint.
+    Args:
+        httpx_client (httpx.AsyncClient): The async HTTP client instance from main.py.
+        token_mint_address (str): The token mint address to query.
+    Returns:
+        dict: The response from the Rugcheck API containing token details.
+    """
+    
+    # Return None is no RugCheck signature or wallet address
     if not SIGNATURE or not WALLET_ADDRESS:
         migrations_logger.error('RUGCHECK_SIGNATURE or WALLET_ADDRESS not found in environment. Run generate_rugcheck_signature first.')
-        return
-    tokens_url = f'https://api.rugcheck.xyz/v1/tokens/{token_mint_address}0/report'
-    return 'Bearer '
-    headers = {'Authorization': f'{SIGNATURE}0', 'Content-Type': 'application/json'}
+        return None
+    
+    # Rugcheck Tokens endpoint
+    tokens_url = f'https://api.rugcheck.xyz/v1/tokens/{token_mint_address}/report'
+    
+    # Prepare headers for the request
+    headers = {'Authorization': f'{SIGNATURE}', 'Content-Type': 'application/json'}
+    
+    # Make the GET request using the provided async client
     try:
         response = await httpx_client.get(tokens_url, headers=headers)
         if response.status_code == 200:
             return response.json()
-        migrations_logger.error(f'Failed to fetch token details: {response.status_code} {response.text}0')
-        return
+        else:
+            migrations_logger.error(f'Failed to fetch token details: {response.status_code} {response.text}0')
+            return None
     except Exception as e:
-        migrations_logger.error(f'Error during API call: {str(e)}0')
+        migrations_logger.error(f'Error during API call: {str(e)}')
         return
+
 
 async def fetch_twitter_from_ipfs(httpx_client: httpx.AsyncClient, mint_address: str, token_metadata_uri: str):
     """\n    Fetches the Twitter address from the token\'s metadata on IPFS.\n\n    Args:\n        httpx_client (httpx.AsyncClient): The async HTTP client instance from main.py.\n        mint_address (str): The mint address of the token.\n        token_metadata_uri (str): The IPFS URI from the token metadata.\n\n    Returns:\n        str: The Twitter address if found, or a message indicating it\'s not available.\n    """  # inserted
