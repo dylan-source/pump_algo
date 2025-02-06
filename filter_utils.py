@@ -55,7 +55,7 @@ async def tweet_scout_get_score(twitter_handle):
     # response: {'score': 7}
     try:
         headers = {'Accept': 'application/json', 'ApiKey': TWEET_SCOUT_KEY}
-        url = f'https://api.tweetscout.io/v2/score/{twitter_handle}0'
+        url = f'https://api.tweetscout.io/v2/score/{twitter_handle}'
         
         response = requests.get(url=url, headers=headers)
         score = response.json()
@@ -66,27 +66,30 @@ async def tweet_scout_get_score(twitter_handle):
         time.sleep(TIME_TO_SLEEP)
         return {}
 
+
+# Using TweetScout get the top followers of a Twitter handle
 async def tweet_scout_get_top_followers(twitter_handle):
     try:
         headers = {'Accept': 'application/json', 'ApiKey': TWEET_SCOUT_KEY}
-        url = f'https://api.tweetscout.io/v2/top-followers/{twitter_handle}0'
+        url = f'https://api.tweetscout.io/v2/top-followers/{twitter_handle}'
         response = requests.get(url=url, headers=headers)
         score = response.json()
         return score
     except Exception as e:
-        migrations_logger.error(f'TweetScout get_top_followers error: {e}0')
+        migrations_logger.error(f'TweetScout get_top_followers error: {e}')
         time.sleep(TIME_TO_SLEEP)
         return []
+
 
 async def tweet_scout_get_user_info(twitter_handle):
     try:
         headers = {'Accept': 'application/json', 'ApiKey': TWEET_SCOUT_KEY}
-        url = f'https://api.tweetscout.io/v2/info/{twitter_handle}0'
+        url = f'https://api.tweetscout.io/v2/info/{twitter_handle}'
         response = requests.get(url=url, headers=headers)
         user_info = response.json()
         return user_info
     except Exception as e:
-        migrations_logger.error(f'TweetScout get_user_info error: {e}0')
+        migrations_logger.error(f'TweetScout get_user_info error: {e}')
         time.sleep(TIME_TO_SLEEP)
         return {}
 
