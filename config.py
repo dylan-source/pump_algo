@@ -1,14 +1,16 @@
 import os
 import sys
+import getpass
 import logging
 import base58
 from dotenv import load_dotenv
+from cryptography.fernet import Fernet
 from solders.pubkey import Pubkey     # type: ignore
 from solders.keypair import Keypair   # type: ignore
 
 load_dotenv()
 
-# Load environment varialbes
+# Load remaining environment varialbes
 WS_URL = os.getenv('WS_URL', '')
 RPC_URL = os.getenv('RPC_URL', '')
 METIS_RPC_URL = os.getenv('METIS_RPC_URL', '')
@@ -20,10 +22,6 @@ TWEET_SCOUT_KEY = os.getenv('TWEET_SCOUT_API_KEY')
 # Define the CSVs to save files
 CSV_MIGRATIONS_FILE = 'migration_data.csv'
 CSV_TRADES_FILE = 'trade_data.csv'
-
-# Import and encode the private key
-PRIVATE_KEY_RAW = os.getenv('PRIVATE_KEY', '')
-PRIVATE_KEY = Keypair.from_bytes(base58.b58decode(PRIVATE_KEY_RAW))
 
 # Define trading parameters
 STOPLOSS = 0.25
@@ -118,3 +116,30 @@ httpx_logger = logging.getLogger('httpx')
 httpx_logger.setLevel(logging.WARNING)
 httpcore_logger = logging.getLogger('httpcore')
 httpcore_logger.setLevel(logging.WARNING)
+
+
+#---------------------------
+#     DECRYPT PRIVATE KEY
+#---------------------------
+
+# Retrieve the encrypted private key from your .env file.
+encrypted_private_key = os.getenv("ENCRYPTED_PRIVATE_KEY")
+if not encrypted_private_key:
+    raise Exception("ENCRYPTED_PRIVATE_KEY not set in .env.")
+
+# Retrieve the master encryption key from a secure source - in production, use a secure vault or prompting the user.
+# encryption_key = os.getenv("ENCRYPTION_KEY")  -> relevant if Master Encryption Key is stored in .env or secure vault (e.g AWS Secrets Manager)
+# if not encryption_key:
+encryption_key = getpass.getpass("Enter your master encryption key: ")
+if not encryption_key:
+    raise Exception("Master encryption key is required.")
+
+# Decrypt the private key
+cipher = Fernet(encryption_key.encode())
+decrypted_private_key = cipher.decrypt(encrypted_private_key.encode()).decode()
+
+# Convert the decrypted base58-encoded private key into bytes and load it into Keypair.
+PRIVATE_KEY = Keypair.from_bytes(base58.b58decode(decrypted_private_key))
+
+# At this point, PRIVATE_KEY is ready to be used with solana.py.
+trade_logger.info("Private key successfully decrypted and loaded.")

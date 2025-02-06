@@ -7,7 +7,7 @@ METIS_RPC_URL = ""
 # Trading wallet details
 WALLET_ADDRESS = ""
 COLD_WALLET_ADDRESS = ""
-PRIVATE_KEY = ""
+ENCRYPTED_PRIVATE_KEY = ""
 
 # Rugcheck API signature
 RUGCHECK_SIGNATURE = ""

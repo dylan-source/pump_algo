@@ -6,3 +6,5 @@ __pycache__
 migrations.log
 trade.log
 .venv
+/Scripts
+trade_data.csv
