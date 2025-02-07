@@ -8,3 +8,4 @@ trade.log
 .venv
 /Scripts
 trade_data.csv
+migration_data.csv

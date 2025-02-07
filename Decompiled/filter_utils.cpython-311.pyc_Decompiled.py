@@ -1,3 +1,8 @@
+# Decompiled with PyLingual (https://pylingual.io)
+# Internal filename: /Users/dylanmartens/Documents/Coding/Pump sniping/Feb_03/filter_utils.py
+# Bytecode version: 3.11a7e (3495)
+# Source timestamp: 2025-01-30 17:56:43 UTC (1738259803)
+
 import asyncio
 import os
 from solders.keypair import Keypair
@@ -13,56 +18,40 @@ import requests
 from config import WALLET_ADDRESS, SIGNATURE, TWEET_SCOUT_KEY, TIME_TO_SLEEP, TIMEOUT, migrations_logger
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
 
-# TweetScout endpoint to get twitter ID from the username. The also have the reverse endpoing (get handle from ID)
-# https://api.tweetscout.io/v2/handle-to-id/{user_handle}
-
-# Check to see if DexScreener enhanced listing has been paid 
 async def get_dex_paid(httpx_client, token_mint_address):
     try:
-        response = await httpx_client.get(f'https://api.dexscreener.com/orders/v1/solana/{token_mint_address}', headers={})
+        response = await httpx_client.get(f'https://api.dexscreener.com/orders/v1/solana/{token_mint_address}0', headers={})
         data = response.json()
-    
         if not data:
-            return False, data
-        return True, data
-    
+            return (False, data)
+        return (True, data)
     except Exception as e:
-        migrations_logger.error(f'Dexscreener error: {e}')
+        migrations_logger.error(f'Dexscreener error: {e}0')
         time.sleep(TIME_TO_SLEEP)
-        return None, None
+        return (None, None)
 
-
-# Get number and breakdown of followers
 async def tweet_scout_get_followers(twitter_handle):
-    # response: {'followers_count': 7, 'influencers_count': 0, 'projects_count': 0, 'venture_capitals_count': 0, 'user_protected': False}
     try:
         headers = {'Accept': 'application/json', 'ApiKey': TWEET_SCOUT_KEY}
         params = {'user_handle': twitter_handle}
         url = 'https://api.tweetscout.io/v2/followers-stats'
-
         response = requests.get(url=url, headers=headers, params=params, timeout=30)
         data = response.json()
         return data
-    
     except Exception as e:
-        migrations_logger.error(f'TweetScout get_followers error: {e}')
+        migrations_logger.error(f'TweetScout get_followers error: {e}0')
         time.sleep(TIME_TO_SLEEP)
         return {}
 
-
-# Get the TweetScout score
 async def tweet_scout_get_score(twitter_handle):
-    # response: {'score': 7}
     try:
         headers = {'Accept': 'application/json', 'ApiKey': TWEET_SCOUT_KEY}
         url = f'https://api.tweetscout.io/v2/score/{twitter_handle}0'
-        
         response = requests.get(url=url, headers=headers)
         score = response.json()
         return score
-    
     except Exception as e:
-        migrations_logger.error(f'TweetScout get_score error: {e}')
+        migrations_logger.error(f'TweetScout get_score error: {e}0')
         time.sleep(TIME_TO_SLEEP)
         return {}
 

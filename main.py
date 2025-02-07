@@ -6,13 +6,16 @@ import ssl
 import websockets
 from datetime import datetime, timezone
 import redis.asyncio as redis
+from pprint import pprint
 
 from config import MIGRATION_ADDRESS, migrations_logger, RPC_URL, SOL_MINT, TRADE_AMOUNT_SOL, SOL_DECIMALS, WALLET_ADDRESS, PRIVATE_KEY, HTTPX_TIMEOUT
 from listen_to_raydium_migration import listen_for_migrations
 #from trade_utils import get_jupiter_quote, execute_swap, get_transaction_status, tokens_purchased, get_price
 from solana.rpc.async_api import AsyncClient
 from storage_utils import parse_migrations_to_save, store_trade_data, fetch_trade_data
-# from filter_utils import process_new_tokens
+from filter_utils import process_new_tokens
+
+
 
 time_to_sleep = 5
 
@@ -33,10 +36,13 @@ async def consume_queue(queue, httpx_client):
             migrations_logger.info(f"Consumer triggered with no token")
 
         # Run the various filters and save the info for future analysis
-        # filters_result, data_to_save = await process_new_tokens(httpx_client=httpx_client, token_address=token_address, pair_address=pair_address)
+        filters_result, data_to_save = await process_new_tokens(httpx_client=httpx_client, token_address=token_address, pair_address=pair_address)
         
+        pprint(filters_result)
+        pprint(data_to_save)
+
         # Save results to a CSV for further analysis
-        # await parse_migrations_to_save(token_address, pair_address, data_to_save, filters_result)
+        await parse_migrations_to_save(token_address=token_address, pair_address=pair_address, data_to_save=data_to_save, filters_result=filters_result)
 
 async def main():
     

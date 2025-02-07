@@ -63,6 +63,7 @@ JUPITER_PRICE_URL = 'https://api.jup.ag/price/v2'
 MIGRATION_ADDRESS = '39azUYFWPz3VHgKCf3VChUwbpURdCHRxjWVowf5jUJjg'
 METADATA_PROGRAM_ID = Pubkey.from_string('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s')
 JUPITER_V6_ADDRESS = 'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4'
+RAYDIUM_ADDRESS = '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1'
 
 #----------------------
 #   DEFINE LOGGER
