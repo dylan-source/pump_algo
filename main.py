@@ -38,13 +38,13 @@ async def consume_queue(queue, httpx_client):
         print(token_address)
 
         # Run the various filters and save the info for future analysis
-        # filters_result, data_to_save = await process_new_tokens(httpx_client=httpx_client, token_address=token_address, pair_address=pair_address)
+        filters_result, data_to_save = await process_new_tokens(httpx_client=httpx_client, token_address=token_address, pair_address=pair_address)
         
-        # pprint(filters_result)
-        # pprint(data_to_save)
+        pprint(filters_result)
+        pprint(data_to_save)
 
         # Save results to a CSV for further analysis
-        # await parse_migrations_to_save(token_address=token_address, pair_address=pair_address, data_to_save=data_to_save, filters_result=filters_result)
+        await parse_migrations_to_save(token_address=token_address, pair_address=pair_address, data_to_save=data_to_save, filters_result=filters_result)
 
 async def main():
     
