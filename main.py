@@ -8,14 +8,12 @@ from datetime import datetime, timezone
 import redis.asyncio as redis
 from pprint import pprint
 
-from config import MIGRATION_ADDRESS, migrations_logger, RPC_URL, SOL_MINT, TRADE_AMOUNT_SOL, SOL_DECIMALS, WALLET_ADDRESS, PRIVATE_KEY, HTTPX_TIMEOUT
+from config import MIGRATION_ADDRESS, migrations_logger, RPC_URL, SOL_MINT, SOL_AMOUNT_LAMPORTS, BUY_SLIPPAGE, SELL_SLIPPAGE, TRADE_AMOUNT_SOL, SOL_DECIMALS, WALLET_ADDRESS, PRIVATE_KEY, HTTPX_TIMEOUT
 from listen_to_raydium_migration import listen_for_migrations
-#from trade_utils import get_jupiter_quote, execute_swap, get_transaction_status, tokens_purchased, get_price
+from trade_utils import trade_wrapper, startup_sell
 from solana.rpc.async_api import AsyncClient
 from storage_utils import parse_migrations_to_save, store_trade_data, fetch_trade_data
 from filter_utils import process_new_tokens
-
-
 
 time_to_sleep = 5
 
@@ -27,7 +25,7 @@ redis_client_trades = redis.Redis(host='localhost', port=6379, db=1)
 
 # Create a consumer queue to take new tokens and execute trade logic
 async def consume_queue(queue, httpx_client):
-
+    
     while True:
         
         # Get new token address from the queue. Break if no signal
@@ -38,28 +36,30 @@ async def consume_queue(queue, httpx_client):
         # Run the various filters and save the info for future analysis
         filters_result, data_to_save = await process_new_tokens(httpx_client=httpx_client, token_address=token_address, pair_address=pair_address)
         
-        pprint(filters_result)
-        pprint(data_to_save)
+        # pprint(data_to_save)
 
         # Save results to a CSV for further analysis
         await parse_migrations_to_save(token_address=token_address, pair_address=pair_address, data_to_save=data_to_save, filters_result=filters_result)
 
+        # Force trade for testing
+        filters_result = True
+        if filters_result:
+            await trade_wrapper(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, risky_address=token_address, 
+                                sol_address=SOL_MINT, trade_amount=SOL_AMOUNT_LAMPORTS, buy_slippage=BUY_SLIPPAGE, sell_slippage=SELL_SLIPPAGE)
+
+
 async def main():
     
-    # Create the queue to share between the producer (monitor_transactions) and consumer (consume_queue)
+    # Check to see if any start up tokens that need to be sold
+    await startup_sell(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, sell_slippage=SELL_SLIPPAGE)
+
+    # Create the queue to share between the producer (monitor_transactions) and consumer (consume_queue) tasks
     queue = asyncio.Queue()
      
     # Run both the monitoring and consuming tasks concurrently
     producer_task = asyncio.create_task(listen_for_migrations(redis_client_tokens=redis_client_tokens, queue=queue))
     consumer_task = asyncio.create_task(consume_queue(queue=queue, httpx_client=httpx_client))
     await asyncio.gather(producer_task, consumer_task)
-
-    # Testing
-    # token_address_1 = "G2ZebU6Qh222gFoq6fKuMiMPNTqXgZdScYX95yJVpump"
-    # await queue.put((token_address_1, "213vwQsv1Lmnj8D4wLFvwsemucH243Ei7YEouhrBSB2o"))
-    # consumer_task = asyncio.create_task(consume_queue(queue=queue, httpx_client=httpx_client))
-    # await asyncio.gather(consumer_task)
-
 
 if __name__ == "__main__":
     asyncio.run(main())

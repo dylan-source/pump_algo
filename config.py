@@ -52,7 +52,7 @@ PRIORITY_FEE_MAX = 1000000
 
 # Define slippage dictionaries
 BUY_SLIPPAGE = {'MIN': 2000, 'MAX': 3000, 'INCREMENTS': 500}
-SELL_SLIPPAGE = {'MIN': 2000, 'MAX': 4000, 'INCREMENTS': 500}
+SELL_SLIPPAGE = {'MIN': 2000, 'MAX': 4500, 'INCREMENTS': 500}
 
 # Load the Jupiter URLs
 JUPITER_QUOTE_URL = 'https://api.jup.ag/swap/v1/quote'

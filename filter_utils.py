@@ -801,7 +801,7 @@ async def process_new_tokens(httpx_client, token_address, pair_address):
     if metadata is not None:
         symbol = metadata.get('symbol', '')
         name = metadata.get('name', '')
-        migrations_logger.info(f'Symbol: {symbol} - Name: {name}0')
+        migrations_logger.info(f'Symbol: {symbol} - Name: {name}')
     else: 
         migrations_logger.error(f'Rugcheck error for: {token_address}')
 
