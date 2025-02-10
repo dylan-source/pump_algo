@@ -73,6 +73,7 @@ async def parse_migrations_to_save(token_address, pair_address, data_to_save, fi
     risks = data_to_save.get('risks', '')
     holder_metrics = data_to_save.get('holder_metrics', '')
 
+     
     # Unpack the details of each dictionary
     results = {
         'timestamp': timestamp_str, 
@@ -89,6 +90,8 @@ async def parse_migrations_to_save(token_address, pair_address, data_to_save, fi
         'ipfs_url': metadata.get('ipfs_url', 0), 
         'twitter_url': metadata.get('twitter_url', 0), 
         'twitter_handle': metadata.get('twitter_handle', 0), 
+        'website_url': metadata.get('website_url', 0), 
+        'website_valid': metadata.get('website_valid', 0), 
         'telegram_url': metadata.get('telegram_url', 0), 
         'image_url': metadata.get('image_url', 0), 
 
