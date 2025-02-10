@@ -513,8 +513,6 @@ async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, r
             case _:
                 trade_logger.error(f"Priority fees too high or swap error for {risky_address} - {risky_amount} - {sell_slippage}")
         trade_logger.info(f"Priority fee to be applied: {recommended_priority_fee}")
-        print(f"Priority fee to be applied: {recommended_priority_fee}")
-
 
         # Loop until successful if simulation error is received
         while True:
@@ -549,7 +547,7 @@ async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, r
                 elif (sell_confirm_result is None or sell_confirm_result["Status"] != "Ok") and sell_slippage <= SELL_SLIPPAGE["MAX"]:
                     trade_logger.error(f"Sell trade failed - {risky_address} - {risky_amount} - {sell_slippage}")
                     sell_slippage = sell_slippage + SELL_SLIPPAGE["INCREMENTS"]
-                    trade_logger.error(f"Increasing sell slippage to: {sell_slippage}")
+                    trade_logger.info(f"Increasing sell slippage to: {sell_slippage}")
                     sell_loop_count += 1
 
                     # Create a priorityFees loop to get an updated priority fees dictionary
@@ -715,4 +713,3 @@ async def trade_wrapper(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, 
                 await asyncio.sleep(MONITOR_PRICE_DELAY)
 
         
-
