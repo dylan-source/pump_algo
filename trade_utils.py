@@ -224,12 +224,7 @@ async def get_recent_prioritization_fees(httpx_client: httpx.AsyncClient, url:st
 
 # Confirm if the transaction was successful
 async def confirm_tx(rpc_client, signature, commitment=Finalized):
-
-    # If simulation fails due to exceeded slippage a custom error is returned by Jupiter
-    # if isinstance(signature, dict):
-    #     # print("Confirm_tx functon error: ", signature["Error"]["InstructionError"][0]["Custom"])
-    #     return signature
-    
+   
     # If swapTransaction fails the execute_swap function returns None
     if signature is None:
         return None
@@ -542,7 +537,6 @@ async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, r
                 continue
 
             else:
-            
                 sell_confirm_result = await confirm_tx(rpc_client=rpc_client, signature=sell_swap_response, commitment=Finalized)
 
                 # If confirmation failed and max slippage is reached then return False
@@ -562,6 +556,7 @@ async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, r
                     priority_fees_loop_count = 0
                     while True:
                         priority_fee_dict = await get_recent_prioritization_fees(httpx_client, RPC_URL)
+                        print("Priority fees loop: ", priority_fee_dict)
                         if priority_fee_dict is None:
                             trade_logger.error(f"Sell function - priority fees not found - retrying for the {priority_fees_loop_count} time")
                             
@@ -579,7 +574,6 @@ async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, r
 
                 # If successful then get the trasnaction details and save the result
                 else:
-                    # Once confirmed provide the tx link and get the transaction details
                     trade_logger.info(f"Transaction sent: https://solscan.io/tx/{sell_swap_response}")
                     sell_tx_result = await get_transaction_details(rpc_client=rpc_client, signature=sell_swap_response, wallet_address=WALLET_ADDRESS, input_mint=risky_address, output_mint=SOL_MINT)
                     
