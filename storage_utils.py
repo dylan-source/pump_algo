@@ -173,7 +173,7 @@ async def write_migrations_to_csv(data_dict):
         if not file_exists:
             writer.writeheader()
         writer.writerow(data_dict)
-    migrations_logger.info('Saved new token to csv')
+    migrations_logger.info('Saved new token to migrations csv')
 
 
 # Save trade data to a csv
