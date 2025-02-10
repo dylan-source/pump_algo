@@ -72,24 +72,42 @@ async def parse_migrations_to_save(token_address, pair_address, data_to_save, fi
     metadata = data_to_save.get('metadata', '')
     risks = data_to_save.get('risks', '')
     holder_metrics = data_to_save.get('holder_metrics', '')
-    
+
     # Unpack the details of each dictionary
     results = {
         'timestamp': timestamp_str, 
         'token_address': token_address, 
         'pair_address': pair_address, 
+
+        # Rugcheck token metadata
         'name': metadata.get('name', ''), 
         'symbol': metadata.get('symbol', ''), 
         'description': metadata.get('description', ''), 
         'ipfs_description': metadata.get('ipfs_description'), 
         'creator': metadata.get('creator', ''), 
         'decimals': metadata.get('decimals', 0), 
-        'telegram_url': risks.get('score', 0), 
-        'total_pct_top_10': holder_metrics.get('total_pct_top_5', 0), 
+        'ipfs_url': metadata.get('ipfs_url', 0), 
+        'twitter_url': metadata.get('twitter_url', 0), 
+        'twitter_handle': metadata.get('twitter_handle', 0), 
+        'telegram_url': metadata.get('telegram_url', 0), 
+        'image_url': metadata.get('image_url', 0), 
+
+        # Unpack Rugcheck risks
+        'risks': risks.get('risks', 0), 
+        'score': risks.get('score', 0), 
+
+        # Unpack Rugcheck holder analysis
+        'total_pct_top_5': holder_metrics.get('total_pct_top_5', 0), 
+        'total_pct_top_10': holder_metrics.get('total_pct_top_10', 0), 
         'total_pct_top_20': holder_metrics.get('total_pct_top_20', 0), 
-        'total_pct_insiders': data_to_save.get('is_dex_paid_parsed', 0), 
-        'is_dex_paid_raw': data_to_save.get('is_dex_paid_raw', 0), 
-        'filters_result': filters_result
+        'total_pct_insiders': holder_metrics.get('total_pct_insiders', 0), 
+
+        # Get DexScreener resutls
+        'is_dexscreener_paid_parsed': data_to_save.get('is_dex_paid_parsed', 0), 
+        'is_dexscreener_paid_raw': data_to_save.get('is_dex_paid_raw', 0), 
+
+        # Do we execute the trade or not - what is the result of the trade filters?
+        'execute_trade': filters_result
         }
     
     # Save the results to a csv
