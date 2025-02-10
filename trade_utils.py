@@ -645,6 +645,7 @@ async def execute_buy(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, re
 
             elif (confirm_result is None or confirm_result["Status"] != "Ok") and buy_slippage > BUY_SLIPPAGE["MAX"]:
                 trade_logger.info(f"Maximum slippage reached: {buy_slippage}")
+                trade_logger.info(f"Buy slippage too high for {risky_address} - {trade_amount} - {buy_slippage}")
                 return False
         
         # # If the simulation fails due to slippage (buy_swap_response is then a dictionary of the error codes) - increase the slippage and try again
