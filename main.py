@@ -41,11 +41,7 @@ async def consume_queue(queue, httpx_client):
 
         # Force trade for testing
         filters_result = True
-        # if filters_result:
-        #     await trade_wrapper(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, risky_address=token_address, 
-        #                         sol_address=SOL_MINT, trade_amount=SOL_AMOUNT_LAMPORTS, buy_slippage=BUY_SLIPPAGE, sell_slippage=SELL_SLIPPAGE)
         if filters_result:
-            # schedule it as a concurrent task.
             asyncio.create_task(
                 trade_wrapper(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, risky_address=token_address, 
                     sol_address=SOL_MINT, trade_amount=SOL_AMOUNT_LAMPORTS, buy_slippage=BUY_SLIPPAGE, sell_slippage=SELL_SLIPPAGE)

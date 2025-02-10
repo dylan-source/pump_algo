@@ -834,6 +834,9 @@ async def trade_filters(risks, holder_metrics, is_dex_paid_parsed):
         - twitter_handles_count: [0,1] -> paused for now
     """
 
+    if risks is None or holder_metrics is None:
+        return False
+
     # Count how many risks there are after filtering out default pump.fun risks
     irrelevant_risks = ['Large Amount of LP Unlocked', 'Low Liquidity', 'Low amount of LP Providers']
     relevant_risks = [risk for risk in risks['risks'] if risk not in irrelevant_risks]

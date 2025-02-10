@@ -518,6 +518,7 @@ async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, r
             case _:
                 trade_logger.error(f"Priority fees too high or swap error for {risky_address} - {risky_amount} - {sell_slippage}")
         trade_logger.info(f"Priority fee to be applied: {recommended_priority_fee}")
+        print(f"Priority fee to be applied: {recommended_priority_fee}")
 
 
         # Loop until successful if simulation error is received
@@ -533,7 +534,7 @@ async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, r
                 trade_logger.info(f"Increasing sell slippage to: {sell_slippage}")
                 continue
             elif isinstance(sell_swap_response, dict) and sell_slippage > SELL_SLIPPAGE["MAX"]:
-                trade_logger.info(f"Maximum slippage reached: {sell_slippage}")
+                trade_logger.info(f"Maximum sell slippage reached: {sell_slippage}")
                 trade_logger.info(f"Sleeping for {SELL_SLIPPAGE_DELAY} seconds and then retrying")
 
                 await asyncio.sleep(30)
@@ -544,12 +545,18 @@ async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, r
             
                 sell_confirm_result = await confirm_tx(rpc_client=rpc_client, signature=sell_swap_response, commitment=Finalized)
 
-                # If the trade fails, log it and try again with a high priority fee                 
-                if sell_confirm_result is None or sell_confirm_result["Status"] != "Ok":
+                # If confirmation failed and max slippage is reached then return False
+                if (sell_confirm_result is None or sell_confirm_result["Status"] != "Ok") and sell_slippage > SELL_SLIPPAGE["MAX"]:
+                    trade_logger.info(f"Maximum sell slippage reached: {sell_slippage} for {risky_address}")
+                    trade_logger.info(f"Sell slippage too high for {risky_address} - {risky_amount} - {sell_slippage}")
+                    return False
+
+                # If confirmation failed, increase slippage and retry
+                elif (sell_confirm_result is None or sell_confirm_result["Status"] != "Ok") and sell_slippage <= SELL_SLIPPAGE["MAX"]:
                     trade_logger.error(f"Sell trade failed - {risky_address} - {risky_amount} - {sell_slippage}")
+                    sell_slippage = sell_slippage + SELL_SLIPPAGE["INCREMENTS"]
+                    trade_logger.error(f"Increasing sell slippage to: {sell_slippage}")
                     sell_loop_count += 1
-                    trade_logger.error(f"Sleeping for {SELL_LOOP_DELAY} seconds")
-                    time.sleep(SELL_LOOP_DELAY)
 
                     # Create a priorityFees loop to get an updated priority fees dictionary
                     priority_fees_loop_count = 0
@@ -567,9 +574,10 @@ async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, r
                             await asyncio.sleep(SELL_LOOP_DELAY)
                         else: break # break priorityFees loop if a new priority fee was received
 
-                    # Continue sellLoop
-                    continue
+                    # Break execution loop and apply new prioritization fees
+                    break
 
+                # If successful then get the trasnaction details and save the result
                 else:
                     # Once confirmed provide the tx link and get the transaction details
                     trade_logger.info(f"Transaction sent: https://solscan.io/tx/{sell_swap_response}")
@@ -620,7 +628,6 @@ async def execute_buy(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, re
         trade_logger.info(f"Buy slippage to be applied: {buy_slippage}")
         quote = await get_jupiter_quote(httpx_client, input_address=sol_address, output_address=risky_address, amount=trade_amount, slippage=buy_slippage, is_buy=True)
         buy_swap_response = await execute_swap(rpc_client=rpc_client, httpx_client=httpx_client, quote=quote, priority_fee=recommended_priority_fee)
-        # confirm_result = await confirm_tx(rpc_client=rpc_client, signature=buy_swap_response, commitment=Finalized)
         
         # If the simulation failed, increase the slippage and retry. Return False is max slippage is reached
         if isinstance(buy_swap_response, dict) and buy_slippage <= BUY_SLIPPAGE["MAX"]:
@@ -628,7 +635,7 @@ async def execute_buy(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, re
             trade_logger.info(f"Increasing buy slippage to: {buy_slippage}")
             continue
         elif isinstance(buy_swap_response, dict) and buy_slippage > BUY_SLIPPAGE["MAX"]:
-            trade_logger.info(f"Maximum slippage reached: {buy_slippage}")
+            trade_logger.info(f"Maximum slippage reached: {buy_slippage} for {risky_address}")
             return False
                 
         else:        
@@ -636,55 +643,22 @@ async def execute_buy(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, re
             # If the simulation passes then confirm the transaction
             confirm_result = await confirm_tx(rpc_client=rpc_client, signature=buy_swap_response, commitment=Finalized)
 
-            # If confirmation failed, increase slippage and retry    
+            # If confirmation failed, increase slippage and retry
             if (confirm_result is None or confirm_result["Status"] != "Ok") and buy_slippage <= BUY_SLIPPAGE["MAX"]:
                 trade_logger.error(f"Buy trade failed - {risky_address} - {trade_amount} - {buy_slippage}")
                 buy_slippage = buy_slippage + BUY_SLIPPAGE["INCREMENTS"]
                 trade_logger.error(f"Increasing buy slippage to: {buy_slippage}")
                 continue
 
+            # If confirmation failed and max slippage is reached then return False
             elif (confirm_result is None or confirm_result["Status"] != "Ok") and buy_slippage > BUY_SLIPPAGE["MAX"]:
-                trade_logger.info(f"Maximum slippage reached: {buy_slippage}")
+                trade_logger.info(f"Maximum buy slippage reached: {buy_slippage}")
                 trade_logger.info(f"Buy slippage too high for {risky_address} - {trade_amount} - {buy_slippage}")
                 return False
-        
-        # # If the simulation fails due to slippage (buy_swap_response is then a dictionary of the error codes) - increase the slippage and try again
-        # if isinstance(buy_swap_response, dict) and buy_slippage<=BUY_SLIPPAGE["MAX"]:
-        #     buy_slippage = buy_slippage + BUY_SLIPPAGE["INCREMENTS"]
-        #     trade_logger.info(f"Increasing buy slippage to: {buy_slippage}")
-        #     continue
-        
-        # # If the simulation fails due to slippage (6001 is Jupiter's slippage error code) - increase the slippage and try again
-        # if confirm_result==6001 and buy_slippage<=BUY_SLIPPAGE["MAX"]:
-        #     buy_slippage = buy_slippage + BUY_SLIPPAGE["INCREMENTS"]
-        #     trade_logger.info(f"Increasing buy slippage to: {buy_slippage}")
-        #     continue
 
-        # # If swapTransaction is None from execute_swap, the log the failed trade
-        # if confirm_result is None: # or confirm_result["Status"] != "Ok":
-        #     trade_logger.error(f"Buy trade failed - {risky_address} - {trade_amount} - {buy_slippage}")
-        #     return False
-
-        # # If the simulation or confirm_tx fail due to slippage (6001 is Jupiter's slippage error code) - increase the slippage and try again
-        # elif confirm_result["Error"] is not None and buy_slippage<=BUY_SLIPPAGE["MAX"]:
-        #     buy_slippage = buy_slippage + BUY_SLIPPAGE["INCREMENTS"]
-        #     trade_logger.info(f"Increasing buy slippage to: {buy_slippage}")
-        #     continue
-
-        # elif buy_slippage > BUY_SLIPPAGE["MAX"]:
-        # # elif isinstance(buy_swap_response, dict) and buy_slippage > BUY_SLIPPAGE["MAX"]:
-        #     trade_logger.info(f"Maximum slippage reached: {buy_slippage}")
-        #     return False
-
-        # elif confirm_result["Status"] == "Ok":
-        #     confirm_result = await confirm_tx(rpc_client=rpc_client, signature=buy_swap_response, commitment=Finalized)
-        #     if confirm_result is None or confirm_result["Status"] != "Ok":
-        #         trade_logger.error(f"Buy trade failed - {risky_address} - {trade_amount} - {buy_slippage}")
-        #         return False
-
+            # If confirmation is successful then log the transaction and return True
             else:
                 trade_logger.info(f"Transaction sent: https://solscan.io/tx/{buy_swap_response}")
-                
                 tx_result = await get_transaction_details(rpc_client=rpc_client, signature=buy_swap_response, wallet_address=WALLET_ADDRESS, input_mint=sol_address, output_mint=risky_address)
                 trades_cache_result = await store_trade_data(redis_client_trades=redis_client_trades, signature=buy_swap_response, timestamp=tx_result["timestamp"], 
                                                                 token_address=risky_address, tokens_spent=tx_result["inputMint_diff"], tokens_received=tx_result["outputMint_diff"])
@@ -748,20 +722,3 @@ async def trade_wrapper(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, 
 
         
 
-
-# if __name__ == "__main__":
-#     # Instantiate the relevant objects
-#     rpc_client = AsyncClient(RPC_URL)
-#     httpx_client = httpx.AsyncClient()
-
-#     # Test tokens
-#     USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-#     BTC_MINT = "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij"
-    
-#     # Instantiate Redis caches
-#     redis_client_tokens = redis.Redis(host='localhost', port=6379, db=0)
-#     redis_client_trades = redis.Redis(host='localhost', port=6379, db=1)
-
-#     asyncio.run(trade_wrapper(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, risky_address=BTC_MINT, 
-#                               sol_address=SOL_MINT, trade_amount=SOL_AMOUNT_LAMPORTS, buy_slippage=BUY_SLIPPAGE, sell_slippage=SELL_SLIPPAGE))
-    
