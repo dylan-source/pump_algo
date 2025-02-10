@@ -401,7 +401,7 @@ async def execute_swap(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, q
             err = simulate_resp.get("result", {}).get("value", {}).get("err")
             if err is not None:
                 trade_logger.error(f"Simulation failed: {err}")
-                trade_logger.error(f"Simulation failed: {simulate_resp}")
+                # trade_logger.error(f"Simulation failed: {simulate_resp}")
                 return {"Error": err}
             trade_logger.info("No simulation error")
 
