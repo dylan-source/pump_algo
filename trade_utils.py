@@ -27,7 +27,7 @@ from config import (RPC_URL, PRIVATE_KEY, JUPITER_QUOTE_URL, JUPITER_SWAP_URL, J
                     WALLET_ADDRESS, COLD_WALLET_ADDRESS, TIME_TO_SLEEP, PRIORITY_FEE_MULTIPLIER, METIS_RPC_URL, MAX_TRADE_TIME_MINS,
                     PRIORITY_FEE_NUM_BLOCKS, PRIORITY_FEE_MIN, PRIORITY_FEE_MAX, SOL_AMOUNT_LAMPORTS, SOL_DECIMALS, SOL_MINT, 
                     trade_logger, MIN_SOL_BALANCE, SOL_MIN_BALANCE_LAMPORTS, SELL_LOOP_DELAY, MONITOR_PRICE_DELAY, STOPLOSS, PRICE_LOOP_RETRIES,
-                    BUY_SLIPPAGE, SELL_SLIPPAGE, START_UP_SLEEP)
+                    BUY_SLIPPAGE, SELL_SLIPPAGE, START_UP_SLEEP, SELL_SLIPPAGE_DELAY)
 # from metadata_utils import fetch_token_metadata
 from storage_utils import store_trade_data, fetch_trade_data, write_trades_to_csv
 import redis.asyncio as redis
@@ -523,7 +523,7 @@ async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, r
         while True:
 
             # Execute the swap
-            trade_logger.info(f"Starting sell slippage of: {sell_slippage}")
+            trade_logger.info(f"Sell slippage to be applied: {sell_slippage}")
             sell_quote = await get_jupiter_quote(httpx_client, input_address=risky_address, output_address=SOL_MINT, amount=risky_amount, slippage=sell_slippage, is_buy=False)
             sell_swap_response = await execute_swap(rpc_client=rpc_client, httpx_client=httpx_client, quote=sell_quote, priority_fee=recommended_priority_fee)
             
@@ -533,7 +533,7 @@ async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, r
                 continue
             elif isinstance(sell_swap_response, dict) and sell_slippage > SELL_SLIPPAGE["MAX"]:
                 trade_logger.info(f"Maximum slippage reached: {sell_slippage}")
-                trade_logger.info(f"Sleeping for {sell_slippage} seconds and then retrying")
+                trade_logger.info(f"Sleeping for {SELL_SLIPPAGE_DELAY} seconds and then retrying")
 
                 await asyncio.sleep(30)
                 sell_slippage = SELL_SLIPPAGE["MAX"]
@@ -616,15 +616,15 @@ async def execute_buy(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, re
     while True:
         
         # Execute buy transaction
-        trade_logger.info(f"Starting buy slippage of: {buy_slippage}")
+        trade_logger.info(f"Buy slippage to be applied: {buy_slippage}")
         quote = await get_jupiter_quote(httpx_client, input_address=sol_address, output_address=risky_address, amount=trade_amount, slippage=buy_slippage, is_buy=True)
         buy_swap_response = await execute_swap(rpc_client=rpc_client, httpx_client=httpx_client, quote=quote, priority_fee=recommended_priority_fee)
 
-        if isinstance(buy_swap_response, dict) and buy_slippage < BUY_SLIPPAGE["MAX"]:
+        if isinstance(buy_swap_response, dict) and buy_slippage <= BUY_SLIPPAGE["MAX"]:
             buy_slippage = buy_slippage + BUY_SLIPPAGE["INCREMENTS"]
             trade_logger.info(f"Increasing buy slippage to: {buy_slippage}")
             continue
-        elif isinstance(buy_swap_response, dict) and buy_slippage >= BUY_SLIPPAGE["MAX"]:
+        elif isinstance(buy_swap_response, dict) and buy_slippage > BUY_SLIPPAGE["MAX"]:
             trade_logger.info(f"Maximum slippage reached: {buy_slippage}")
             return False
         else:
