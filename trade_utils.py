@@ -545,7 +545,7 @@ async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, r
 
                 # If the trade fails, log it and try again with a high priority fee                 
                 if sell_confirm_result is None or sell_confirm_result["Status"] != "Ok":
-                    trade_logger.error(f"Sell trade failed for SOL - {risky_address} - {risky_amount} - {sell_slippage}")
+                    trade_logger.error(f"Sell trade failed - {risky_address} - {risky_amount} - {sell_slippage}")
                     sell_loop_count += 1
                     trade_logger.error(f"Sleeping for {SELL_LOOP_DELAY} seconds")
                     time.sleep(SELL_LOOP_DELAY)
@@ -630,7 +630,7 @@ async def execute_buy(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, re
         else:
             confirm_result = await confirm_tx(rpc_client=rpc_client, signature=buy_swap_response, commitment=Finalized)
             if confirm_result is None or confirm_result["Status"] != "Ok":
-                trade_logger.error(f"Buy trade failed for SOL - {risky_address} - {trade_amount} - {buy_slippage}")
+                trade_logger.error(f"Buy trade failed - {risky_address} - {trade_amount} - {buy_slippage}")
                 return False
 
             else:

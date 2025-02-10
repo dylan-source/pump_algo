@@ -15,8 +15,6 @@ from solana.rpc.async_api import AsyncClient
 from storage_utils import parse_migrations_to_save, store_trade_data, fetch_trade_data
 from filter_utils import process_new_tokens
 
-time_to_sleep = 5
-
 # Instantiate the relevant objects
 rpc_client = AsyncClient(RPC_URL)
 httpx_client = httpx.AsyncClient(timeout=HTTPX_TIMEOUT)
@@ -60,6 +58,7 @@ async def main():
     producer_task = asyncio.create_task(listen_for_migrations(redis_client_tokens=redis_client_tokens, queue=queue))
     consumer_task = asyncio.create_task(consume_queue(queue=queue, httpx_client=httpx_client))
     await asyncio.gather(producer_task, consumer_task)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
