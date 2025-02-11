@@ -1,6 +1,6 @@
 import asyncio
 import os
-from solders.keypair import Keypair
+from solders.keypair import Keypair # type: ignore
 import base64
 import base58
 import mimetypes
@@ -573,7 +573,7 @@ async def get_ipfs_data(httpx_client: httpx.AsyncClient, token_metadata_uri: str
             }
 
     except Exception as e:
-        migrations_logger.error(f'Error fetching IPFS data: {str(e)}')
+        # migrations_logger.error(f'Error fetching IPFS data: {str(e)}')
         return {
             'ipfs_url': None, 
             'ifps_description': None, 
@@ -847,7 +847,7 @@ async def trade_filters(risks, holder_metrics, is_dex_paid_parsed):
     risk_holder_interaction_5 = relevant_risks_count * total_pct_top_5
 
     # If all conditions are met return True else False
-    if is_dex_paid_parsed == True and risk_holder_interaction_5 < 35 and total_pct_top_5 < 50:
+    if is_dex_paid_parsed==True and risk_holder_interaction_5<35 and total_pct_top_5<50:
         return True
     else:
         return False

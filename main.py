@@ -10,7 +10,7 @@ from pprint import pprint
 
 from config import MIGRATION_ADDRESS, migrations_logger, RPC_URL, SOL_MINT, SOL_AMOUNT_LAMPORTS, BUY_SLIPPAGE, SELL_SLIPPAGE, TRADE_AMOUNT_SOL, SOL_DECIMALS, WALLET_ADDRESS, PRIVATE_KEY, HTTPX_TIMEOUT
 from listen_to_raydium_migration import listen_for_migrations
-from trade_utils import trade_wrapper, startup_sell
+from trade_utils import trade_wrapper, startup_sell, get_price, get_price_jupiter
 from solana.rpc.async_api import AsyncClient
 from storage_utils import parse_migrations_to_save, store_trade_data, fetch_trade_data
 from filter_utils import process_new_tokens
@@ -31,22 +31,30 @@ async def consume_queue(queue, httpx_client):
         if token_address is None: 
             migrations_logger.info(f"Consumer triggered with no token")
 
+
+        # sol_price, usd_price = await get_price(httpx_client, token_address)
+        # print(sol_price*1000)
+        # print(usd_price*1000)
+
+        # jup_price = await get_price_jupiter(httpx_client, token_address)
+        # print(jup_price)
+        # print(jup_price*1000)
+
+
         # Run the various filters and save the info for future analysis
         filters_result, data_to_save = await process_new_tokens(httpx_client=httpx_client, token_address=token_address, pair_address=pair_address)
-        
-        # pprint(data_to_save)
 
         # Save results to a CSV for further analysis
         await parse_migrations_to_save(token_address=token_address, pair_address=pair_address, data_to_save=data_to_save, filters_result=filters_result)
 
         # Force trade for testing
         # filters_result = True
-        
+
         if filters_result:
             asyncio.create_task(
                 trade_wrapper(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, risky_address=token_address, 
                     sol_address=SOL_MINT, trade_amount=SOL_AMOUNT_LAMPORTS, buy_slippage=BUY_SLIPPAGE, sell_slippage=SELL_SLIPPAGE)
-            )
+                    )
 
 
 async def main():

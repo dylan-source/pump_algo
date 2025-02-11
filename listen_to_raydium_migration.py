@@ -1,7 +1,7 @@
 import websockets
 import asyncio
 import json
-from solders.pubkey import Pubkey
+from solders.pubkey import Pubkey   # type: ignore
 from datetime import datetime, timezone
 from config import MIGRATION_ADDRESS, WS_URL, RPC_URL, RELAY_DELAY, migrations_logger
 from storage_utils import store_token_address, fetch_token_address

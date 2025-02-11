@@ -24,17 +24,17 @@ CSV_MIGRATIONS_FILE = 'migration_data.csv'
 CSV_TRADES_FILE = 'trade_data.csv'
 
 # Define trading parameters
-STOPLOSS = 0.25
-COMMITTMENT_LEVEL = 'finalized'
-RELAY_DELAY = 15
-TIME_TO_SLEEP = 15
-TIMEOUT = 30000
-HTTPX_TIMEOUT = 10
-MAX_TRADE_TIME_MINS = 8
-SELL_LOOP_DELAY = 10
-MONITOR_PRICE_DELAY = 2
-PRICE_LOOP_RETRIES = 5
-START_UP_SLEEP = 5
+STOPLOSS = 0.05                     # trailing stoploss value
+COMMITTMENT_LEVEL = 'finalized'     # level at which sol processing occurs
+RELAY_DELAY = 15                    # time when to reconnect to websocket after it drops
+TIME_TO_SLEEP = 15                  # sleep time between api calls for filters_utils functions
+TIMEOUT = 30000                     # sleep time between api calls for filters_utils functions -> mainly for scraping functions
+HTTPX_TIMEOUT = 10                  # timeout specifically for HTTPX
+MAX_TRADE_TIME_MINS = 8             # maximum trade duration
+SELL_LOOP_DELAY = 10                # delay between api calls in execute_sell function
+MONITOR_PRICE_DELAY = 2             # length of time between Jupiter price API calls -> to prevent rate limit
+PRICE_LOOP_RETRIES = 5              # max number of times to attempt to fetch a rpice
+START_UP_SLEEP = 10                  # number of seconds after migration before attempting to buy -> often an error occurs if too soon
 
 # Define SOL constants
 SOL_DECIMALS = 9
@@ -47,12 +47,13 @@ SOL_MINT = 'So11111111111111111111111111111111111111112'
 # Define priority fee ranges
 PRIORITY_FEE_NUM_BLOCKS = 100
 PRIORITY_FEE_MULTIPLIER = 1.2
+PRIORITY_FEE_STOPLOSS_MULTIPLIER = 1.75
 PRIORITY_FEE_MIN = 30000
 PRIORITY_FEE_MAX = 500000
 
 # Define slippage dictionaries
 BUY_SLIPPAGE = {'MIN': 2000, 'MAX': 3500, 'INCREMENTS': 500}
-SELL_SLIPPAGE = {'MIN': 2500, 'MAX': 4500, 'INCREMENTS': 500}
+SELL_SLIPPAGE = {'MIN': 2500, 'MAX': 4500, 'INCREMENTS': 500, 'STOPLOSS_MIN': 3500}
 SELL_SLIPPAGE_DELAY = 5
 
 # Load the Jupiter URLs
