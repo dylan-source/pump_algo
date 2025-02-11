@@ -357,7 +357,8 @@ async def get_jupiter_quote(httpx_client:httpx.AsyncClient, input_address:str, o
 
     # Log and return the result for the best route
     if not quote_response or quote_response.get("error"):
-        trade_logger.error(f"No routes found for address: {risk_address}")
+        trade_logger.error(f"No routes found for: {risk_address}")
+        trade_logger.error(f"Quote response: {quote_response}")
         return None
     else:
         trade_logger.info(f"Routes found for address: {risk_address}")
@@ -385,6 +386,7 @@ async def execute_swap(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, q
         # swapTransaction contains the serialized instructions to execute the swap. Return none, if no instructions were found
         if not swap_transaction:
             trade_logger.error("No swapTransaction found in the response.")
+            await asyncio.sleep(5)
             return None
         
         # If swapTransaction is found, decode the swap instructions and sign the transaction
@@ -454,7 +456,7 @@ async def fetch_dexscreener_price_with_pair_id(httpx_client:httpx.AsyncClient, p
 
 
 # Fetch token price from Jupiter
-async def get_price_jupiter(client:httpx.AsyncClient, address, timeout=10):
+async def get_price(client:httpx.AsyncClient, address, timeout=10):
 
     # Cannot use vsToken and showExtraInfo. vsToken provides the derived (or market average) price
     # All prices are in USDC (unless if vsToken is used)
@@ -491,7 +493,7 @@ async def get_price_jupiter(client:httpx.AsyncClient, address, timeout=10):
         
 
 # Fetch the price from DexScreener using token address
-async def get_price(httpx_client:httpx.AsyncClient, token_address:str, chain_id:str="solana") -> float:
+async def get_price_dexscreener(httpx_client:httpx.AsyncClient, token_address:str, chain_id:str="solana") -> float:
     """
     Fetch the priceNative value from the DexScreener token-pairs API for the given chain and token.
     Returns: float: The priceNative (price relative to SOL) value as a float, or None if an error occurs.
@@ -508,7 +510,7 @@ async def get_price(httpx_client:httpx.AsyncClient, token_address:str, chain_id:
             if "priceNative" in first_pair:
                 price_native_str = first_pair["priceNative"]
                 # user_price = first_pair["priceUsd"]
-                return float(price_native_str)
+                return float(price_native_str)*10**5
             else:
                 trade_logger.error("Could not find 'priceNative' in the first pair object.")
                 return None
@@ -1191,6 +1193,8 @@ async def trade_wrapper(rpc_client: AsyncClient, httpx_client: httpx.AsyncClient
             if current_price is None:
                 trade_logger.warning(f"Unable to retrieve current price for {risky_address}. Will retry in {MONITOR_PRICE_DELAY} seconds.")
             else:
+                trade_logger.info(f"New price for {risky_address}: Current price: {current_price}. Current trailing stoploss to {stoploss_trigger}.")
+
                 # Update highest_price and trailing stoploss trigger if a new high is reached.
                 if current_price > highest_price:
                     highest_price = current_price
@@ -1207,4 +1211,4 @@ async def trade_wrapper(rpc_client: AsyncClient, httpx_client: httpx.AsyncClient
         # Wait for the monitoring delay before checking the price again.
         await asyncio.sleep(MONITOR_PRICE_DELAY)
 
-    trade_logger.info("Trade wrapper completed.")
+    trade_logger.info(f"Trade completed for {risky_address}")
