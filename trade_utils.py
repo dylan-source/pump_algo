@@ -190,12 +190,10 @@ async def get_recent_prioritization_fees(httpx_client: httpx.AsyncClient, url:st
         json_response = response.json()
 
         if json_response and "result" in json_response:
-            
             fees = [fee["prioritizationFee"] for fee in json_response["result"]]
             fees = fees[-num_blocks:]
             median = int(statistics.median(fees))
             recommended_fee = int(median * multiplier)
-            # recommended_fee = int(np.percentile(fees, 65) * multiplier)
 
             priority_fees = {
                 "recommended": recommended_fee,
@@ -214,9 +212,8 @@ async def get_recent_prioritization_fees(httpx_client: httpx.AsyncClient, url:st
 
             # Log the final priority fees dictionary
             trade_logger.info(f"Priority fees: {priority_fees}")
-
             return priority_fees
-        
+              
     except Exception as e:
         trade_logger.error(f"Error getting priority fees - {e}")
         return None
@@ -397,7 +394,7 @@ async def execute_swap(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, q
             err = simulate_resp.get("result", {}).get("value", {}).get("err")
             if err is not None:
                 trade_logger.error(f"Simulation failed: {err}")
-                trade_logger.error(f"Simulation failed: {simulate_resp}")
+                # trade_logger.error(f"Simulation failed: {simulate_resp}")
                 return {"Error": err}
             trade_logger.info("No simulation error")
 
@@ -588,74 +585,171 @@ async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, r
             
         
 # Function to execute a buy
-async def execute_buy(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, redis_client_trades:redis.Redis, risky_address:str, sol_address:str=SOL_MINT, 
-                      trade_amount:int=SOL_AMOUNT_LAMPORTS, buy_slippage:dict=BUY_SLIPPAGE):
+async def execute_buy(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, redis_client_trades:redis.Redis, risky_address:str, 
+                        sol_address:str=SOL_MINT, trade_amount:int=SOL_AMOUNT_LAMPORTS, buy_slippage:dict=BUY_SLIPPAGE):
+    
+    # Helper function to deal with errors
+    def parse_simulation_error(error_obj):
+        if isinstance(error_obj, dict) and "InstructionError" in error_obj:
+            instruction_error = error_obj["InstructionError"]
+            if isinstance(instruction_error, list) and len(instruction_error) > 1:
+                if isinstance(instruction_error[1], dict):
+                    return instruction_error[1].get("Custom")
+                elif isinstance(instruction_error[1], str):
+                    return instruction_error[1]
+        return None
 
-    # Get SOL balance in lamports and confirm if the wallet balance is greater than the minimum threshold
+    
+    # 1. Check SOL balance.
     balance_resp = await rpc_client.get_balance(Pubkey.from_string(WALLET_ADDRESS))
-    sol_value = (balance_resp.value) 
-
+    sol_value = balance_resp.value
     if sol_value <= SOL_MIN_BALANCE_LAMPORTS:
-        trade_logger.error(f"SOL balance below wallet minimum threshold - Wallet amount: {sol_value} - Trade amount: {SOL_MIN_BALANCE_LAMPORTS}")
+        trade_logger.error(f"SOL balance below threshold - Wallet: {sol_value}, Threshold: {SOL_MIN_BALANCE_LAMPORTS}")
         return False
     else:
-        trade_logger.info(f"Sufficient SOL for trade - Wallet amount: {sol_value} - Trade amount: {SOL_AMOUNT_LAMPORTS}")
+        trade_logger.info(f"Sufficient SOL for trade - Wallet: {sol_value}, Trade amount: {SOL_AMOUNT_LAMPORTS}")
 
-
-    # Get recommended priority fee - based upon last N blocks times multiplier -  do not trade is priority fee is too high/low
-    recommended_priority_fee = await get_recent_prioritization_fees(httpx_client, RPC_URL)
-    if recommended_priority_fee is None:
-        trade_logger.error("Priority fees not found")
+    # 2. Get initial priority fees and choose the starting fee level.
+    fees = await get_recent_prioritization_fees(httpx_client, RPC_URL)
+    if fees is None:
         return False
-    else:
-        recommended_priority_fee = recommended_priority_fee["recommended"]
-        trade_logger.info(f"Recommended priority fee: {recommended_priority_fee}")
+    
+    # Define the order in which we want to try fees.
+    fee_index = 0
+    fee_keys = ["recommended", "percentile_65", "percentile_75", "percentile_85"]
+    current_priority_fee = fees[fee_keys[fee_index]]
 
+    # 3. Set starting slippage.
+    current_slippage = buy_slippage["MIN"]
 
-    # Loop until successful if simulation error is received or max slippage is reached
-    buy_slippage = BUY_SLIPPAGE["MIN"]
+    # 4. Main loop: try simulation and confirmation until success or until limits are reached.
     while True:
         
-        # Execute buy transaction
-        trade_logger.info(f"Buy slippage to be applied: {buy_slippage}")
-        quote = await get_jupiter_quote(httpx_client, input_address=sol_address, output_address=risky_address, amount=trade_amount, slippage=buy_slippage, is_buy=True)
-        buy_swap_response = await execute_swap(rpc_client=rpc_client, httpx_client=httpx_client, quote=quote, priority_fee=recommended_priority_fee)
-        
-        # If the simulation failed, increase the slippage and retry. Return False is max slippage is reached
-        if isinstance(buy_swap_response, dict) and buy_slippage <= BUY_SLIPPAGE["MAX"]:
-            buy_slippage = buy_slippage + BUY_SLIPPAGE["INCREMENTS"]
-            trade_logger.info(f"Increasing buy slippage to: {buy_slippage}")
-            continue
-        elif isinstance(buy_swap_response, dict) and buy_slippage > BUY_SLIPPAGE["MAX"]:
-            trade_logger.info(f"Maximum slippage reached: {buy_slippage} for {risky_address}")
-            return False
-                
-        else:        
-            
-            # If the simulation passes then confirm the transaction
-            confirm_result = await confirm_tx(rpc_client=rpc_client, signature=buy_swap_response, commitment=Finalized)
+        # Log the current settings, get a quote from Jupiter & execute (simulate & send) the swap.
+        trade_logger.info(f"Attempting buy trade with slippage: {current_slippage}bps and priority fee: {current_priority_fee}.")
+        quote = await get_jupiter_quote(httpx_client,input_address=sol_address, output_address=risky_address, amount=trade_amount, slippage=current_slippage, is_buy=True)
+        swap_result = await execute_swap(rpc_client=rpc_client, httpx_client=httpx_client, quote=quote, priority_fee=current_priority_fee)
 
-            # If confirmation failed, increase slippage and retry
-            if (confirm_result is None or confirm_result["Status"] != "Ok") and buy_slippage <= BUY_SLIPPAGE["MAX"]:
-                trade_logger.error(f"Buy trade failed - {risky_address} - {trade_amount} - {buy_slippage}")
-                buy_slippage = buy_slippage + BUY_SLIPPAGE["INCREMENTS"]
-                trade_logger.error(f"Increasing buy slippage to: {buy_slippage}")
+        # --- CASE 1: Simulation failure ---
+        # Check if swap_result is None - happens when no routes are found or swapTransaction is None
+        if swap_result is None:
+            if fee_index < len(fee_keys) - 1:
+                fee_index += 1
+                fees = await get_recent_prioritization_fees(httpx_client, RPC_URL)
+                current_priority_fee = fees[fee_keys[fee_index]]
+                trade_logger.error(f"SwapResult returned None Increasing priority fee to {current_priority_fee} using '{fee_keys[fee_index]}' and retrying.")
                 continue
+        
+        # Check if swap_result is a dict with an "Error" key.
+        elif isinstance(swap_result, dict) and "Error" in swap_result:
+            error_code = parse_simulation_error(swap_result["Error"])
 
-            # If confirmation failed and max slippage is reached then return False
-            elif (confirm_result is None or confirm_result["Status"] != "Ok") and buy_slippage > BUY_SLIPPAGE["MAX"]:
-                trade_logger.info(f"Maximum buy slippage reached: {buy_slippage}")
-                trade_logger.info(f"Buy slippage too high for {risky_address} - {trade_amount} - {buy_slippage}")
+            # If simulation fails due to insufficient slippage - increase and retry
+            if error_code == 6001:
+                if current_slippage < buy_slippage["MAX"]:
+                    current_slippage += buy_slippage["INCREMENTS"]
+                    trade_logger.error(f"Insufficient slippage. Increasing slippage to {current_slippage}bps and retrying.")
+                    continue
+                else:
+                    trade_logger.error(f"Maximum slippage reached. Aborting trade for {risky_address}.")
+                    return False
+            
+            # Likely due to insufficient priority fees: increase fee level.
+            elif error_code == "ProgramFailedToComplete":
+                if fee_index < len(fee_keys) - 1:
+                    fee_index += 1
+                    fees = await get_recent_prioritization_fees(httpx_client, RPC_URL)
+                    current_priority_fee = fees[fee_keys[fee_index]]
+                    trade_logger.error(f"ProgramFailedToComplete detected. Increasing priority fee to {current_priority_fee} using '{fee_keys[fee_index]}' and retrying.")
+                    continue
+                else:
+                    trade_logger.error("All priority fee levels exhausted during simulation error. Aborting trade.")
+                    return False
+            
+            # For any other simulation error, attempt to increase slippage if possible.
+            else:
+                if current_slippage < buy_slippage["MAX"]:
+                    current_slippage += buy_slippage["INCREMENTS"]
+                    trade_logger.info(f"Simulation error with code {error_code}. Increasing slippage to {current_slippage}bps and retrying.")
+                    continue
+                else:
+                    trade_logger.error(f"Trade aborted due to simulation error code {error_code}.")
+                    return False
+
+        # If swap_result is not a simulation error dictionary, assume it is a valid signature.
+        signature = swap_result
+
+        # --- CONFIRMATION HANDLING ---
+        confirm_result = await confirm_tx(rpc_client=rpc_client, signature=signature, commitment="finalized")
+
+        # If confirm_tx returns None, assume it did not confirm due to insufficient priority fee.
+        if confirm_result is None:
+            if fee_index < len(fee_keys) - 1:
+                fee_index += 1
+                fees = await get_recent_prioritization_fees(httpx_client, RPC_URL)
+                current_priority_fee = fees[fee_keys[fee_index]]
+                trade_logger.error(f"Confirm_tx returned None. Increasing priority fee to {current_priority_fee} using '{fee_keys[fee_index]}' and retrying.")
+                continue
+            else:
+                trade_logger.error("All priority fee levels exhausted during confirmation. Aborting trade.")
                 return False
 
-            # If confirmation is successful then log the transaction and return True
+        # If a confirmation error is returned, inspect it.
+        if confirm_result.get("Status") != "Ok":
+            error_obj = confirm_result.get("Error")
+            error_code = parse_simulation_error(error_obj) if error_obj else None
+            trade_logger.error(f"CONFIRM_RESULT ERROR: {error_code}")
+            
+            if error_code == 6001:
+                if current_slippage < buy_slippage["MAX"]:
+                    current_slippage += buy_slippage["INCREMENTS"]
+                    trade_logger.error(f"Confirmation error: insufficient slippage (error code {error_code}). Increasing slippage to {current_slippage}bps and retrying.")
+                    continue
+                else:
+                    trade_logger.error(f"Maximum slippage reached during confirmation ({current_slippage}bps). Aborting trade.")
+                    return False
+            elif error_code == "ProgramFailedToComplete":
+                if fee_index < len(fee_keys) - 1:
+                    fee_index += 1
+                    fees = await get_recent_prioritization_fees(httpx_client, RPC_URL)
+                    current_priority_fee = fees[fee_keys[fee_index]]
+                    trade_logger.error(f"Confirmation error: ProgramFailedToComplete detected. Increasing priority fee to {current_priority_fee} using '{fee_keys[fee_index]}' and retrying.")
+                    continue
+                else:
+                    trade_logger.error("All priority fee levels exhausted during confirmation error. Aborting trade.")
+                    return False
+                
+            # For any other confirmation error, assume it may be a fee issue.
             else:
-                trade_logger.info(f"Transaction sent: https://solscan.io/tx/{buy_swap_response}")
-                tx_result = await get_transaction_details(rpc_client=rpc_client, signature=buy_swap_response, wallet_address=WALLET_ADDRESS, input_mint=sol_address, output_mint=risky_address)
-                trades_cache_result = await store_trade_data(redis_client_trades=redis_client_trades, signature=buy_swap_response, timestamp=tx_result["timestamp"], 
-                                                                token_address=risky_address, tokens_spent=tx_result["inputMint_diff"], tokens_received=tx_result["outputMint_diff"])
-                trade_logger.info(f"Cached buy results for {risky_address}: {trades_cache_result}")
-                return True
+                if fee_index < len(fee_keys) - 1:
+                    fee_index += 1
+                    fees = await get_recent_prioritization_fees(httpx_client, RPC_URL)
+                    current_priority_fee = fees[fee_keys[fee_index]]
+                    trade_logger.error(f"Confirmation error with code {error_code}. Increasing priority fee to {current_priority_fee} using '{fee_keys[fee_index]}' and retrying.")
+                    continue
+                else:
+                    trade_logger.error("All priority fee levels exhausted during confirmation error. Aborting trade.")
+                    return False
+
+            
+        # --- SUCCESS: Transaction confirmed ---
+        trade_logger.info(f"Transaction sent: https://solscan.io/tx/{signature}")
+        tx_result = await get_transaction_details(rpc_client=rpc_client,
+                                                  signature=signature,
+                                                  wallet_address=WALLET_ADDRESS,
+                                                  input_mint=sol_address,
+                                                  output_mint=risky_address)
+        trades_cache_result = await store_trade_data(
+            redis_client_trades=redis_client_trades,
+            signature=signature,
+            timestamp=tx_result["timestamp"],
+            token_address=risky_address,
+            tokens_spent=tx_result["inputMint_diff"],
+            tokens_received=tx_result["outputMint_diff"]
+        )
+        trade_logger.info(f"Cached buy results for {risky_address}: {trades_cache_result}")
+        return True
+
 
 
 # Wrapper to house full trade logic
@@ -713,3 +807,6 @@ async def trade_wrapper(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, 
                 await asyncio.sleep(MONITOR_PRICE_DELAY)
 
         
+
+
+
