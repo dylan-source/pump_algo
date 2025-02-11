@@ -483,121 +483,121 @@ async def startup_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, r
 
 
 # Function to execute a sell
-async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, redis_client_trades:redis.Redis, risky_address:str, sell_slippage:dict=SELL_SLIPPAGE):
+# async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, redis_client_trades:redis.Redis, risky_address:str, sell_slippage:dict=SELL_SLIPPAGE):
 
-    # Initialize some function variables
-    sell_slippage = SELL_SLIPPAGE["MIN"]
-    sell_loop_count = 0
+#     # Initialize some function variables
+#     sell_slippage = SELL_SLIPPAGE["MIN"]
+#     sell_loop_count = 0
 
-    # Confirm that the risky token is in the wallet
-    risky_amount = await get_token_balance(rpc_client=rpc_client, wallet_address=WALLET_ADDRESS, token_mint_address=risky_address)
-    if risky_amount == 0:
-        trade_logger.error(f"No tokens found for {risky_address}")
-        return None
+#     # Confirm that the risky token is in the wallet
+#     risky_amount = await get_token_balance(rpc_client=rpc_client, wallet_address=WALLET_ADDRESS, token_mint_address=risky_address)
+#     if risky_amount == 0:
+#         trade_logger.error(f"No tokens found for {risky_address}")
+#         return None
     
-    # Get recommended priority fee - based upon last N blocks times multiplier - do not trade is priority fee is too high/low
-    while True:
-        priority_fee_dict = await get_recent_prioritization_fees(httpx_client, RPC_URL)
-        if priority_fee_dict is None:
-            trade_logger.error("Sell function - priority fees not found - retrying")
-            await asyncio.sleep(SELL_LOOP_DELAY)
-        else:
-            break
+#     # Get recommended priority fee - based upon last N blocks times multiplier - do not trade is priority fee is too high/low
+#     while True:
+#         priority_fee_dict = await get_recent_prioritization_fees(httpx_client, RPC_URL)
+#         if priority_fee_dict is None:
+#             trade_logger.error("Sell function - priority fees not found - retrying")
+#             await asyncio.sleep(SELL_LOOP_DELAY)
+#         else:
+#             break
 
-    # Create the sellLoop to execute sell transaction
-    while True:
-        match sell_loop_count:
-            case 0 if priority_fee_dict["recommended"] <= PRIORITY_FEE_MAX:
-                recommended_priority_fee = priority_fee_dict["recommended"]
+#     # Create the sellLoop to execute sell transaction
+#     while True:
+#         match sell_loop_count:
+#             case 0 if priority_fee_dict["recommended"] <= PRIORITY_FEE_MAX:
+#                 recommended_priority_fee = priority_fee_dict["recommended"]
 
-            case 1 if priority_fee_dict["percentile_65"] <= PRIORITY_FEE_MAX:
-                recommended_priority_fee = priority_fee_dict["percentile_65"]
+#             case 1 if priority_fee_dict["percentile_65"] <= PRIORITY_FEE_MAX:
+#                 recommended_priority_fee = priority_fee_dict["percentile_65"]
 
-            case 2 if priority_fee_dict["percentile_75"] <= PRIORITY_FEE_MAX:
-                recommended_priority_fee = priority_fee_dict["percentile_75"]
+#             case 2 if priority_fee_dict["percentile_75"] <= PRIORITY_FEE_MAX:
+#                 recommended_priority_fee = priority_fee_dict["percentile_75"]
 
-            # case 3 if sell_loop_count >= 2 and (priority_fee_dict["percentile_75"] * PRIORITY_FEE_MULTIPLIER) <= PRIORITY_FEE_MAX:
-            #     recommended_priority_fee = priority_fee_dict["percentile_75"] * PRIORITY_FEE_MULTIPLIER
+#             # case 3 if sell_loop_count >= 2 and (priority_fee_dict["percentile_75"] * PRIORITY_FEE_MULTIPLIER) <= PRIORITY_FEE_MAX:
+#             #     recommended_priority_fee = priority_fee_dict["percentile_75"] * PRIORITY_FEE_MULTIPLIER
 
-            case _:
-                trade_logger.error(f"Priority fees too high or swap error for {risky_address} - {risky_amount} - {sell_slippage}")
-        trade_logger.info(f"Priority fee to be applied: {recommended_priority_fee}")
+#             case _:
+#                 trade_logger.error(f"Priority fees too high or swap error for {risky_address} - {risky_amount} - {sell_slippage}")
+#         trade_logger.info(f"Priority fee to be applied: {recommended_priority_fee}")
 
-        # Loop until successful if simulation error is received
-        while True:
+#         # Loop until successful if simulation error is received
+#         while True:
 
-            # Execute the swap
-            trade_logger.info(f"Sell slippage to be applied: {sell_slippage}")
-            sell_quote = await get_jupiter_quote(httpx_client, input_address=risky_address, output_address=SOL_MINT, amount=risky_amount, slippage=sell_slippage, is_buy=False)
-            sell_swap_response = await execute_swap(rpc_client=rpc_client, httpx_client=httpx_client, quote=sell_quote, priority_fee=recommended_priority_fee)
+#             # Execute the swap
+#             trade_logger.info(f"Sell slippage to be applied: {sell_slippage}")
+#             sell_quote = await get_jupiter_quote(httpx_client, input_address=risky_address, output_address=SOL_MINT, amount=risky_amount, slippage=sell_slippage, is_buy=False)
+#             sell_swap_response = await execute_swap(rpc_client=rpc_client, httpx_client=httpx_client, quote=sell_quote, priority_fee=recommended_priority_fee)
             
-            if isinstance(sell_swap_response, dict) and sell_slippage <= SELL_SLIPPAGE["MAX"]:
-                sell_slippage = sell_slippage + SELL_SLIPPAGE["INCREMENTS"]
-                trade_logger.info(f"Increasing sell slippage to: {sell_slippage}")
-                continue
-            elif isinstance(sell_swap_response, dict) and sell_slippage > SELL_SLIPPAGE["MAX"]:
-                trade_logger.info(f"Maximum sell slippage reached: {sell_slippage}")
-                trade_logger.info(f"Sleeping for {SELL_SLIPPAGE_DELAY} seconds and then retrying")
+#             if isinstance(sell_swap_response, dict) and sell_slippage <= SELL_SLIPPAGE["MAX"]:
+#                 sell_slippage = sell_slippage + SELL_SLIPPAGE["INCREMENTS"]
+#                 trade_logger.info(f"Increasing sell slippage to: {sell_slippage}")
+#                 continue
+#             elif isinstance(sell_swap_response, dict) and sell_slippage > SELL_SLIPPAGE["MAX"]:
+#                 trade_logger.info(f"Maximum sell slippage reached: {sell_slippage}")
+#                 trade_logger.info(f"Sleeping for {SELL_SLIPPAGE_DELAY} seconds and then retrying")
 
-                await asyncio.sleep(30)
-                sell_slippage = SELL_SLIPPAGE["MAX"]
-                continue
+#                 await asyncio.sleep(30)
+#                 sell_slippage = SELL_SLIPPAGE["MAX"]
+#                 continue
 
-            else:
-                sell_confirm_result = await confirm_tx(rpc_client=rpc_client, signature=sell_swap_response, commitment=Finalized)
+#             else:
+#                 sell_confirm_result = await confirm_tx(rpc_client=rpc_client, signature=sell_swap_response, commitment=Finalized)
 
-                # If confirmation failed and max slippage is reached then return False
-                if (sell_confirm_result is None or sell_confirm_result["Status"] != "Ok") and sell_slippage > SELL_SLIPPAGE["MAX"]:
-                    trade_logger.info(f"Maximum sell slippage reached: {sell_slippage} for {risky_address}")
-                    trade_logger.info(f"Sell slippage too high for {risky_address} - {risky_amount} - {sell_slippage}")
-                    return False
+#                 # If confirmation failed and max slippage is reached then return False
+#                 if (sell_confirm_result is None or sell_confirm_result["Status"] != "Ok") and sell_slippage > SELL_SLIPPAGE["MAX"]:
+#                     trade_logger.info(f"Maximum sell slippage reached: {sell_slippage} for {risky_address}")
+#                     trade_logger.info(f"Sell slippage too high for {risky_address} - {risky_amount} - {sell_slippage}")
+#                     return False
 
-                # If confirmation failed, increase slippage and retry
-                elif (sell_confirm_result is None or sell_confirm_result["Status"] != "Ok") and sell_slippage <= SELL_SLIPPAGE["MAX"]:
-                    trade_logger.error(f"Sell trade failed - {risky_address} - {risky_amount} - {sell_slippage}")
-                    sell_slippage = sell_slippage + SELL_SLIPPAGE["INCREMENTS"]
-                    trade_logger.info(f"Increasing sell slippage to: {sell_slippage}")
-                    sell_loop_count += 1
+#                 # If confirmation failed, increase slippage and retry
+#                 elif (sell_confirm_result is None or sell_confirm_result["Status"] != "Ok") and sell_slippage <= SELL_SLIPPAGE["MAX"]:
+#                     trade_logger.error(f"Sell trade failed - {risky_address} - {risky_amount} - {sell_slippage}")
+#                     sell_slippage = sell_slippage + SELL_SLIPPAGE["INCREMENTS"]
+#                     trade_logger.info(f"Increasing sell slippage to: {sell_slippage}")
+#                     sell_loop_count += 1
 
-                    # Create a priorityFees loop to get an updated priority fees dictionary
-                    priority_fees_loop_count = 0
-                    while True:
-                        priority_fee_dict = await get_recent_prioritization_fees(httpx_client, RPC_URL)
-                        print("Priority fees loop: ", priority_fee_dict)
-                        if priority_fee_dict is None:
-                            trade_logger.error(f"Sell function - priority fees not found - retrying for the {priority_fees_loop_count} time")
+#                     # Create a priorityFees loop to get an updated priority fees dictionary
+#                     priority_fees_loop_count = 0
+#                     while True:
+#                         priority_fee_dict = await get_recent_prioritization_fees(httpx_client, RPC_URL)
+#                         print("Priority fees loop: ", priority_fee_dict)
+#                         if priority_fee_dict is None:
+#                             trade_logger.error(f"Sell function - priority fees not found - retrying for the {priority_fees_loop_count} time")
                             
-                            # Prevent infinite looping
-                            priority_fees_loop_count += 1
-                            if priority_fees_loop_count > 10: 
-                                recommended_priority_fee = PRIORITY_FEE_MAX
-                                break 
+#                             # Prevent infinite looping
+#                             priority_fees_loop_count += 1
+#                             if priority_fees_loop_count > 10: 
+#                                 recommended_priority_fee = PRIORITY_FEE_MAX
+#                                 break 
                             
-                            await asyncio.sleep(SELL_LOOP_DELAY)
-                        else: break # break priorityFees loop if a new priority fee was received
+#                             await asyncio.sleep(SELL_LOOP_DELAY)
+#                         else: break # break priorityFees loop if a new priority fee was received
 
-                    # Break execution loop and apply new prioritization fees
-                    break
+#                     # Break execution loop and apply new prioritization fees
+#                     break
 
-                # If successful then get the trasnaction details and save the result
-                else:
-                    trade_logger.info(f"Transaction sent: https://solscan.io/tx/{sell_swap_response}")
-                    sell_tx_result = await get_transaction_details(rpc_client=rpc_client, signature=sell_swap_response, wallet_address=WALLET_ADDRESS, input_mint=risky_address, output_mint=SOL_MINT)
+#                 # If successful then get the trasnaction details and save the result
+#                 else:
+#                     trade_logger.info(f"Transaction sent: https://solscan.io/tx/{sell_swap_response}")
+#                     sell_tx_result = await get_transaction_details(rpc_client=rpc_client, signature=sell_swap_response, wallet_address=WALLET_ADDRESS, input_mint=risky_address, output_mint=SOL_MINT)
                     
-                    # Fetch the buy data from Redis and save all info in a CSV
-                    buy_trade_data = await fetch_trade_data(redis_client_trades=redis_client_trades, token_address=risky_address)
-                    sell_trade_data = {
-                        "sell_timestamp": sell_tx_result["timestamp"],
-                        "sell_transaction_hash": str(sell_swap_response),
-                        "sell_tokens_spent": sell_tx_result["inputMint_diff"],
-                        "sell_tokens_received": sell_tx_result["outputMint_diff"]
-                        }
-                    await write_trades_to_csv(tx_address=risky_address, buy_data_dict=buy_trade_data, sell_data_dict=sell_trade_data, redis_client=redis_client_trades)
-                    return True
+#                     # Fetch the buy data from Redis and save all info in a CSV
+#                     buy_trade_data = await fetch_trade_data(redis_client_trades=redis_client_trades, token_address=risky_address)
+#                     sell_trade_data = {
+#                         "sell_timestamp": sell_tx_result["timestamp"],
+#                         "sell_transaction_hash": str(sell_swap_response),
+#                         "sell_tokens_spent": sell_tx_result["inputMint_diff"],
+#                         "sell_tokens_received": sell_tx_result["outputMint_diff"]
+#                         }
+#                     await write_trades_to_csv(tx_address=risky_address, buy_data_dict=buy_trade_data, sell_data_dict=sell_trade_data, redis_client=redis_client_trades)
+#                     return True
             
         
 
-async def execute_sell_2(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, redis_client_trades:redis.Redis, risky_address:str, sell_slippage:dict=SELL_SLIPPAGE):
+async def execute_sell(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, redis_client_trades:redis.Redis, risky_address:str, sell_slippage:dict=SELL_SLIPPAGE):
     """
     Execute a sell trade for the token at risky_address.
 
@@ -951,7 +951,7 @@ async def trade_wrapper(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, 
         elapsed_time = time.time() - trade_start_time
         if elapsed_time >= (MAX_TRADE_TIME_MINS * 60):
             trade_logger.info(f"Initiating ordered sell for {risky_address}")
-            sell_result = await execute_sell_2(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, risky_address=risky_address, sell_slippage=sell_slippage)
+            sell_result = await execute_sell(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, risky_address=risky_address, sell_slippage=sell_slippage)
             if sell_result: break
         
         else:
@@ -965,7 +965,7 @@ async def trade_wrapper(rpc_client:AsyncClient, httpx_client:httpx.AsyncClient, 
 
             if stoploss_price < stoploss_trigger:
                 trade_logger.info(f"Initiating stoploss sell for {risky_address}")
-                sell_result = await execute_sell_2(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, risky_address=risky_address, sell_slippage=sell_slippage)
+                sell_result = await execute_sell(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, risky_address=risky_address, sell_slippage=sell_slippage)
                 if sell_result: break
             else:
                 await asyncio.sleep(MONITOR_PRICE_DELAY)

@@ -1,0 +1,939 @@
+2025-02-11 12:24:59 [INFO] Private key successfully decrypted and loaded.
+2025-02-11 12:25:02 [INFO] No startup tokens to sell
+2025-02-11 12:26:14 [INFO] Sleeping for 5 seconds before trading
+2025-02-11 12:26:20 [INFO] Sufficient SOL for trade - Wallet: 301557223, Trade amount: 100000
+2025-02-11 12:26:20 [INFO] Priority fees: {'recommended': 30000, 'mean': 3865320, 'median': 14515, 'percentile_65': 323190, 'percentile_75': 810417, 'percentile_85': 6030559}
+2025-02-11 12:26:20 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 30000.
+2025-02-11 12:26:21 [INFO] Routes found for address: H89GQZ71VGnRzs3QUHqaCyV75hKUFSoPSkefxGBHpump
+2025-02-11 12:26:21 [INFO] No simulation error
+2025-02-11 12:26:43 [INFO] Trade confirmation for 4dbs72Pk1Bk5at9ooNVeeKnVNRgGnXaYTCv7bQG21xozVtywfdkcgtj2GTeeweX43huKmahrMmTSdFbdWH6WwpRY - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:26:43 [INFO] Transaction sent: https://solscan.io/tx/4dbs72Pk1Bk5at9ooNVeeKnVNRgGnXaYTCv7bQG21xozVtywfdkcgtj2GTeeweX43huKmahrMmTSdFbdWH6WwpRY
+2025-02-11 12:26:43 [INFO] Cached buy results for H89GQZ71VGnRzs3QUHqaCyV75hKUFSoPSkefxGBHpump: True
+2025-02-11 12:26:44 [INFO] Buy spot price for H89GQZ71VGnRzs3QUHqaCyV75hKUFSoPSkefxGBHpump: 5.60322e-05
+2025-02-11 12:26:44 [INFO] TRADE IN PROGRESS
+2025-02-11 12:26:44 [INFO] Stoploss price: 4.202415e-05 for H89GQZ71VGnRzs3QUHqaCyV75hKUFSoPSkefxGBHpump
+2025-02-11 12:27:45 [INFO] Initiating ordered sell for H89GQZ71VGnRzs3QUHqaCyV75hKUFSoPSkefxGBHpump
+2025-02-11 12:27:46 [INFO] Token balance for H89GQZ71VGnRzs3QUHqaCyV75hKUFSoPSkefxGBHpump: 3588845010
+2025-02-11 12:27:46 [INFO] Priority fees: {'recommended': 30000, 'mean': 4982350, 'median': 13392, 'percentile_65': 291932, 'percentile_75': 721314, 'percentile_85': 6972333}
+2025-02-11 12:27:46 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 30000.
+2025-02-11 12:27:47 [INFO] Routes found for address: H89GQZ71VGnRzs3QUHqaCyV75hKUFSoPSkefxGBHpump
+2025-02-11 12:27:48 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:27:48 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:27:48 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 30000.
+2025-02-11 12:27:48 [INFO] Routes found for address: H89GQZ71VGnRzs3QUHqaCyV75hKUFSoPSkefxGBHpump
+2025-02-11 12:27:48 [INFO] No simulation error
+2025-02-11 12:28:06 [INFO] Trade confirmation for 5CajheeHZQNMY81datjJwT1MYoMsPCgSXcUKQ7Vk1d3iHiPEUcrGGJrpi5crigSeKpCyp8ksUFkFVtSgeBMyoxvY - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:28:06 [INFO] Sell transaction sent: https://solscan.io/tx/5CajheeHZQNMY81datjJwT1MYoMsPCgSXcUKQ7Vk1d3iHiPEUcrGGJrpi5crigSeKpCyp8ksUFkFVtSgeBMyoxvY
+2025-02-11 12:28:06 [INFO] Return value in SOL for H89GQZ71VGnRzs3QUHqaCyV75hKUFSoPSkefxGBHpump: -0.002107052
+2025-02-11 12:28:06 [INFO] Return % for H89GQZ71VGnRzs3QUHqaCyV75hKUFSoPSkefxGBHpump: -96.90803392387365
+2025-02-11 12:28:06 [INFO] Saved new trade to csv
+2025-02-11 12:28:06 [INFO] Redis key deleted for H89GQZ71VGnRzs3QUHqaCyV75hKUFSoPSkefxGBHpump: True
+2025-02-11 12:28:16 [INFO] Sleeping for 5 seconds before trading
+2025-02-11 12:28:22 [INFO] Sufficient SOL for trade - Wallet: 299450171, Trade amount: 100000
+2025-02-11 12:28:22 [INFO] Priority fees: {'recommended': 90000, 'mean': 2537247, 'median': 75000, 'percentile_65': 265070, 'percentile_75': 400599, 'percentile_85': 1340747}
+2025-02-11 12:28:22 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 90000.
+2025-02-11 12:28:23 [INFO] Routes found for address: tJ4WUPxfnqPSptnsF7ofZF2MgcL7zjXruCyAU3hpump
+2025-02-11 12:28:23 [ERROR] Simulation failed: {'InstructionError': [6, {'Custom': 6001}]}
+2025-02-11 12:28:23 [INFO] Buy error. Insufficient slippage. Increasing slippage to 2500bps and retrying.
+2025-02-11 12:28:23 [INFO] Attempting buy trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:28:24 [INFO] Routes found for address: tJ4WUPxfnqPSptnsF7ofZF2MgcL7zjXruCyAU3hpump
+2025-02-11 12:28:24 [ERROR] Simulation failed: {'InstructionError': [6, {'Custom': 6001}]}
+2025-02-11 12:28:24 [INFO] Buy error. Insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:28:24 [INFO] Attempting buy trade with slippage: 3000bps and priority fee: 90000.
+2025-02-11 12:28:24 [INFO] Routes found for address: tJ4WUPxfnqPSptnsF7ofZF2MgcL7zjXruCyAU3hpump
+2025-02-11 12:28:25 [ERROR] Simulation failed: {'InstructionError': [6, 'ProgramFailedToComplete']}
+2025-02-11 12:28:25 [INFO] Priority fees: {'recommended': 90000, 'mean': 2124653, 'median': 75000, 'percentile_65': 255000, 'percentile_75': 389831, 'percentile_85': 1111111}
+2025-02-11 12:28:25 [INFO] Buy error. ProgramFailedToComplete detected. Increasing priority fee to 255000 using 'percentile_65' and retrying.
+2025-02-11 12:28:25 [INFO] Attempting buy trade with slippage: 3000bps and priority fee: 255000.
+2025-02-11 12:28:26 [INFO] Routes found for address: tJ4WUPxfnqPSptnsF7ofZF2MgcL7zjXruCyAU3hpump
+2025-02-11 12:28:26 [ERROR] Simulation failed: {'InstructionError': [6, 'ProgramFailedToComplete']}
+2025-02-11 12:28:26 [INFO] Priority fees: {'recommended': 90000, 'mean': 2124653, 'median': 75000, 'percentile_65': 255000, 'percentile_75': 389831, 'percentile_85': 1111111}
+2025-02-11 12:28:26 [INFO] Buy error. ProgramFailedToComplete detected. Increasing priority fee to 389831 using 'percentile_75' and retrying.
+2025-02-11 12:28:26 [INFO] Attempting buy trade with slippage: 3000bps and priority fee: 389831.
+2025-02-11 12:28:27 [INFO] Routes found for address: tJ4WUPxfnqPSptnsF7ofZF2MgcL7zjXruCyAU3hpump
+2025-02-11 12:28:27 [ERROR] Simulation failed: {'InstructionError': [6, {'Custom': 6001}]}
+2025-02-11 12:28:27 [INFO] Buy error. Insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:28:27 [INFO] Attempting buy trade with slippage: 3500bps and priority fee: 389831.
+2025-02-11 12:28:27 [INFO] Routes found for address: tJ4WUPxfnqPSptnsF7ofZF2MgcL7zjXruCyAU3hpump
+2025-02-11 12:28:28 [ERROR] Simulation failed: {'InstructionError': [6, 'ProgramFailedToComplete']}
+2025-02-11 12:28:28 [INFO] Priority fees: {'recommended': 90000, 'mean': 2084717, 'median': 75000, 'percentile_65': 265070, 'percentile_75': 394029, 'percentile_85': 1136929}
+2025-02-11 12:28:28 [INFO] Buy error. ProgramFailedToComplete detected. Increasing priority fee to 1136929 using 'percentile_85' and retrying.
+2025-02-11 12:28:28 [INFO] Attempting buy trade with slippage: 3500bps and priority fee: 1136929.
+2025-02-11 12:28:28 [INFO] Routes found for address: tJ4WUPxfnqPSptnsF7ofZF2MgcL7zjXruCyAU3hpump
+2025-02-11 12:28:29 [ERROR] Simulation failed: {'InstructionError': [6, 'ProgramFailedToComplete']}
+2025-02-11 12:28:29 [ERROR] All priority fee levels exhausted during simulation error. Aborting trade.
+2025-02-11 12:29:50 [INFO] Sleeping for 5 seconds before trading
+2025-02-11 12:29:55 [INFO] Sufficient SOL for trade - Wallet: 299450171, Trade amount: 100000
+2025-02-11 12:29:56 [INFO] Priority fees: {'recommended': 90000, 'mean': 5911226, 'median': 75000, 'percentile_65': 274146, 'percentile_75': 1724979, 'percentile_85': 9888697}
+2025-02-11 12:29:56 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 90000.
+2025-02-11 12:29:56 [INFO] Routes found for address: Z1mRpcY8HYc9FVfrgXnDaZPS5uTgANn8ReU9ie9pump
+2025-02-11 12:29:57 [INFO] No simulation error
+2025-02-11 12:30:30 [INFO] Sleeping for 5 seconds before trading
+2025-02-11 12:30:36 [INFO] Sufficient SOL for trade - Wallet: 299450171, Trade amount: 100000
+2025-02-11 12:30:36 [INFO] Priority fees: {'recommended': 242226, 'mean': 4762742, 'median': 201855, 'percentile_65': 450606, 'percentile_75': 1205451, 'percentile_85': 6446202}
+2025-02-11 12:30:36 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 242226.
+2025-02-11 12:30:37 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:30:38 [INFO] No simulation error
+2025-02-11 12:30:51 [INFO] Sleeping for 5 seconds before trading
+2025-02-11 12:30:52 [INFO] Trade confirmation for 2mn4JfsqgnhPNavyVvoJVAbBg5RkPbBeLCFjEFKakZQ1xJQtCFR7khSvipmDGFsgxkiU3beyaeiQie1rKsPZbmdc - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:30:52 [INFO] Transaction sent: https://solscan.io/tx/2mn4JfsqgnhPNavyVvoJVAbBg5RkPbBeLCFjEFKakZQ1xJQtCFR7khSvipmDGFsgxkiU3beyaeiQie1rKsPZbmdc
+2025-02-11 12:30:53 [INFO] Cached buy results for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump: True
+2025-02-11 12:30:53 [INFO] Buy spot price for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump: 8.21941e-05
+2025-02-11 12:30:53 [INFO] TRADE IN PROGRESS
+2025-02-11 12:30:53 [INFO] Stoploss price: 6.1645575e-05 for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:30:56 [INFO] Sufficient SOL for trade - Wallet: 297063665, Trade amount: 100000
+2025-02-11 12:30:56 [INFO] Priority fees: {'recommended': 145052, 'mean': 4792653, 'median': 120877, 'percentile_65': 384768, 'percentile_75': 1122221, 'percentile_85': 4271917}
+2025-02-11 12:30:56 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 145052.
+2025-02-11 12:30:57 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:30:57 [ERROR] Simulation failed: {'InstructionError': [6, 'ProgramFailedToComplete']}
+2025-02-11 12:30:58 [INFO] Priority fees: {'recommended': 145052, 'mean': 4807457, 'median': 120877, 'percentile_65': 384768, 'percentile_75': 1528776, 'percentile_85': 4271917}
+2025-02-11 12:30:58 [INFO] Buy error. ProgramFailedToComplete detected. Increasing priority fee to 384768 using 'percentile_65' and retrying.
+2025-02-11 12:30:58 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 384768.
+2025-02-11 12:30:58 [INFO] Initiating stoploss sell for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:30:58 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:30:58 [INFO] Token balance for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump: 2959012440
+2025-02-11 12:30:58 [INFO] Priority fees: {'recommended': 145052, 'mean': 4807457, 'median': 120877, 'percentile_65': 384768, 'percentile_75': 1528776, 'percentile_85': 4271917}
+2025-02-11 12:30:58 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 145052.
+2025-02-11 12:30:58 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:30:58 [INFO] No simulation error
+2025-02-11 12:30:59 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:30:59 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:30:59 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 145052.
+2025-02-11 12:31:00 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:00 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:00 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:31:00 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 145052.
+2025-02-11 12:31:01 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:03 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:03 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:31:03 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 145052.
+2025-02-11 12:31:03 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:04 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:04 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:31:04 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 145052.
+2025-02-11 12:31:04 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:05 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:05 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:31:05 [INFO] Initiating stoploss sell for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:05 [INFO] Token balance for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump: 2959012440
+2025-02-11 12:31:05 [INFO] Priority fees: {'recommended': 55797, 'mean': 2298043, 'median': 46498, 'percentile_65': 273913, 'percentile_75': 498338, 'percentile_85': 2533329}
+2025-02-11 12:31:05 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 55797.
+2025-02-11 12:31:06 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:06 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:06 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:31:06 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 55797.
+2025-02-11 12:31:07 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:07 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:07 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:31:07 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 55797.
+2025-02-11 12:31:07 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:08 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:08 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:31:08 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 55797.
+2025-02-11 12:31:08 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:09 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:09 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:31:09 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 55797.
+2025-02-11 12:31:09 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:10 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:10 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:31:10 [INFO] Initiating stoploss sell for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:10 [INFO] Token balance for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump: 2959012440
+2025-02-11 12:31:10 [INFO] Priority fees: {'recommended': 90000, 'mean': 2794193, 'median': 75000, 'percentile_65': 345593, 'percentile_75': 514714, 'percentile_85': 3192075}
+2025-02-11 12:31:10 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:31:11 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:11 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:11 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:31:11 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 90000.
+2025-02-11 12:31:12 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:12 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:12 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:31:12 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 90000.
+2025-02-11 12:31:12 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:13 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:13 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:31:13 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 90000.
+2025-02-11 12:31:13 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:13 [INFO] Trade confirmation for 2JBJSHLa2GfH33yzkH3NDU9iGTeg5DcChCWpc4CS6PnrErR9thsgmhA5vr49WhG8Ehs1ZXy2hvt147ozbWdqgJDM - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:31:13 [INFO] Transaction sent: https://solscan.io/tx/2JBJSHLa2GfH33yzkH3NDU9iGTeg5DcChCWpc4CS6PnrErR9thsgmhA5vr49WhG8Ehs1ZXy2hvt147ozbWdqgJDM
+2025-02-11 12:31:13 [INFO] Cached buy results for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: True
+2025-02-11 12:31:14 [INFO] Buy spot price for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: 8.3832e-05
+2025-02-11 12:31:14 [INFO] TRADE IN PROGRESS
+2025-02-11 12:31:14 [INFO] Stoploss price: 6.287400000000001e-05 for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:14 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:14 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:31:14 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 90000.
+2025-02-11 12:31:14 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:15 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:15 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:31:15 [INFO] Initiating stoploss sell for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:15 [INFO] Token balance for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump: 2959012440
+2025-02-11 12:31:15 [INFO] Priority fees: {'recommended': 90000, 'mean': 3517536, 'median': 75000, 'percentile_65': 381041, 'percentile_75': 1131644, 'percentile_85': 4642542}
+2025-02-11 12:31:15 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:31:16 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:16 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:16 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:31:16 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 90000.
+2025-02-11 12:31:16 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:17 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:17 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:31:17 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 90000.
+2025-02-11 12:31:17 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:18 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:18 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:31:18 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 90000.
+2025-02-11 12:31:18 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:19 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:19 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:31:19 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 90000.
+2025-02-11 12:31:19 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:20 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:20 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:31:20 [INFO] Initiating stoploss sell for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:20 [INFO] Token balance for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump: 2959012440
+2025-02-11 12:31:20 [INFO] Priority fees: {'recommended': 90000, 'mean': 3440155, 'median': 75000, 'percentile_65': 281483, 'percentile_75': 767341, 'percentile_85': 4142203}
+2025-02-11 12:31:20 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:31:20 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:21 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:21 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:31:21 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 90000.
+2025-02-11 12:31:21 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:22 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:22 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:31:22 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 90000.
+2025-02-11 12:31:22 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:23 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:23 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:31:23 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 90000.
+2025-02-11 12:31:23 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:24 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:24 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:31:24 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 90000.
+2025-02-11 12:31:24 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:25 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:25 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:31:25 [INFO] Initiating stoploss sell for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:25 [INFO] Token balance for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump: 2959012440
+2025-02-11 12:31:25 [INFO] Priority fees: {'recommended': 90000, 'mean': 3707576, 'median': 75000, 'percentile_65': 281483, 'percentile_75': 767341, 'percentile_85': 4642542}
+2025-02-11 12:31:25 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:31:25 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:26 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:26 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:31:26 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 90000.
+2025-02-11 12:31:26 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:27 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:27 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:31:27 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 90000.
+2025-02-11 12:31:27 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:27 [ERROR] Trade confirmation error: Unable to confirm transaction 5HiGsBs3J8mSUFcSgns2JM8Q4zbtLrG588C74DRupAuRBfQiowdPPTrmpiw3zMaHNuRgY6TvAyjzDEDv6k3kgiXs
+2025-02-11 12:31:27 [INFO] Priority fees: {'recommended': 90000, 'mean': 3719154, 'median': 75000, 'percentile_65': 281483, 'percentile_75': 767341, 'percentile_85': 4642542}
+2025-02-11 12:31:27 [ERROR] Confirm_tx returned None. Increasing priority fee to 281483 using 'percentile_65' and retrying.
+2025-02-11 12:31:27 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 281483.
+2025-02-11 12:31:28 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:28 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:31:28 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 90000.
+2025-02-11 12:31:28 [INFO] Routes found for address: Z1mRpcY8HYc9FVfrgXnDaZPS5uTgANn8ReU9ie9pump
+2025-02-11 12:31:28 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:28 [ERROR] Simulation failed: {'InstructionError': [6, {'Custom': 6001}]}
+2025-02-11 12:31:28 [INFO] Buy error. Insufficient slippage. Increasing slippage to 2500bps and retrying.
+2025-02-11 12:31:28 [INFO] Attempting buy trade with slippage: 2500bps and priority fee: 281483.
+2025-02-11 12:31:29 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:29 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:31:29 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 90000.
+2025-02-11 12:31:29 [INFO] Routes found for address: Z1mRpcY8HYc9FVfrgXnDaZPS5uTgANn8ReU9ie9pump
+2025-02-11 12:31:29 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:29 [ERROR] Simulation failed: {'InstructionError': [6, {'Custom': 6001}]}
+2025-02-11 12:31:29 [INFO] Buy error. Insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:31:29 [INFO] Attempting buy trade with slippage: 3000bps and priority fee: 281483.
+2025-02-11 12:31:29 [INFO] Routes found for address: Z1mRpcY8HYc9FVfrgXnDaZPS5uTgANn8ReU9ie9pump
+2025-02-11 12:31:29 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:29 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:31:30 [INFO] Initiating stoploss sell for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:30 [INFO] Token balance for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump: 2959012440
+2025-02-11 12:31:30 [INFO] No simulation error
+2025-02-11 12:31:30 [INFO] Priority fees: {'recommended': 90000, 'mean': 3833147, 'median': 75000, 'percentile_65': 281483, 'percentile_75': 765126, 'percentile_85': 4642542}
+2025-02-11 12:31:30 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:31:31 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:31 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:31 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:31:31 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 90000.
+2025-02-11 12:31:32 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:32 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:32 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:31:32 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 90000.
+2025-02-11 12:31:32 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:33 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:33 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:31:33 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 90000.
+2025-02-11 12:31:33 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:34 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:34 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:31:34 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 90000.
+2025-02-11 12:31:34 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:35 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:35 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:31:35 [INFO] Initiating stoploss sell for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:35 [INFO] Token balance for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump: 2959012440
+2025-02-11 12:31:35 [INFO] Priority fees: {'recommended': 90000, 'mean': 3705223, 'median': 75000, 'percentile_65': 398816, 'percentile_75': 1010401, 'percentile_85': 4642542}
+2025-02-11 12:31:35 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:31:36 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:36 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:36 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:31:36 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 90000.
+2025-02-11 12:31:36 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:37 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:37 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:31:37 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 90000.
+2025-02-11 12:31:37 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:38 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:38 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:31:38 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 90000.
+2025-02-11 12:31:38 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:39 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:39 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:31:39 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 90000.
+2025-02-11 12:31:39 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:40 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:40 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:31:40 [INFO] Initiating stoploss sell for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:40 [INFO] Token balance for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump: 2959012440
+2025-02-11 12:31:40 [INFO] Priority fees: {'recommended': 90000, 'mean': 4023168, 'median': 75000, 'percentile_65': 398816, 'percentile_75': 1010401, 'percentile_85': 5383965}
+2025-02-11 12:31:40 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:31:41 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:41 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:41 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:31:41 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 90000.
+2025-02-11 12:31:41 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:42 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:42 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:31:42 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 90000.
+2025-02-11 12:31:42 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:43 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:43 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:31:43 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 90000.
+2025-02-11 12:31:43 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:44 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:44 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:31:44 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 90000.
+2025-02-11 12:31:44 [INFO] Initiating stoploss sell for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:44 [INFO] Token balance for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: 2240349540
+2025-02-11 12:31:44 [INFO] Routes found for address: GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump
+2025-02-11 12:31:44 [INFO] Priority fees: {'recommended': 90000, 'mean': 3930982, 'median': 75000, 'percentile_65': 398816, 'percentile_75': 1010401, 'percentile_85': 4557850}
+2025-02-11 12:31:44 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:31:45 [INFO] No simulation error
+2025-02-11 12:31:45 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:45 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:45 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:31:45 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 90000.
+2025-02-11 12:31:46 [INFO] Trade confirmation for qhRpvhQboGBaxLVLrnVgYhnpNYqQt4YvWtJ5iqxEAxvmR8hAu22ojRGnHLzsr6391XWUmoEhGA4BMQf5xVjmDoq - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:31:46 [INFO] Transaction sent: https://solscan.io/tx/qhRpvhQboGBaxLVLrnVgYhnpNYqQt4YvWtJ5iqxEAxvmR8hAu22ojRGnHLzsr6391XWUmoEhGA4BMQf5xVjmDoq
+2025-02-11 12:31:46 [INFO] Cached buy results for Z1mRpcY8HYc9FVfrgXnDaZPS5uTgANn8ReU9ie9pump: True
+2025-02-11 12:31:46 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:46 [INFO] Buy spot price for Z1mRpcY8HYc9FVfrgXnDaZPS5uTgANn8ReU9ie9pump: 9.34194e-05
+2025-02-11 12:31:46 [INFO] TRADE IN PROGRESS
+2025-02-11 12:31:46 [INFO] Stoploss price: 7.006455e-05 for Z1mRpcY8HYc9FVfrgXnDaZPS5uTgANn8ReU9ie9pump
+2025-02-11 12:31:47 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:47 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:31:47 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 90000.
+2025-02-11 12:31:47 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:47 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:47 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:31:47 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 90000.
+2025-02-11 12:31:48 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:48 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:48 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:31:48 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 90000.
+2025-02-11 12:31:49 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:49 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:49 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:31:50 [INFO] Initiating stoploss sell for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:50 [INFO] Token balance for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: 2240349540
+2025-02-11 12:31:50 [INFO] Priority fees: {'recommended': 90000, 'mean': 4386203, 'median': 75000, 'percentile_65': 398816, 'percentile_75': 1111111, 'percentile_85': 5598343}
+2025-02-11 12:31:50 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:31:50 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:51 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:51 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:31:51 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 90000.
+2025-02-11 12:31:51 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:52 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:52 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:31:52 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 90000.
+2025-02-11 12:31:52 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:53 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:53 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:31:53 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 90000.
+2025-02-11 12:31:53 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:53 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:53 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:31:53 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 90000.
+2025-02-11 12:31:54 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:54 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:54 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:31:55 [INFO] Initiating stoploss sell for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:55 [INFO] Token balance for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: 2240349540
+2025-02-11 12:31:55 [INFO] Priority fees: {'recommended': 60860, 'mean': 5035553, 'median': 50717, 'percentile_65': 402483, 'percentile_75': 1121857, 'percentile_85': 7782016}
+2025-02-11 12:31:55 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 60860.
+2025-02-11 12:31:55 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:56 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:56 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:31:56 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 60860.
+2025-02-11 12:31:56 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:57 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:57 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:31:57 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 60860.
+2025-02-11 12:31:57 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:57 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:57 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:31:57 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 60860.
+2025-02-11 12:31:58 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:58 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:58 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:31:58 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 60860.
+2025-02-11 12:31:59 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:31:59 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:31:59 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:31:59 [INFO] Initiating stoploss sell for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:00 [INFO] Token balance for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: 2240349540
+2025-02-11 12:32:00 [INFO] Priority fees: {'recommended': 90000, 'mean': 4791255, 'median': 75000, 'percentile_65': 391478, 'percentile_75': 1111111, 'percentile_85': 6273667}
+2025-02-11 12:32:00 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:32:00 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:01 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:01 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:32:01 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 90000.
+2025-02-11 12:32:01 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:02 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:02 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:32:02 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 90000.
+2025-02-11 12:32:02 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:03 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:03 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:32:03 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 90000.
+2025-02-11 12:32:03 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:04 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:04 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:32:04 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 90000.
+2025-02-11 12:32:04 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:05 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:05 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:32:05 [INFO] Initiating stoploss sell for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:05 [INFO] Token balance for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: 2240349540
+2025-02-11 12:32:05 [INFO] Priority fees: {'recommended': 90000, 'mean': 4637835, 'median': 75000, 'percentile_65': 448131, 'percentile_75': 1121857, 'percentile_85': 6873699}
+2025-02-11 12:32:05 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:32:06 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:06 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:06 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:32:06 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 90000.
+2025-02-11 12:32:06 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:07 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:07 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:32:07 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 90000.
+2025-02-11 12:32:07 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:08 [INFO] Trade confirmation for 4bh1dYSSxgoTot2Dw8QyUJFm7d1X65WxMTvznhFjfnHvCyxmXWhL77t3ASEKXqGvey6PBkpyNHpvzjmFppsMpDUb - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:32:08 [INFO] Sell transaction sent: https://solscan.io/tx/4bh1dYSSxgoTot2Dw8QyUJFm7d1X65WxMTvznhFjfnHvCyxmXWhL77t3ASEKXqGvey6PBkpyNHpvzjmFppsMpDUb
+2025-02-11 12:32:08 [INFO] Return value in SOL for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump: -0.00245766
+2025-02-11 12:32:08 [INFO] Return % for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump: -102.98151355999106
+2025-02-11 12:32:08 [INFO] Saved new trade to csv
+2025-02-11 12:32:08 [INFO] Redis key deleted for GAVmejvhsfQTkx8msUdQa1FyffJounCHH4zsQhqspump: True
+2025-02-11 12:32:08 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:08 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:32:08 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 90000.
+2025-02-11 12:32:08 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:09 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:09 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:32:09 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 90000.
+2025-02-11 12:32:09 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:10 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:10 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:32:10 [INFO] Initiating stoploss sell for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:10 [INFO] Token balance for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: 2240349540
+2025-02-11 12:32:10 [INFO] Priority fees: {'recommended': 90000, 'mean': 5085396, 'median': 75000, 'percentile_65': 430412, 'percentile_75': 1601696, 'percentile_85': 7730670}
+2025-02-11 12:32:10 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:32:10 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:11 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:11 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:32:11 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 90000.
+2025-02-11 12:32:11 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:12 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:12 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:32:12 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 90000.
+2025-02-11 12:32:12 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:13 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:13 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:32:13 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 90000.
+2025-02-11 12:32:13 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:14 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:14 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:32:14 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 90000.
+2025-02-11 12:32:14 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:15 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:15 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:32:15 [INFO] Initiating ordered sell for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:15 [INFO] Token balance for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: 2240349540
+2025-02-11 12:32:15 [INFO] Priority fees: {'recommended': 30000, 'mean': 4252512, 'median': 23099, 'percentile_65': 384341, 'percentile_75': 1106956, 'percentile_85': 6872249}
+2025-02-11 12:32:15 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 30000.
+2025-02-11 12:32:15 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:16 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:16 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:32:16 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 30000.
+2025-02-11 12:32:16 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:17 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:17 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:32:17 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 30000.
+2025-02-11 12:32:17 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:18 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:18 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:32:18 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 30000.
+2025-02-11 12:32:18 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:18 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:18 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:32:18 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 30000.
+2025-02-11 12:32:19 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:19 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:19 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:32:19 [INFO] Initiating ordered sell for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:19 [INFO] Token balance for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: 2240349540
+2025-02-11 12:32:20 [INFO] Priority fees: {'recommended': 30000, 'mean': 4545707, 'median': 23099, 'percentile_65': 387159, 'percentile_75': 1111111, 'percentile_85': 7722453}
+2025-02-11 12:32:20 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 30000.
+2025-02-11 12:32:20 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:20 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:20 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:32:20 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 30000.
+2025-02-11 12:32:21 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:21 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:21 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:32:21 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 30000.
+2025-02-11 12:32:22 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:22 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:22 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:32:22 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 30000.
+2025-02-11 12:32:22 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:23 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:23 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:32:23 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 30000.
+2025-02-11 12:32:23 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:24 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:24 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:32:24 [INFO] Initiating ordered sell for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:24 [INFO] Token balance for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: 2240349540
+2025-02-11 12:32:24 [INFO] Priority fees: {'recommended': 210435, 'mean': 4865910, 'median': 175363, 'percentile_65': 772831, 'percentile_75': 1305316, 'percentile_85': 7730670}
+2025-02-11 12:32:24 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 210435.
+2025-02-11 12:32:24 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:25 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:25 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:32:25 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 210435.
+2025-02-11 12:32:25 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:26 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:26 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:32:26 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 210435.
+2025-02-11 12:32:26 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:27 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:27 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:32:27 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 210435.
+2025-02-11 12:32:27 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:28 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:28 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:32:28 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 210435.
+2025-02-11 12:32:28 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:29 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:29 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:32:29 [INFO] Initiating ordered sell for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:29 [INFO] Token balance for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: 2240349540
+2025-02-11 12:32:29 [INFO] Priority fees: {'recommended': 291667, 'mean': 5602940, 'median': 243056, 'percentile_65': 772831, 'percentile_75': 1601696, 'percentile_85': 8713868}
+2025-02-11 12:32:29 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 291667.
+2025-02-11 12:32:29 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:30 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:30 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:32:30 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 291667.
+2025-02-11 12:32:30 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:31 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:31 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:32:31 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 291667.
+2025-02-11 12:32:31 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:32 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:32 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:32:32 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 291667.
+2025-02-11 12:32:32 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:33 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:33 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:32:33 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 291667.
+2025-02-11 12:32:33 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:33 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:33 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:32:33 [INFO] Initiating ordered sell for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:34 [INFO] Token balance for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: 2240349540
+2025-02-11 12:32:34 [INFO] Priority fees: {'recommended': 300692, 'mean': 4164449, 'median': 250577, 'percentile_65': 528460, 'percentile_75': 1111111, 'percentile_85': 7722453}
+2025-02-11 12:32:34 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 300692.
+2025-02-11 12:32:34 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:35 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:35 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:32:35 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 300692.
+2025-02-11 12:32:35 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:36 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:36 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:32:36 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 300692.
+2025-02-11 12:32:36 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:36 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:36 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:32:36 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 300692.
+2025-02-11 12:32:37 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:37 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:37 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:32:37 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 300692.
+2025-02-11 12:32:38 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:38 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:38 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:32:38 [INFO] Initiating ordered sell for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:38 [INFO] Token balance for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: 2240349540
+2025-02-11 12:32:39 [INFO] Priority fees: {'recommended': 413430, 'mean': 4541333, 'median': 344525, 'percentile_65': 864786, 'percentile_75': 1308650, 'percentile_85': 7730670}
+2025-02-11 12:32:39 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 413430.
+2025-02-11 12:32:39 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:39 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:39 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:32:39 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 413430.
+2025-02-11 12:32:40 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:40 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:40 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:32:40 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 413430.
+2025-02-11 12:32:40 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:41 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:41 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:32:41 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 413430.
+2025-02-11 12:32:41 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:42 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:42 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:32:42 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 413430.
+2025-02-11 12:32:42 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:43 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:43 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:32:43 [INFO] Initiating ordered sell for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:43 [INFO] Token balance for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: 2240349540
+2025-02-11 12:32:43 [INFO] Priority fees: {'recommended': 427104, 'mean': 4489689, 'median': 355920, 'percentile_65': 806497, 'percentile_75': 1136768, 'percentile_85': 7730670}
+2025-02-11 12:32:43 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 427104.
+2025-02-11 12:32:43 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:44 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:44 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:32:44 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 427104.
+2025-02-11 12:32:44 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:45 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:45 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:32:45 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 427104.
+2025-02-11 12:32:45 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:46 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:46 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:32:46 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 427104.
+2025-02-11 12:32:46 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:47 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:32:47 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:32:47 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 427104.
+2025-02-11 12:32:47 [INFO] Routes found for address: 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump
+2025-02-11 12:32:47 [INFO] No simulation error
+2025-02-11 12:32:48 [INFO] Initiating ordered sell for Z1mRpcY8HYc9FVfrgXnDaZPS5uTgANn8ReU9ie9pump
+2025-02-11 12:32:48 [INFO] Token balance for Z1mRpcY8HYc9FVfrgXnDaZPS5uTgANn8ReU9ie9pump: 2152521890
+2025-02-11 12:32:49 [INFO] Priority fees: {'recommended': 314493, 'mean': 3671965, 'median': 262078, 'percentile_65': 537482, 'percentile_75': 1111111, 'percentile_85': 4294748}
+2025-02-11 12:32:49 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 314493.
+2025-02-11 12:32:49 [INFO] Routes found for address: Z1mRpcY8HYc9FVfrgXnDaZPS5uTgANn8ReU9ie9pump
+2025-02-11 12:32:49 [INFO] No simulation error
+2025-02-11 12:33:08 [INFO] Trade confirmation for 5h8nJ5BrptNYmqrJ8eRt9ew9XAbztAjZhK8svyoyyCx73S5qoc1NiqsLsiKNSsg6QtLZF5eT4wAEAFMUo5iw8j5e - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:33:08 [INFO] Sell transaction sent: https://solscan.io/tx/5h8nJ5BrptNYmqrJ8eRt9ew9XAbztAjZhK8svyoyyCx73S5qoc1NiqsLsiKNSsg6QtLZF5eT4wAEAFMUo5iw8j5e
+2025-02-11 12:33:08 [INFO] Return value in SOL for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: -0.002956382
+2025-02-11 12:33:08 [INFO] Return % for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: -116.89703002869064
+2025-02-11 12:33:08 [INFO] Saved new trade to csv
+2025-02-11 12:33:08 [INFO] Redis key deleted for 5hWRKsLG8ChjvVARS5z3VprBdCuWGqkYXrSmexbNpump: True
+2025-02-11 12:34:20 [ERROR] Trade confirmation error: Unable to confirm transaction Z3sCKLxA4pZiNS2r9faVFNSkRUYwqp7fzNXKkiNT28m6EKCG5PE89H6KF2YWbXGibnC15nFPZsXFr9uvf2qyy8m
+2025-02-11 12:34:20 [INFO] Priority fees: {'recommended': 175052, 'mean': 4921407, 'median': 145877, 'percentile_65': 382934, 'percentile_75': 1111111, 'percentile_85': 5431882}
+2025-02-11 12:34:20 [INFO] Sell confirmation returned None. Increasing priority fee to 382934 using 'percentile_65' and retrying.
+2025-02-11 12:34:20 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 382934.
+2025-02-11 12:34:21 [INFO] Routes found for address: Z1mRpcY8HYc9FVfrgXnDaZPS5uTgANn8ReU9ie9pump
+2025-02-11 12:34:22 [INFO] No simulation error
+2025-02-11 12:34:42 [INFO] Trade confirmation for zu5Twpun8GQ8k5X2WWUcaZ6jTTMfSFz3GqYSVaBnt5g7stgtAFNAHGdPLT2s1Ehte1pi4xvTxy22LQPMoaADAn7 - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:34:42 [INFO] Sell transaction sent: https://solscan.io/tx/zu5Twpun8GQ8k5X2WWUcaZ6jTTMfSFz3GqYSVaBnt5g7stgtAFNAHGdPLT2s1Ehte1pi4xvTxy22LQPMoaADAn7
+2025-02-11 12:34:42 [INFO] Return value in SOL for Z1mRpcY8HYc9FVfrgXnDaZPS5uTgANn8ReU9ie9pump: -0.002719553
+2025-02-11 12:34:42 [INFO] Return % for Z1mRpcY8HYc9FVfrgXnDaZPS5uTgANn8ReU9ie9pump: -112.11124087555132
+2025-02-11 12:34:42 [INFO] Saved new trade to csv
+2025-02-11 12:34:42 [INFO] Redis key deleted for Z1mRpcY8HYc9FVfrgXnDaZPS5uTgANn8ReU9ie9pump: True
+2025-02-11 12:36:25 [INFO] Sleeping for 5 seconds before trading
+2025-02-11 12:36:30 [INFO] Sufficient SOL for trade - Wallet: 291316576, Trade amount: 100000
+2025-02-11 12:36:31 [INFO] Priority fees: {'recommended': 215685, 'mean': 3751275, 'median': 179738, 'percentile_65': 500331, 'percentile_75': 2058327, 'percentile_85': 7730670}
+2025-02-11 12:36:31 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 215685.
+2025-02-11 12:36:31 [INFO] Routes found for address: EiNVAry68nNoLyxBcUM83HVR8LB1SFdUWGAqik86pump
+2025-02-11 12:36:32 [INFO] No simulation error
+2025-02-11 12:36:47 [INFO] Trade confirmation for 5v9ELiAjWezPChDvkvCW2aZSiXkFtRnPhxY1WtZfme8jWEvnFtUJ9mW5qQJ4iFHQZNqd78BrRUyobtBWBtX2qw6z - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:36:47 [INFO] Transaction sent: https://solscan.io/tx/5v9ELiAjWezPChDvkvCW2aZSiXkFtRnPhxY1WtZfme8jWEvnFtUJ9mW5qQJ4iFHQZNqd78BrRUyobtBWBtX2qw6z
+2025-02-11 12:36:47 [INFO] Cached buy results for EiNVAry68nNoLyxBcUM83HVR8LB1SFdUWGAqik86pump: True
+2025-02-11 12:36:47 [INFO] Buy spot price for EiNVAry68nNoLyxBcUM83HVR8LB1SFdUWGAqik86pump: 4.87211e-05
+2025-02-11 12:36:47 [INFO] TRADE IN PROGRESS
+2025-02-11 12:36:47 [INFO] Stoploss price: 3.6540824999999996e-05 for EiNVAry68nNoLyxBcUM83HVR8LB1SFdUWGAqik86pump
+2025-02-11 12:36:51 [INFO] Sleeping for 5 seconds before trading
+2025-02-11 12:36:56 [INFO] Sufficient SOL for trade - Wallet: 288956611, Trade amount: 100000
+2025-02-11 12:36:57 [INFO] Priority fees: {'recommended': 310375, 'mean': 3567645, 'median': 258646, 'percentile_65': 828598, 'percentile_75': 2303201, 'percentile_85': 5030275}
+2025-02-11 12:36:57 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 310375.
+2025-02-11 12:36:57 [INFO] Routes found for address: FuF5n6TqzoDfUMFvLaFy6RevAWPeKrNZ5QZ2fqukpump
+2025-02-11 12:36:57 [ERROR] Simulation failed: {'InstructionError': [6, {'Custom': 6001}]}
+2025-02-11 12:36:57 [INFO] Buy error. Insufficient slippage. Increasing slippage to 2500bps and retrying.
+2025-02-11 12:36:57 [INFO] Attempting buy trade with slippage: 2500bps and priority fee: 310375.
+2025-02-11 12:36:58 [INFO] Routes found for address: FuF5n6TqzoDfUMFvLaFy6RevAWPeKrNZ5QZ2fqukpump
+2025-02-11 12:36:58 [ERROR] Simulation failed: {'InstructionError': [6, 'ProgramFailedToComplete']}
+2025-02-11 12:36:58 [INFO] Priority fees: {'recommended': 279162, 'mean': 3569502, 'median': 232635, 'percentile_65': 818035, 'percentile_75': 2303201, 'percentile_85': 5030275}
+2025-02-11 12:36:58 [INFO] Buy error. ProgramFailedToComplete detected. Increasing priority fee to 818035 using 'percentile_65' and retrying.
+2025-02-11 12:36:58 [INFO] Attempting buy trade with slippage: 2500bps and priority fee: 818035.
+2025-02-11 12:36:59 [INFO] Routes found for address: FuF5n6TqzoDfUMFvLaFy6RevAWPeKrNZ5QZ2fqukpump
+2025-02-11 12:36:59 [INFO] No simulation error
+2025-02-11 12:37:49 [INFO] Initiating ordered sell for EiNVAry68nNoLyxBcUM83HVR8LB1SFdUWGAqik86pump
+2025-02-11 12:37:49 [INFO] Token balance for EiNVAry68nNoLyxBcUM83HVR8LB1SFdUWGAqik86pump: 6030347910
+2025-02-11 12:37:49 [INFO] Priority fees: {'recommended': 143125, 'mean': 3194083, 'median': 119271, 'percentile_65': 497756, 'percentile_75': 1149709, 'percentile_85': 4714901}
+2025-02-11 12:37:49 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 143125.
+2025-02-11 12:37:50 [INFO] Routes found for address: EiNVAry68nNoLyxBcUM83HVR8LB1SFdUWGAqik86pump
+2025-02-11 12:37:51 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:37:51 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:37:51 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 143125.
+2025-02-11 12:37:51 [INFO] Routes found for address: EiNVAry68nNoLyxBcUM83HVR8LB1SFdUWGAqik86pump
+2025-02-11 12:37:52 [INFO] No simulation error
+2025-02-11 12:38:02 [INFO] Sleeping for 5 seconds before trading
+2025-02-11 12:38:07 [INFO] Sufficient SOL for trade - Wallet: 288956611, Trade amount: 100000
+2025-02-11 12:38:08 [INFO] Priority fees: {'recommended': 90000, 'mean': 2722526, 'median': 75000, 'percentile_65': 278171, 'percentile_75': 497411, 'percentile_85': 1310328}
+2025-02-11 12:38:08 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 90000.
+2025-02-11 12:38:08 [INFO] Routes found for address: 5ZGK6GLCmqUWUukW4oWU6msiPUPFFBJqC7xnNuxppump
+2025-02-11 12:38:09 [INFO] Trade confirmation for b7BDbJWU6njDPcTzYdUtyS8CeSmjVXJT8rQwvmeuNxiuvHgxt1uX62589Uu8nWSZYsNPKrUkMxRqSMeLwer4Yv4 - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:38:09 [INFO] Sell transaction sent: https://solscan.io/tx/b7BDbJWU6njDPcTzYdUtyS8CeSmjVXJT8rQwvmeuNxiuvHgxt1uX62589Uu8nWSZYsNPKrUkMxRqSMeLwer4Yv4
+2025-02-11 12:38:09 [INFO] Return value in SOL for EiNVAry68nNoLyxBcUM83HVR8LB1SFdUWGAqik86pump: -0.002320113
+2025-02-11 12:38:09 [INFO] Return % for EiNVAry68nNoLyxBcUM83HVR8LB1SFdUWGAqik86pump: -98.31133088838182
+2025-02-11 12:38:09 [INFO] Saved new trade to csv
+2025-02-11 12:38:09 [INFO] Redis key deleted for EiNVAry68nNoLyxBcUM83HVR8LB1SFdUWGAqik86pump: True
+2025-02-11 12:38:09 [INFO] No simulation error
+2025-02-11 12:38:26 [INFO] Trade confirmation for gBw1GTT5YBZrZWMDjHUci1yR3Pw3CWuNymP3LpA4b1EYpUbvtm8iTEyrdriRx2gWEFTJPb6J2BkMm8fDRPQNEb2 - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:38:26 [INFO] Transaction sent: https://solscan.io/tx/gBw1GTT5YBZrZWMDjHUci1yR3Pw3CWuNymP3LpA4b1EYpUbvtm8iTEyrdriRx2gWEFTJPb6J2BkMm8fDRPQNEb2
+2025-02-11 12:38:27 [INFO] Cached buy results for 5ZGK6GLCmqUWUukW4oWU6msiPUPFFBJqC7xnNuxppump: True
+2025-02-11 12:38:27 [INFO] Buy spot price for 5ZGK6GLCmqUWUukW4oWU6msiPUPFFBJqC7xnNuxppump: 0.000632133
+2025-02-11 12:38:27 [INFO] TRADE IN PROGRESS
+2025-02-11 12:38:27 [INFO] Stoploss price: 0.00047409975 for 5ZGK6GLCmqUWUukW4oWU6msiPUPFFBJqC7xnNuxppump
+2025-02-11 12:38:30 [ERROR] Trade confirmation error: Unable to confirm transaction 5ademyHu5dT5286RdaR8b6vv71HyX1oXeeqPRNghR3oPRWCVhdtTawao5qk1NLppGSLtRu7m2WhCu71CthHDx217
+2025-02-11 12:38:30 [INFO] Priority fees: {'recommended': 127196, 'mean': 3404597, 'median': 105997, 'percentile_65': 258688, 'percentile_75': 429916, 'percentile_85': 2220016}
+2025-02-11 12:38:30 [ERROR] Confirm_tx returned None. Increasing priority fee to 429916 using 'percentile_75' and retrying.
+2025-02-11 12:38:30 [INFO] Attempting buy trade with slippage: 2500bps and priority fee: 429916.
+2025-02-11 12:38:31 [INFO] Routes found for address: FuF5n6TqzoDfUMFvLaFy6RevAWPeKrNZ5QZ2fqukpump
+2025-02-11 12:38:32 [INFO] No simulation error
+2025-02-11 12:38:46 [INFO] Initiating stoploss sell for 5ZGK6GLCmqUWUukW4oWU6msiPUPFFBJqC7xnNuxppump
+2025-02-11 12:38:46 [INFO] Trade confirmation for 5LGRe8RDG41XpAAmwAHAyCtb55sHydSRDGn2GZoWAKuAYNfBW2U21BroyrsbqhuVzEkViR51n7wdEDiVT2jx3yz2 - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:38:46 [INFO] Transaction sent: https://solscan.io/tx/5LGRe8RDG41XpAAmwAHAyCtb55sHydSRDGn2GZoWAKuAYNfBW2U21BroyrsbqhuVzEkViR51n7wdEDiVT2jx3yz2
+2025-02-11 12:38:46 [INFO] Cached buy results for FuF5n6TqzoDfUMFvLaFy6RevAWPeKrNZ5QZ2fqukpump: True
+2025-02-11 12:38:46 [INFO] Token balance for 5ZGK6GLCmqUWUukW4oWU6msiPUPFFBJqC7xnNuxppump: 373218020
+2025-02-11 12:38:46 [INFO] Buy spot price for FuF5n6TqzoDfUMFvLaFy6RevAWPeKrNZ5QZ2fqukpump: 9.09642e-05
+2025-02-11 12:38:46 [INFO] TRADE IN PROGRESS
+2025-02-11 12:38:46 [INFO] Stoploss price: 6.822315000000001e-05 for FuF5n6TqzoDfUMFvLaFy6RevAWPeKrNZ5QZ2fqukpump
+2025-02-11 12:38:47 [INFO] Priority fees: {'recommended': 235054, 'mean': 4422003, 'median': 195879, 'percentile_65': 387512, 'percentile_75': 1111111, 'percentile_85': 7730670}
+2025-02-11 12:38:47 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 235054.
+2025-02-11 12:38:47 [INFO] Routes found for address: 5ZGK6GLCmqUWUukW4oWU6msiPUPFFBJqC7xnNuxppump
+2025-02-11 12:38:48 [INFO] No simulation error
+2025-02-11 12:39:03 [INFO] Trade confirmation for 23WYy9KkKnjcJXu6Sxh5jcQcwCAxqecwRgthsp6qFmtD8t3P4cGc6EPHWfTCXSZuhbSgAidw2Po5FJVTqBKT2REu - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:39:03 [INFO] Sell transaction sent: https://solscan.io/tx/23WYy9KkKnjcJXu6Sxh5jcQcwCAxqecwRgthsp6qFmtD8t3P4cGc6EPHWfTCXSZuhbSgAidw2Po5FJVTqBKT2REu
+2025-02-11 12:39:03 [INFO] Return value in SOL for 5ZGK6GLCmqUWUukW4oWU6msiPUPFFBJqC7xnNuxppump: -0.002390738
+2025-02-11 12:39:03 [INFO] Return % for 5ZGK6GLCmqUWUukW4oWU6msiPUPFFBJqC7xnNuxppump: -107.00261381742664
+2025-02-11 12:39:03 [INFO] Saved new trade to csv
+2025-02-11 12:39:03 [INFO] Redis key deleted for 5ZGK6GLCmqUWUukW4oWU6msiPUPFFBJqC7xnNuxppump: True
+2025-02-11 12:39:46 [INFO] Initiating ordered sell for FuF5n6TqzoDfUMFvLaFy6RevAWPeKrNZ5QZ2fqukpump
+2025-02-11 12:39:47 [INFO] Token balance for FuF5n6TqzoDfUMFvLaFy6RevAWPeKrNZ5QZ2fqukpump: 2193407270
+2025-02-11 12:39:47 [INFO] Priority fees: {'recommended': 90000, 'mean': 3047991, 'median': 75000, 'percentile_65': 392746, 'percentile_75': 639568, 'percentile_85': 2231704}
+2025-02-11 12:39:47 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:39:48 [INFO] Routes found for address: FuF5n6TqzoDfUMFvLaFy6RevAWPeKrNZ5QZ2fqukpump
+2025-02-11 12:39:48 [INFO] No simulation error
+2025-02-11 12:40:02 [INFO] Trade confirmation for Pdn3fqyQZEXfd3mna2z5g2tQ7YtEm94u5EuAMFFHhoYJX4XXPXGd6fGsBb87FMJn6qQhJDCD8gfgGpvaxCVFj1C - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:40:02 [INFO] Sell transaction sent: https://solscan.io/tx/Pdn3fqyQZEXfd3mna2z5g2tQ7YtEm94u5EuAMFFHhoYJX4XXPXGd6fGsBb87FMJn6qQhJDCD8gfgGpvaxCVFj1C
+2025-02-11 12:40:03 [INFO] Return value in SOL for FuF5n6TqzoDfUMFvLaFy6RevAWPeKrNZ5QZ2fqukpump: -0.002594012
+2025-02-11 12:40:03 [INFO] Return % for FuF5n6TqzoDfUMFvLaFy6RevAWPeKrNZ5QZ2fqukpump: -100.76979375307864
+2025-02-11 12:40:03 [INFO] Saved new trade to csv
+2025-02-11 12:40:03 [INFO] Redis key deleted for FuF5n6TqzoDfUMFvLaFy6RevAWPeKrNZ5QZ2fqukpump: True
+2025-02-11 12:41:30 [INFO] Sleeping for 5 seconds before trading
+2025-02-11 12:41:32 [INFO] Sleeping for 5 seconds before trading
+2025-02-11 12:41:36 [INFO] Sufficient SOL for trade - Wallet: 284011713, Trade amount: 100000
+2025-02-11 12:41:36 [INFO] Priority fees: {'recommended': 237409, 'mean': 3803166, 'median': 197841, 'percentile_65': 747883, 'percentile_75': 1668301, 'percentile_85': 7730670}
+2025-02-11 12:41:36 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 237409.
+2025-02-11 12:41:37 [INFO] Routes found for address: W3PYuYi54Yp8iQ4c1AGDTwmoX3erVFqWndHAYKnpump
+2025-02-11 12:41:37 [INFO] No simulation error
+2025-02-11 12:41:38 [INFO] Sufficient SOL for trade - Wallet: 284011713, Trade amount: 100000
+2025-02-11 12:41:38 [INFO] Priority fees: {'recommended': 232255, 'mean': 3694019, 'median': 193546, 'percentile_65': 679491, 'percentile_75': 1201532, 'percentile_85': 7730670}
+2025-02-11 12:41:38 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 232255.
+2025-02-11 12:41:38 [INFO] Routes found for address: 1gc6yARWMqZKjM5QKjeAzK2QRbTxUqA5CmBRvVipump
+2025-02-11 12:41:39 [INFO] No simulation error
+2025-02-11 12:41:51 [INFO] Trade confirmation for 3zFGZmDExiCf8tcXPk4CLhgYCjUtUnQKQCxn5Y1y44Sr4jAYfYVrkTwX9GWNMN1Qu5RtQPTwrVnjicicxiRs5Q6d - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:41:51 [INFO] Transaction sent: https://solscan.io/tx/3zFGZmDExiCf8tcXPk4CLhgYCjUtUnQKQCxn5Y1y44Sr4jAYfYVrkTwX9GWNMN1Qu5RtQPTwrVnjicicxiRs5Q6d
+2025-02-11 12:41:51 [INFO] Cached buy results for W3PYuYi54Yp8iQ4c1AGDTwmoX3erVFqWndHAYKnpump: True
+2025-02-11 12:41:52 [INFO] Buy spot price for W3PYuYi54Yp8iQ4c1AGDTwmoX3erVFqWndHAYKnpump: 7.92779e-05
+2025-02-11 12:41:52 [INFO] TRADE IN PROGRESS
+2025-02-11 12:41:52 [INFO] Stoploss price: 5.9458425e-05 for W3PYuYi54Yp8iQ4c1AGDTwmoX3erVFqWndHAYKnpump
+2025-02-11 12:42:54 [INFO] Initiating ordered sell for W3PYuYi54Yp8iQ4c1AGDTwmoX3erVFqWndHAYKnpump
+2025-02-11 12:42:54 [INFO] Token balance for W3PYuYi54Yp8iQ4c1AGDTwmoX3erVFqWndHAYKnpump: 2508017180
+2025-02-11 12:42:55 [INFO] Priority fees: {'recommended': 124064, 'mean': 1553092, 'median': 103387, 'percentile_65': 260739, 'percentile_75': 342070, 'percentile_85': 2073380}
+2025-02-11 12:42:55 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 124064.
+2025-02-11 12:42:55 [INFO] Routes found for address: W3PYuYi54Yp8iQ4c1AGDTwmoX3erVFqWndHAYKnpump
+2025-02-11 12:42:56 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:42:56 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:42:56 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 124064.
+2025-02-11 12:42:56 [INFO] Routes found for address: W3PYuYi54Yp8iQ4c1AGDTwmoX3erVFqWndHAYKnpump
+2025-02-11 12:42:57 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:42:57 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:42:57 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 124064.
+2025-02-11 12:42:57 [INFO] Routes found for address: W3PYuYi54Yp8iQ4c1AGDTwmoX3erVFqWndHAYKnpump
+2025-02-11 12:42:58 [INFO] No simulation error
+2025-02-11 12:43:10 [ERROR] Trade confirmation error: Unable to confirm transaction 2cxNxH6eLfL6z9yeCXxoHwidFkThtFpNLsSGhNWbr4CWKzuhnFSmA6eM1qiSxtvj2CT1n5phwecTLaRSQGpA7q63
+2025-02-11 12:43:10 [INFO] Priority fees: {'recommended': 90000, 'mean': 2027838, 'median': 75000, 'percentile_65': 196489, 'percentile_75': 372379, 'percentile_85': 2241483}
+2025-02-11 12:43:10 [ERROR] Confirm_tx returned None. Increasing priority fee to 196489 using 'percentile_65' and retrying.
+2025-02-11 12:43:10 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 196489.
+2025-02-11 12:43:11 [INFO] Routes found for address: 1gc6yARWMqZKjM5QKjeAzK2QRbTxUqA5CmBRvVipump
+2025-02-11 12:43:11 [INFO] No simulation error
+2025-02-11 12:43:12 [INFO] Trade confirmation for 2w2xxDaisZrZoXSvE1qD3nKkyUaevYrdBbmo7dePSeX8KM89BG6SUfiVz2eo75JEpa6hzCDvYKHRFJEudA28nvYw - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:43:12 [INFO] Sell transaction sent: https://solscan.io/tx/2w2xxDaisZrZoXSvE1qD3nKkyUaevYrdBbmo7dePSeX8KM89BG6SUfiVz2eo75JEpa6hzCDvYKHRFJEudA28nvYw
+2025-02-11 12:43:12 [INFO] Return value in SOL for W3PYuYi54Yp8iQ4c1AGDTwmoX3erVFqWndHAYKnpump: -0.002395117
+2025-02-11 12:43:12 [INFO] Return % for W3PYuYi54Yp8iQ4c1AGDTwmoX3erVFqWndHAYKnpump: -100.56380157106994
+2025-02-11 12:43:12 [INFO] Saved new trade to csv
+2025-02-11 12:43:12 [INFO] Redis key deleted for W3PYuYi54Yp8iQ4c1AGDTwmoX3erVFqWndHAYKnpump: True
+2025-02-11 12:43:32 [INFO] Trade confirmation for 3Y6yYsxEKHajsy76saShwWMmC5x3cmu8RNxeETBjxm5BtdkfzFYwJdQzGBeP2nD1vEDnzsUan1D234jDLZrYrzUv - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:43:32 [INFO] Transaction sent: https://solscan.io/tx/3Y6yYsxEKHajsy76saShwWMmC5x3cmu8RNxeETBjxm5BtdkfzFYwJdQzGBeP2nD1vEDnzsUan1D234jDLZrYrzUv
+2025-02-11 12:43:32 [INFO] Cached buy results for 1gc6yARWMqZKjM5QKjeAzK2QRbTxUqA5CmBRvVipump: True
+2025-02-11 12:43:32 [INFO] Buy spot price for 1gc6yARWMqZKjM5QKjeAzK2QRbTxUqA5CmBRvVipump: 8.13528e-05
+2025-02-11 12:43:32 [INFO] TRADE IN PROGRESS
+2025-02-11 12:43:32 [INFO] Stoploss price: 6.1014600000000004e-05 for 1gc6yARWMqZKjM5QKjeAzK2QRbTxUqA5CmBRvVipump
+2025-02-11 12:44:34 [INFO] Initiating ordered sell for 1gc6yARWMqZKjM5QKjeAzK2QRbTxUqA5CmBRvVipump
+2025-02-11 12:44:35 [INFO] Token balance for 1gc6yARWMqZKjM5QKjeAzK2QRbTxUqA5CmBRvVipump: 2471185190
+2025-02-11 12:44:35 [INFO] Priority fees: {'recommended': 90000, 'mean': 5467417, 'median': 75000, 'percentile_65': 641068, 'percentile_75': 3424964, 'percentile_85': 8133590}
+2025-02-11 12:44:35 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:44:36 [INFO] Routes found for address: 1gc6yARWMqZKjM5QKjeAzK2QRbTxUqA5CmBRvVipump
+2025-02-11 12:44:36 [INFO] No simulation error
+2025-02-11 12:44:50 [INFO] Trade confirmation for 3ocaivNRS2cbwCTZExDVjXD7vEbYF8qkLeEAwPjrMeUTKfrA4FQigMMV9EB5MDpCVE4EkjsvH9qs682coC4zB317 - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:44:50 [INFO] Sell transaction sent: https://solscan.io/tx/3ocaivNRS2cbwCTZExDVjXD7vEbYF8qkLeEAwPjrMeUTKfrA4FQigMMV9EB5MDpCVE4EkjsvH9qs682coC4zB317
+2025-02-11 12:44:50 [INFO] Return value in SOL for 1gc6yARWMqZKjM5QKjeAzK2QRbTxUqA5CmBRvVipump: -0.002337591
+2025-02-11 12:44:50 [INFO] Return % for 1gc6yARWMqZKjM5QKjeAzK2QRbTxUqA5CmBRvVipump: -99.86423265174821
+2025-02-11 12:44:50 [INFO] Saved new trade to csv
+2025-02-11 12:44:50 [INFO] Redis key deleted for 1gc6yARWMqZKjM5QKjeAzK2QRbTxUqA5CmBRvVipump: True
+2025-02-11 12:45:30 [INFO] Sleeping for 5 seconds before trading
+2025-02-11 12:45:36 [INFO] Sufficient SOL for trade - Wallet: 279279005, Trade amount: 100000
+2025-02-11 12:45:36 [INFO] Priority fees: {'recommended': 90000, 'mean': 4518142, 'median': 75000, 'percentile_65': 384536, 'percentile_75': 1111111, 'percentile_85': 7730670}
+2025-02-11 12:45:36 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 90000.
+2025-02-11 12:45:37 [INFO] Routes found for address: 4ZQCqe8ByGKgX8Vzk8pCRzn4o4EyNWqUFe5pkKQKpump
+2025-02-11 12:45:37 [INFO] No simulation error
+2025-02-11 12:45:52 [INFO] Trade confirmation for 3RXQP2iwds3bA9oV2t2mskxHr3q11fMgo11yWSsJe5JDsTPHyaLNV374Ljgyvdw6yNodttxzBWYxieexCffJ1uNn - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:45:52 [INFO] Transaction sent: https://solscan.io/tx/3RXQP2iwds3bA9oV2t2mskxHr3q11fMgo11yWSsJe5JDsTPHyaLNV374Ljgyvdw6yNodttxzBWYxieexCffJ1uNn
+2025-02-11 12:45:52 [INFO] Cached buy results for 4ZQCqe8ByGKgX8Vzk8pCRzn4o4EyNWqUFe5pkKQKpump: True
+2025-02-11 12:45:52 [INFO] Buy spot price for 4ZQCqe8ByGKgX8Vzk8pCRzn4o4EyNWqUFe5pkKQKpump: 5.35626e-05
+2025-02-11 12:45:52 [INFO] TRADE IN PROGRESS
+2025-02-11 12:45:52 [INFO] Stoploss price: 4.0171950000000004e-05 for 4ZQCqe8ByGKgX8Vzk8pCRzn4o4EyNWqUFe5pkKQKpump
+2025-02-11 12:46:15 [INFO] Sleeping for 5 seconds before trading
+2025-02-11 12:46:21 [INFO] Sufficient SOL for trade - Wallet: 277044725, Trade amount: 100000
+2025-02-11 12:46:21 [INFO] Priority fees: {'recommended': 90000, 'mean': 3063412, 'median': 75000, 'percentile_65': 154603, 'percentile_75': 301650, 'percentile_85': 1056894}
+2025-02-11 12:46:21 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 90000.
+2025-02-11 12:46:21 [INFO] Routes found for address: FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump
+2025-02-11 12:46:22 [INFO] No simulation error
+2025-02-11 12:46:39 [INFO] Trade confirmation for 3NXYHPK35bjqk9ZKkxNTWzwmWrJK9phopne8yvVLseVhKhrUUnvNpvxgknhKuVmCmGgdPcCmwQUGFYgv3qLM43mt - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:46:39 [INFO] Transaction sent: https://solscan.io/tx/3NXYHPK35bjqk9ZKkxNTWzwmWrJK9phopne8yvVLseVhKhrUUnvNpvxgknhKuVmCmGgdPcCmwQUGFYgv3qLM43mt
+2025-02-11 12:46:39 [INFO] Cached buy results for FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump: True
+2025-02-11 12:46:39 [INFO] Buy spot price for FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump: 9.49961e-05
+2025-02-11 12:46:39 [INFO] TRADE IN PROGRESS
+2025-02-11 12:46:39 [INFO] Stoploss price: 7.1247075e-05 for FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump
+2025-02-11 12:46:54 [INFO] Initiating ordered sell for 4ZQCqe8ByGKgX8Vzk8pCRzn4o4EyNWqUFe5pkKQKpump
+2025-02-11 12:46:55 [INFO] Token balance for 4ZQCqe8ByGKgX8Vzk8pCRzn4o4EyNWqUFe5pkKQKpump: 3229136320
+2025-02-11 12:46:55 [INFO] Priority fees: {'recommended': 137782, 'mean': 1787015, 'median': 114819, 'percentile_65': 269277, 'percentile_75': 476194, 'percentile_85': 2154967}
+2025-02-11 12:46:55 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 137782.
+2025-02-11 12:46:56 [INFO] Routes found for address: 4ZQCqe8ByGKgX8Vzk8pCRzn4o4EyNWqUFe5pkKQKpump
+2025-02-11 12:46:56 [INFO] No simulation error
+2025-02-11 12:47:13 [INFO] Trade confirmation for 4xUKwBdmE5nSrR6o6pTcqKzJi7Ra7bJ1GfqvgwA4v6TkdGss4Hr3UFSyAyAwUGPTd9RTqG4q5amW2KsZHzMopEQ9 - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:47:13 [INFO] Sell transaction sent: https://solscan.io/tx/4xUKwBdmE5nSrR6o6pTcqKzJi7Ra7bJ1GfqvgwA4v6TkdGss4Hr3UFSyAyAwUGPTd9RTqG4q5amW2KsZHzMopEQ9
+2025-02-11 12:47:13 [INFO] Return value in SOL for 4ZQCqe8ByGKgX8Vzk8pCRzn4o4EyNWqUFe5pkKQKpump: -0.002258971
+2025-02-11 12:47:13 [INFO] Return % for 4ZQCqe8ByGKgX8Vzk8pCRzn4o4EyNWqUFe5pkKQKpump: -101.10509873426787
+2025-02-11 12:47:13 [INFO] Saved new trade to csv
+2025-02-11 12:47:13 [INFO] Redis key deleted for 4ZQCqe8ByGKgX8Vzk8pCRzn4o4EyNWqUFe5pkKQKpump: True
+2025-02-11 12:47:41 [INFO] Initiating ordered sell for FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump
+2025-02-11 12:47:42 [INFO] Token balance for FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump: 2126403630
+2025-02-11 12:47:42 [INFO] Priority fees: {'recommended': 90000, 'mean': 3000699, 'median': 75000, 'percentile_65': 211655, 'percentile_75': 729125, 'percentile_85': 3192975}
+2025-02-11 12:47:42 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:47:43 [INFO] Routes found for address: FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump
+2025-02-11 12:47:43 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:47:43 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:47:43 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 90000.
+2025-02-11 12:47:44 [INFO] Routes found for address: FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump
+2025-02-11 12:47:44 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:47:44 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:47:44 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 90000.
+2025-02-11 12:47:45 [INFO] Routes found for address: FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump
+2025-02-11 12:47:45 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:47:45 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:47:45 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 90000.
+2025-02-11 12:47:45 [INFO] Routes found for address: FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump
+2025-02-11 12:47:46 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:47:46 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:47:46 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 90000.
+2025-02-11 12:47:46 [INFO] Routes found for address: FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump
+2025-02-11 12:47:47 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:47:47 [ERROR] Maximum sell slippage reached (4500bps). Aborting trade.
+2025-02-11 12:47:47 [INFO] Initiating ordered sell for FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump
+2025-02-11 12:47:47 [INFO] Token balance for FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump: 2126403630
+2025-02-11 12:47:47 [INFO] Priority fees: {'recommended': 90000, 'mean': 4035141, 'median': 75000, 'percentile_65': 194330, 'percentile_75': 729125, 'percentile_85': 6400691}
+2025-02-11 12:47:47 [INFO] Attempting sell trade with slippage: 2500bps and priority fee: 90000.
+2025-02-11 12:47:48 [INFO] Routes found for address: FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump
+2025-02-11 12:47:48 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:47:48 [INFO] Sell error: insufficient slippage. Increasing slippage to 3000bps and retrying.
+2025-02-11 12:47:48 [INFO] Attempting sell trade with slippage: 3000bps and priority fee: 90000.
+2025-02-11 12:47:48 [INFO] Routes found for address: FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump
+2025-02-11 12:47:49 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:47:49 [INFO] Sell error: insufficient slippage. Increasing slippage to 3500bps and retrying.
+2025-02-11 12:47:49 [INFO] Attempting sell trade with slippage: 3500bps and priority fee: 90000.
+2025-02-11 12:47:49 [INFO] Routes found for address: FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump
+2025-02-11 12:47:50 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:47:50 [INFO] Sell error: insufficient slippage. Increasing slippage to 4000bps and retrying.
+2025-02-11 12:47:50 [INFO] Attempting sell trade with slippage: 4000bps and priority fee: 90000.
+2025-02-11 12:47:50 [INFO] Routes found for address: FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump
+2025-02-11 12:47:51 [ERROR] Simulation failed: {'InstructionError': [3, {'Custom': 6001}]}
+2025-02-11 12:47:51 [INFO] Sell error: insufficient slippage. Increasing slippage to 4500bps and retrying.
+2025-02-11 12:47:51 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 90000.
+2025-02-11 12:47:51 [INFO] Routes found for address: FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump
+2025-02-11 12:47:52 [INFO] No simulation error
+2025-02-11 12:49:08 [INFO] Sleeping for 5 seconds before trading
+2025-02-11 12:49:10 [INFO] Sleeping for 5 seconds before trading
+2025-02-11 12:49:13 [INFO] Sufficient SOL for trade - Wallet: 274785754, Trade amount: 100000
+2025-02-11 12:49:14 [INFO] Priority fees: {'recommended': 223899, 'mean': 4575204, 'median': 186583, 'percentile_65': 518094, 'percentile_75': 2340254, 'percentile_85': 7730670}
+2025-02-11 12:49:14 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 223899.
+2025-02-11 12:49:14 [INFO] Routes found for address: 9t4H7em2jhEE3DYPE9skKsQLyW8BeS16UFDrJTCipump
+2025-02-11 12:49:15 [ERROR] Simulation failed: {'InstructionError': [6, 'ProgramFailedToComplete']}
+2025-02-11 12:49:15 [INFO] Priority fees: {'recommended': 220033, 'mean': 4262448, 'median': 183361, 'percentile_65': 511714, 'percentile_75': 2248234, 'percentile_85': 7730670}
+2025-02-11 12:49:15 [INFO] Buy error. ProgramFailedToComplete detected. Increasing priority fee to 511714 using 'percentile_65' and retrying.
+2025-02-11 12:49:15 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 511714.
+2025-02-11 12:49:15 [INFO] Routes found for address: 9t4H7em2jhEE3DYPE9skKsQLyW8BeS16UFDrJTCipump
+2025-02-11 12:49:16 [INFO] Sufficient SOL for trade - Wallet: 274785754, Trade amount: 100000
+2025-02-11 12:49:16 [INFO] Priority fees: {'recommended': 209185, 'mean': 4250841, 'median': 174321, 'percentile_65': 503307, 'percentile_75': 2248234, 'percentile_85': 7730670}
+2025-02-11 12:49:16 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 209185.
+2025-02-11 12:49:16 [ERROR] Simulation failed: {'InstructionError': [6, 'ProgramFailedToComplete']}
+2025-02-11 12:49:16 [INFO] Routes found for address: FVeDxYHzTi9KC6u29M3jrg4WPBTynkaKFnowafr7pump
+2025-02-11 12:49:16 [INFO] Priority fees: {'recommended': 209185, 'mean': 4326042, 'median': 174321, 'percentile_65': 511714, 'percentile_75': 2340254, 'percentile_85': 7730670}
+2025-02-11 12:49:16 [INFO] Buy error. ProgramFailedToComplete detected. Increasing priority fee to 2340254 using 'percentile_75' and retrying.
+2025-02-11 12:49:16 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 2340254.
+2025-02-11 12:49:17 [ERROR] Simulation failed: {'InstructionError': [6, 'ProgramFailedToComplete']}
+2025-02-11 12:49:17 [INFO] Priority fees: {'recommended': 203820, 'mean': 4506346, 'median': 169850, 'percentile_65': 511714, 'percentile_75': 2365254, 'percentile_85': 7730670}
+2025-02-11 12:49:17 [INFO] Buy error. ProgramFailedToComplete detected. Increasing priority fee to 511714 using 'percentile_65' and retrying.
+2025-02-11 12:49:17 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 511714.
+2025-02-11 12:49:17 [INFO] Routes found for address: 9t4H7em2jhEE3DYPE9skKsQLyW8BeS16UFDrJTCipump
+2025-02-11 12:49:17 [INFO] Routes found for address: FVeDxYHzTi9KC6u29M3jrg4WPBTynkaKFnowafr7pump
+2025-02-11 12:49:17 [ERROR] Simulation failed: {'InstructionError': [6, 'ProgramFailedToComplete']}
+2025-02-11 12:49:18 [INFO] Priority fees: {'recommended': 203820, 'mean': 4165732, 'median': 169850, 'percentile_65': 503307, 'percentile_75': 2248234, 'percentile_85': 7730670}
+2025-02-11 12:49:18 [INFO] Buy error. ProgramFailedToComplete detected. Increasing priority fee to 7730670 using 'percentile_85' and retrying.
+2025-02-11 12:49:18 [INFO] Attempting buy trade with slippage: 2000bps and priority fee: 7730670.
+2025-02-11 12:49:18 [INFO] Routes found for address: 9t4H7em2jhEE3DYPE9skKsQLyW8BeS16UFDrJTCipump
+2025-02-11 12:49:18 [INFO] No simulation error
+2025-02-11 12:49:19 [ERROR] Simulation failed: {'InstructionError': [6, 'ProgramFailedToComplete']}
+2025-02-11 12:49:19 [ERROR] All priority fee levels exhausted during simulation error. Aborting trade.
+2025-02-11 12:49:22 [ERROR] Trade confirmation error: Unable to confirm transaction 2jG2F8X2ugDjfh5yKcjXuH3rMGwc8DyVZyR2ZXm1eiW4BkKbCYsn8oMJ5siQpnbSR6jtNc48ZP4uFJGs1vavf1JF
+2025-02-11 12:49:23 [INFO] Priority fees: {'recommended': 187742, 'mean': 3781652, 'median': 156452, 'percentile_65': 497804, 'percentile_75': 1405725, 'percentile_85': 7730670}
+2025-02-11 12:49:23 [INFO] Sell confirmation returned None. Increasing priority fee to 497804 using 'percentile_65' and retrying.
+2025-02-11 12:49:23 [INFO] Attempting sell trade with slippage: 4500bps and priority fee: 497804.
+2025-02-11 12:49:23 [INFO] Routes found for address: FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump
+2025-02-11 12:49:23 [INFO] No simulation error
+2025-02-11 12:49:36 [INFO] Trade confirmation for 2eBMJWrY6Hs3uRB5U9ofBQPn8Jb82gPe6PkdTSLufwztoUPhmQnntkDCiduQsJPQqSGqhU3dRU78aB9rva4yHyiy - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:49:36 [INFO] Transaction sent: https://solscan.io/tx/2eBMJWrY6Hs3uRB5U9ofBQPn8Jb82gPe6PkdTSLufwztoUPhmQnntkDCiduQsJPQqSGqhU3dRU78aB9rva4yHyiy
+2025-02-11 12:49:37 [INFO] Cached buy results for FVeDxYHzTi9KC6u29M3jrg4WPBTynkaKFnowafr7pump: True
+2025-02-11 12:49:37 [INFO] Buy spot price for FVeDxYHzTi9KC6u29M3jrg4WPBTynkaKFnowafr7pump: 6.13565e-05
+2025-02-11 12:49:37 [INFO] TRADE IN PROGRESS
+2025-02-11 12:49:37 [INFO] Stoploss price: 4.6017374999999996e-05 for FVeDxYHzTi9KC6u29M3jrg4WPBTynkaKFnowafr7pump
+2025-02-11 12:49:41 [INFO] Trade confirmation for ReL5cdcU9UtMTdGtPTMGNfteF6no8dUKtRDn2o2BN3ULSUFR6CJKtxxxmgjS7EuZzxT86nGpu1LE4diLUc3LFkN - Status: Ok - Error: None - ConfirmationStatus: finalized
+2025-02-11 12:49:41 [INFO] Sell transaction sent: https://solscan.io/tx/ReL5cdcU9UtMTdGtPTMGNfteF6no8dUKtRDn2o2BN3ULSUFR6CJKtxxxmgjS7EuZzxT86nGpu1LE4diLUc3LFkN
+2025-02-11 12:49:41 [INFO] Return value in SOL for FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump: -0.002684429
+2025-02-11 12:49:41 [INFO] Return % for FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump: -120.14738528743041
+2025-02-11 12:49:41 [INFO] Saved new trade to csv
+2025-02-11 12:49:41 [INFO] Redis key deleted for FMBj2ngSXu1aoM1Aef5dRNaTtZBgavhS6YoTujgcpump: True
+2025-02-11 12:49:46 [INFO] Sleeping for 5 seconds before trading
