@@ -1,18 +1,12 @@
 import asyncio
 import httpx
-import time
-import json
-import ssl
-import websockets
-from datetime import datetime, timezone
 import redis.asyncio as redis
-from pprint import pprint
 
-from config import MIGRATION_ADDRESS, migrations_logger, RPC_URL, SOL_MINT, SOL_AMOUNT_LAMPORTS, BUY_SLIPPAGE, SELL_SLIPPAGE, TRADE_AMOUNT_SOL, SOL_DECIMALS, WALLET_ADDRESS, PRIVATE_KEY, HTTPX_TIMEOUT
+from config import migrations_logger, RPC_URL, SOL_MINT, SOL_AMOUNT_LAMPORTS, BUY_SLIPPAGE, SELL_SLIPPAGE, HTTPX_TIMEOUT
 from listen_to_raydium_migration import listen_for_migrations
 from trade_utils import trade_wrapper, startup_sell
 from solana.rpc.async_api import AsyncClient
-from storage_utils import parse_migrations_to_save, store_trade_data, fetch_trade_data
+from storage_utils import parse_migrations_to_save
 from filter_utils import process_new_tokens
 
 # Instantiate the relevant objects
