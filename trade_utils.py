@@ -1,5 +1,3 @@
-
-
 import statistics
 import aiohttp
 import requests
@@ -345,24 +343,30 @@ async def get_jupiter_quote(httpx_client:httpx.AsyncClient, input_address:str, o
         "swapMode": "ExactIn"
     }
 
-    # quote_response = await httpx_client.get(JUPITER_QUOTE_URL, headers={'Accept':'application/json'}, params=params)
-    quote_response = await httpx_client.get(quote_url, headers={'Accept':'application/json'}, params=params)
-    quote_response = quote_response.json()
+    try:
+        # quote_response = await httpx_client.get(JUPITER_QUOTE_URL, headers={'Accept':'application/json'}, params=params)
+        quote_response = await httpx_client.get(quote_url, headers={'Accept':'application/json'}, params=params)
+        quote_response = quote_response.json()
 
-    # Define risky address for logging purposes
-    if is_buy: 
-        risk_address = output_address
-    else:
-        risk_address = input_address
+        # Define risky address for logging purposes
+        if is_buy: 
+            risk_address = output_address
+        else:
+            risk_address = input_address
 
-    # Log and return the result for the best route
-    if not quote_response or quote_response.get("error"):
-        trade_logger.error(f"No routes found for: {risk_address}")
-        trade_logger.error(f"Quote response: {quote_response}")
-        return None
-    else:
-        trade_logger.info(f"Routes found for address: {risk_address}")
-        return quote_response
+        # Log and return the result for the best route
+        if not quote_response or quote_response.get("error"):
+            trade_logger.error(f"No routes found for: {risk_address}")
+            return None
+        else:
+            trade_logger.info(f"Routes found for address: {risk_address}")
+            return quote_response
+    except httpx.ConnectTimeout:
+        trade_logger.error(f"Get_jupiter_quote function - HTTPX Timeout Error")
+        await asyncio.sleep(5)
+    except Exception as e:
+        trade_logger.error(f"Get_jupiter_quote function error: {e}")
+        await asyncio.sleep(5)
 
 
 # Execute a swap based upon quote
@@ -462,34 +466,42 @@ async def get_price(client:httpx.AsyncClient, address, timeout=10):
     # All prices are in USDC (unless if vsToken is used)
 
     payload = {
-        "ids":address,
-        # "vsToken": SOL_MINT,
+        "ids": address,
+        # Do not use vsToken as we want prices in USDC.
         "showExtraInfo": False
     }
 
     loop_count = 0
     while True:
-        response = await client.get(url=JUPITER_PRICE_URL, params=payload, timeout=Timeout(timeout=timeout))
-        response = response.json()
-
-        # Sometimes no prices are available yet
-        if response is None or response["data"][address] is None:
+        try:
+            response = await client.get(url=JUPITER_PRICE_URL, params=payload, timeout=Timeout(timeout=timeout))
+            response_json = response.json()
+        except Exception as e:
+            trade_logger.error(f"Error fetching price for {address}: {e}")
             return None
-        
-        derived_price = response["data"][address]["price"]
-            
-        # Error handling
-        if derived_price is None:
-            trade_logger.error(f"No price received for {address}")
 
-            loop_count += 1
-            if loop_count > PRICE_LOOP_RETRIES:
-                return None
-            else:
-                await asyncio.sleep(MONITOR_PRICE_DELAY)
-                continue
-        else:
+        # Check if the token data exists in the response
+        token_data = response_json.get("data", {}).get(address)
+        if token_data is None:
+            # Sometimes no prices are available yet; return None (or consider a retry)
+            return None
+
+        # First, try to get the last traded price
+        last_traded_price = token_data.get("lastTradedPrice")
+        if last_traded_price is not None:
+            return float(last_traded_price)
+
+        # Fall back to the derived price if no last traded price is available
+        derived_price = token_data.get("price")
+        if derived_price is not None:
             return float(derived_price)
+
+        # Neither price is available; log error and retry up to the maximum retries
+        trade_logger.error(f"No price received for {address}")
+        loop_count += 1
+        if loop_count > PRICE_LOOP_RETRIES:
+            return None
+        await asyncio.sleep(MONITOR_PRICE_DELAY)
         
 
 # Fetch the price from DexScreener using token address

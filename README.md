@@ -11,6 +11,12 @@ Post migration pump.fun sniper bot
 6. Increase buy slippage max if price is increasing (and vice verse for selling)?
 7. Looking into DexScreener prices - the price at migration is always 0.0004108, yet I don't get this value when I recalculate it
 
+# Price feeds:
+ - Codex.io is the fastest and most accurate in real-time
+ - DexScreener has best rate limit but is incredibly slow
+ - Jupiter's feed is a bit delayed and somewhat accurate
+ - Overall - Codex is best, but most expensive ($350 per month) and free plan is too limited for use
+
 # Not critical:
 1. In execute_swap function, filter for multiple routes, currently defauls to first route - not critical reason: pump.fun tokens only have a single raydium route
 
