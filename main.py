@@ -1,11 +1,11 @@
 import asyncio
 import httpx
 import redis.asyncio as redis
+from solana.rpc.async_api import AsyncClient
 
 from config import migrations_logger, RPC_URL, SOL_MINT, SOL_AMOUNT_LAMPORTS, BUY_SLIPPAGE, SELL_SLIPPAGE, HTTPX_TIMEOUT
 from listen_to_raydium_migration import listen_for_migrations
 from trade_utils import trade_wrapper, startup_sell
-from solana.rpc.async_api import AsyncClient
 from storage_utils import parse_migrations_to_save
 from filter_utils import process_new_tokens
 
