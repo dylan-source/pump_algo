@@ -32,9 +32,9 @@ TIMEOUT = 30000                     # sleep time between api calls for filters_u
 HTTPX_TIMEOUT = 10                  # timeout specifically for HTTPX
 MAX_TRADE_TIME_MINS = 8             # maximum trade duration
 SELL_LOOP_DELAY = 10                # delay between api calls in execute_sell function
-MONITOR_PRICE_DELAY = 2             # length of time between price API calls -> to prevent rate limit
+MONITOR_PRICE_DELAY = 3             # length of time between price API calls -> to prevent rate limit
 PRICE_LOOP_RETRIES = 5              # max number of times to attempt to fetch a rpice
-START_UP_SLEEP = 10                 # number of seconds after migration before attempting to buy -> often an error occurs if too soon
+START_UP_SLEEP = 5                  # number of seconds after migration before attempting to buy -> often an error occurs if too soon
 
 # Define SOL constants
 SOL_DECIMALS = 9
