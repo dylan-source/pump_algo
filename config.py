@@ -8,7 +8,7 @@ from cryptography.fernet import Fernet
 from solders.pubkey import Pubkey     # type: ignore
 from solders.keypair import Keypair   # type: ignore
 
-from solana.rpc.api import Client
+from solana.rpc.async_api import AsyncClient
 
 load_dotenv()
 
@@ -154,7 +154,7 @@ trade_logger.info("Private key successfully decrypted and loaded.")
 
 UNIT_BUDGET =  150_000
 UNIT_PRICE =  1_000_000
-client = Client(RPC_URL)
+client = AsyncClient(RPC_URL)
 payer_keypair = PRIVATE_KEY
 
 

@@ -30,7 +30,7 @@ from utils.pool_utils import (
 from config import client, payer_keypair, UNIT_BUDGET, UNIT_PRICE
 from raydium.constants import ACCOUNT_LAYOUT_LEN, SOL_DECIMAL, TOKEN_PROGRAM_ID, WSOL
 
-def buy(pair_address: str, sol_in: float = 0.01, slippage: int = 5) -> bool:
+async def buy(pair_address: str, sol_in: float = 0.01, slippage: int = 5) -> bool:
     try:
         print(f"Starting buy transaction for pair address: {pair_address}")
 
