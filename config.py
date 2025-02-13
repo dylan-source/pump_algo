@@ -132,14 +132,12 @@ encrypted_private_key = os.getenv("ENCRYPTED_PRIVATE_KEY")
 if not encrypted_private_key:
     raise Exception("ENCRYPTED_PRIVATE_KEY not set in .env.")
 
-# Retrieve the master encryption key from a secure source - in production, use a secure vault or prompting the user.
-# encryption_key = os.getenv("ENCRYPTION_KEY")  -> relevant if Master Encryption Key is stored in .env or secure vault (e.g AWS Secrets Manager)
-# if not encryption_key:
+# Attempt to retrieve the master encryption key from an environment variable.
 encryption_key = getpass.getpass("Enter your master encryption key: ")
 if not encryption_key:
     raise Exception("Master encryption key is required.")
 
-# Decrypt the private key
+# Decrypt the private key using the master encryption key.
 cipher = Fernet(encryption_key.encode())
 decrypted_private_key = cipher.decrypt(encrypted_private_key.encode()).decode()
 
@@ -158,3 +156,7 @@ UNIT_BUDGET =  150_000
 UNIT_PRICE =  1_000_000
 client = Client(RPC_URL)
 payer_keypair = PRIVATE_KEY
+
+
+
+

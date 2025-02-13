@@ -7,7 +7,7 @@ migrations.log
 trade.log
 trade_all_trades.log
 .venv
-/Scripts
+/Scripts/encryption.txt
 trade_data.csv
 trade_data_all_trades.csv
 migration_data.csv

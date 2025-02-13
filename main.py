@@ -15,7 +15,6 @@ from solana.rpc.async_api import AsyncClient
 from storage_utils import parse_migrations_to_save, store_trade_data, fetch_trade_data
 from filter_utils import process_new_tokens
 
-
 from raydium.amm_v4 import buy, sell
 
 # Instantiate the relevant objects
@@ -49,7 +48,7 @@ async def consume_queue(queue, httpx_client):
         #             sol_address=SOL_MINT, trade_amount=SOL_AMOUNT_LAMPORTS, buy_slippage=BUY_SLIPPAGE, sell_slippage=SELL_SLIPPAGE)
         #             )        
             
-        sol_in = 0.001
+        sol_in = 0.0001
         slippage = 1
         buy(pair_address, sol_in, slippage)
         
