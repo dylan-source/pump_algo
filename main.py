@@ -15,6 +15,9 @@ from solana.rpc.async_api import AsyncClient
 from storage_utils import parse_migrations_to_save, store_trade_data, fetch_trade_data
 from filter_utils import process_new_tokens
 
+
+from raydium.amm_v4 import buy, sell
+
 # Instantiate the relevant objects
 rpc_client = AsyncClient(RPC_URL)
 httpx_client = httpx.AsyncClient(timeout=HTTPX_TIMEOUT)
@@ -40,11 +43,23 @@ async def consume_queue(queue, httpx_client):
         # Force trade for testing
         # filters_result = True
 
-        if filters_result:
-            asyncio.create_task(
-                trade_wrapper(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, risky_address=token_address, 
-                    sol_address=SOL_MINT, trade_amount=SOL_AMOUNT_LAMPORTS, buy_slippage=BUY_SLIPPAGE, sell_slippage=SELL_SLIPPAGE)
-                    )
+        # if filters_result:
+        #     asyncio.create_task(
+        #         trade_wrapper(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, risky_address=token_address, 
+        #             sol_address=SOL_MINT, trade_amount=SOL_AMOUNT_LAMPORTS, buy_slippage=BUY_SLIPPAGE, sell_slippage=SELL_SLIPPAGE)
+        #             )        
+            
+        sol_in = 0.001
+        slippage = 1
+        buy(pair_address, sol_in, slippage)
+        
+        time.sleep(30)
+        
+        percentage = 100
+        slippage = 1
+        sell(pair_address, percentage, slippage)
+        
+        
 
 
 async def main():
