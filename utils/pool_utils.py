@@ -8,7 +8,7 @@ from solana.rpc.types import MemcmpOpts
 from solders.instruction import AccountMeta, Instruction  # type: ignore
 from solders.pubkey import Pubkey  # type: ignore
 
-from config import client
+from config import client, trade_logger
 from layouts.amm_v4 import LIQUIDITY_STATE_LAYOUT_V4, MARKET_STATE_LAYOUT_V3
 from layouts.clmm import CLMM_POOL_STATE_LAYOUT
 from layouts.cpmm import CPMM_POOL_STATE_LAYOUT
@@ -111,7 +111,7 @@ class DIRECTION(Enum):
     BUY = 0
     SELL = 1
 
-def fetch_amm_v4_pool_keys(pair_address: str) -> Optional[AmmV4PoolKeys]:
+async def fetch_amm_v4_pool_keys(pair_address: str) -> Optional[AmmV4PoolKeys]:
     
     def bytes_of(value):
         if not (0 <= value < 2**64):
@@ -120,10 +120,14 @@ def fetch_amm_v4_pool_keys(pair_address: str) -> Optional[AmmV4PoolKeys]:
    
     try:
         amm_id = Pubkey.from_string(pair_address)
-        amm_data = client.get_account_info_json_parsed(amm_id, commitment=Processed).value.data
+        amm_data = await client.get_account_info_json_parsed(amm_id, commitment=Processed)# .value.data
+        amm_data = amm_data.value.data
+        
         amm_data_decoded = LIQUIDITY_STATE_LAYOUT_V4.parse(amm_data)
         marketId = Pubkey.from_bytes(amm_data_decoded.serumMarket)
-        marketInfo = client.get_account_info_json_parsed(marketId, commitment=Processed).value.data
+        marketInfo = await client.get_account_info_json_parsed(marketId, commitment=Processed)
+        marketInfo = marketInfo.value.data
+        
         market_decoded = MARKET_STATE_LAYOUT_V3.parse(marketInfo)
         vault_signer_nonce = market_decoded.vault_signer_nonce
         
@@ -155,7 +159,7 @@ def fetch_amm_v4_pool_keys(pair_address: str) -> Optional[AmmV4PoolKeys]:
 
         return pool_keys
     except Exception as e:
-        print(f"Error fetching pool keys: {e}")
+        trade_logger.error(f"Error fetching pool keys: {e}")
         return None
 
 def fetch_cpmm_pool_keys(pair_address: str) -> Optional[CpmmPoolKeys]:
@@ -423,7 +427,7 @@ def make_clmm_swap_instruction(
         print(f"Error occurred: {e}")
         return None
 
-def get_amm_v4_reserves(pool_keys: AmmV4PoolKeys) -> tuple:
+async def get_amm_v4_reserves(pool_keys: AmmV4PoolKeys) -> tuple:
     try:
         quote_vault = pool_keys.quote_vault
         quote_decimal = pool_keys.quote_decimals
@@ -433,7 +437,7 @@ def get_amm_v4_reserves(pool_keys: AmmV4PoolKeys) -> tuple:
         base_decimal = pool_keys.base_decimals
         base_mint = pool_keys.base_mint
     
-        balances_response = client.get_multiple_accounts_json_parsed(
+        balances_response = await client.get_multiple_accounts_json_parsed(
             [quote_vault, base_vault], 
             Processed
         )
@@ -446,7 +450,7 @@ def get_amm_v4_reserves(pool_keys: AmmV4PoolKeys) -> tuple:
         base_account_balance = base_account.data.parsed['info']['tokenAmount']['uiAmount']
         
         if quote_account_balance is None or base_account_balance is None:
-            print("Error: One of the account balances is None.")
+            trade_logger.error("Error: One of the account balances is None.")
             return None, None, None
         
         if base_mint == WSOL:
@@ -458,12 +462,12 @@ def get_amm_v4_reserves(pool_keys: AmmV4PoolKeys) -> tuple:
             quote_reserve = quote_account_balance
             token_decimal = base_decimal
 
-        print(f"Base Mint: {base_mint} | Quote Mint: {quote_mint}")
-        print(f"Base Reserve: {base_reserve} | Quote Reserve: {quote_reserve} | Token Decimal: {token_decimal}")
+        trade_logger.info(f"Base Mint: {base_mint} | Quote Mint: {quote_mint}")
+        trade_logger.info(f"Base Reserve: {base_reserve} | Quote Reserve: {quote_reserve} | Token Decimal: {token_decimal}")
         return base_reserve, quote_reserve, token_decimal
 
     except Exception as e:
-        print(f"Error occurred: {e}")
+        trade_logger.error(f"Error occurred: {e}")
         return None, None, None
 
 def get_cpmm_reserves(pool_keys: CpmmPoolKeys):
@@ -550,7 +554,7 @@ def get_clmm_reserves(pool_keys: ClmmPoolKeys):
     print(f"Base Reserve: {base_reserve} | Quote Reserve: {quote_reserve} | Token Decimal: {token_decimal}")
     return base_reserve, quote_reserve, token_decimal
 
-def fetch_pair_address_from_rpc(
+async def fetch_pair_address_from_rpc(
     program_id: Pubkey, 
     token_mint: str, 
     quote_offset: int, 
@@ -558,36 +562,36 @@ def fetch_pair_address_from_rpc(
     data_length: int
 ) -> list:
 
-    def fetch_pair(base_mint: str, quote_mint: str) -> list:
+    async def fetch_pair(base_mint: str, quote_mint: str) -> list:
         memcmp_filter_base = MemcmpOpts(offset=quote_offset, bytes=quote_mint)
         memcmp_filter_quote = MemcmpOpts(offset=base_offset, bytes=base_mint)
         try:
-            print(f"Fetching pair addresses for base_mint: {base_mint}, quote_mint: {quote_mint}")
-            response = client.get_program_accounts(
+            trade_logger.info(f"Fetching pair addresses for base_mint: {base_mint}, quote_mint: {quote_mint}")
+            response = await client.get_program_accounts(
                 program_id,
                 commitment=Processed,
                 filters=[data_length, memcmp_filter_base, memcmp_filter_quote],
             )
             accounts = response.value
             if accounts:
-                print(f"Found {len(accounts)} matching AMM account(s).")
+                trade_logger.info(f"Found {len(accounts)} matching AMM account(s).")
                 return [account.pubkey.__str__() for account in accounts]
             else:
-                print("No matching AMM accounts found.")
+                trade_logger.error("No matching AMM accounts found.")
         except Exception as e:
-            print(f"Error fetching AMM pair addresses: {e}")
+            trade_logger.error(f"Error fetching AMM pair addresses: {e}")
         return []
 
-    pair_addresses = fetch_pair(token_mint, DEFAULT_QUOTE_MINT)
+    pair_addresses = await fetch_pair(token_mint, DEFAULT_QUOTE_MINT)
 
     if not pair_addresses:
-        print("Retrying with reversed base and quote mints...")
-        pair_addresses = fetch_pair(DEFAULT_QUOTE_MINT, token_mint)
+        trade_logger.error("Retrying with reversed base and quote mints...")
+        pair_addresses = await fetch_pair(DEFAULT_QUOTE_MINT, token_mint)
 
     return pair_addresses
 
-def get_amm_v4_pair_from_rpc(token_mint: str) -> list:
-    return fetch_pair_address_from_rpc(
+async def get_amm_v4_pair_from_rpc(token_mint: str) -> list:
+    return await fetch_pair_address_from_rpc(
         program_id=RAYDIUM_AMM_V4,
         token_mint=token_mint,
         quote_offset=400,

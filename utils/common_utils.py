@@ -4,12 +4,12 @@ from solana.rpc.commitment import Confirmed, Processed
 from solana.rpc.types import TokenAccountOpts
 from solders.signature import Signature #type: ignore
 from solders.pubkey import Pubkey  # type: ignore
-from config import client, payer_keypair
+from config import client, payer_keypair, trade_logger
 
-def get_token_balance(mint_str: str) -> float | None:
+async def get_token_balance(mint_str: str) -> float | None:
 
     mint = Pubkey.from_string(mint_str)
-    response = client.get_token_accounts_by_owner_json_parsed(
+    response = await client.get_token_accounts_by_owner_json_parsed(
         payer_keypair.pubkey(),
         TokenAccountOpts(mint=mint),
         commitment=Processed
@@ -23,31 +23,36 @@ def get_token_balance(mint_str: str) -> float | None:
                 return float(token_amount)
     return None
 
-def confirm_txn(txn_sig: Signature, max_retries: int = 20, retry_interval: int = 3) -> bool:
+async def confirm_txn(txn_sig: Signature, max_retries: int = 20, retry_interval: int = 3) -> bool:
+    trade_logger.error(txn_sig)
+    trade_logger.error(type(txn_sig))
+    
     retries = 1
     
     while retries < max_retries:
         try:
-            txn_res = client.get_transaction(
+            txn_res = await client.get_transaction(
                 txn_sig, 
                 encoding="json", 
                 commitment=Confirmed, 
                 max_supported_transaction_version=0)
             
+            trade_logger.error(txn_res)
+            trade_logger.error(txn_res.value)
             txn_json = json.loads(txn_res.value.transaction.meta.to_json())
             
             if txn_json['err'] is None:
-                print("Transaction confirmed... try count:", retries)
+                trade_logger.info("Transaction confirmed... try count:", retries)
                 return True
             
-            print("Error: Transaction not confirmed. Retrying...")
+            trade_logger.error("Error: Transaction not confirmed. Retrying...")
             if txn_json['err']:
-                print("Transaction failed.")
+                trade_logger.error("Transaction failed.")
                 return False
         except Exception as e:
-            print("Awaiting confirmation... try count:", retries)
+            trade_logger.info("Awaiting confirmation... try count:", retries)
             retries += 1
             time.sleep(retry_interval)
     
-    print("Max retries reached. Transaction confirmation failed.")
+    trade_logger.error("Max retries reached. Transaction confirmation failed.")
     return None

@@ -77,8 +77,6 @@ async def main():
     # await asyncio.gather(producer_task, consumer_task)
     
     pair_address = "879F697iuDJGMevRkRcnW21fcXiAeLJK1ffsw2ATebce"
-    
-    time.sleep(2)
     sol_in = 0.0001
     slippage = 1
     await buy(pair_address, sol_in, slippage)
@@ -88,7 +86,7 @@ async def main():
     
     percentage = 100
     slippage = 1
-    sell(pair_address, percentage, slippage)
+    # sell(pair_address, percentage, slippage)
     
 
 
