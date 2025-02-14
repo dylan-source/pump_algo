@@ -23,6 +23,21 @@ httpx_client = httpx.AsyncClient(timeout=HTTPX_TIMEOUT)
 redis_client_tokens = redis.Redis(host='localhost', port=6379, db=0)
 redis_client_trades = redis.Redis(host='localhost', port=6379, db=1)
 
+async def new_trade_wrapper(pair_address: str):
+    # time.sleep(2)
+    sol_in = 0.0001
+    slippage = 1
+    await buy(pair_address, sol_in, slippage)
+    
+    print("Sleeping")
+    await asyncio.sleep(30)
+    
+    percentage = 100
+    slippage = 1
+    await sell(pair_address, percentage, slippage)
+    
+    
+
 # Create a consumer queue to take new tokens and execute trade logic
 async def consume_queue(queue, httpx_client):
     
@@ -46,19 +61,13 @@ async def consume_queue(queue, httpx_client):
         #     asyncio.create_task(
         #         trade_wrapper(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, risky_address=token_address, 
         #             sol_address=SOL_MINT, trade_amount=SOL_AMOUNT_LAMPORTS, buy_slippage=BUY_SLIPPAGE, sell_slippage=SELL_SLIPPAGE)
-        #             )        
-            
-        # time.sleep(2)
-        sol_in = 0.0001
-        slippage = 1
-        await buy(pair_address, sol_in, slippage)
+        #             )     
         
-        print("Sleeping")
-        time.sleep(30)
         
-        percentage = 100
-        slippage = 1
-        await sell(pair_address, percentage, slippage)
+        asyncio.create_task(new_trade_wrapper(pair_address))      
+        
+        
+
         
         
 

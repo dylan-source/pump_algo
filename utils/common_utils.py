@@ -1,5 +1,5 @@
 import json
-import time
+import asyncio
 from solana.rpc.commitment import Confirmed, Processed
 from solana.rpc.types import TokenAccountOpts
 from solders.signature import Signature #type: ignore
@@ -23,7 +23,7 @@ async def get_token_balance(mint_str: str) -> float | None:
                 return float(token_amount)
     return None
 
-async def confirm_txn(txn_sig: Signature, max_retries: int = 10, retry_interval: int = 3) -> bool:    
+async def confirm_txn(txn_sig: Signature, max_retries: int = 20, retry_interval: int = 3) -> bool:    
     retries = 1
     
     while retries < max_retries:
@@ -47,7 +47,7 @@ async def confirm_txn(txn_sig: Signature, max_retries: int = 10, retry_interval:
         except Exception as e:
             trade_logger.info(f"Awaiting confirmation... try count: {retries}")
             retries += 1
-            time.sleep(retry_interval)
+            await asyncio.sleep(retry_interval)
     
     trade_logger.error("Max retries reached. Transaction confirmation failed.")
     return None

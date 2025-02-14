@@ -13,7 +13,7 @@ from layouts.amm_v4 import LIQUIDITY_STATE_LAYOUT_V4, MARKET_STATE_LAYOUT_V3
 from layouts.clmm import CLMM_POOL_STATE_LAYOUT
 from layouts.cpmm import CPMM_POOL_STATE_LAYOUT
 from raydium.constants import (
-    WSOL,
+    WSOL,  
     TOKEN_PROGRAM_ID,
     RAYDIUM_AMM_V4,
     RAYDIUM_CPMM,
@@ -453,7 +453,7 @@ async def get_amm_v4_reserves(pool_keys: AmmV4PoolKeys) -> tuple:
             trade_logger.error("Error: One of the account balances is None.")
             return None, None, None
         
-        if base_mint == WSOL:
+        if base_mint == WSOL:                         
             base_reserve = quote_account_balance  
             quote_reserve = base_account_balance  
             token_decimal = quote_decimal 
