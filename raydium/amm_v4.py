@@ -146,7 +146,7 @@ async def buy(pair_address:str, sol_in:float=0.01, slippage:int=5, priority_fee:
             latest_blockhash,
         )
         
-        trade_logger.info("Simulating transaction")
+        trade_logger.info("Simulating transaction...")
         simulation_txn_sig = await client.simulate_transaction(
             txn=VersionedTransaction(compiled_message, [payer_keypair]),
             sig_verify=False,
@@ -155,11 +155,11 @@ async def buy(pair_address:str, sol_in:float=0.01, slippage:int=5, priority_fee:
         
         simulation_status = simulation_txn_sig.value.err
         if simulation_status is not None:
-            error = simulation_status.err.code
+            error = simulation_status.err# .code
             trade_logger.error(f"Simulation error - error code: {error} ")
             return error
         
-        trade_logger.info("Simulation successful - sending transaction...")
+        trade_logger.info("Sending transaction...")
         txn_sig = await client.send_transaction(
             txn=VersionedTransaction(compiled_message, [payer_keypair]),
             opts=TxOpts(skip_preflight=True),
@@ -170,12 +170,11 @@ async def buy(pair_address:str, sol_in:float=0.01, slippage:int=5, priority_fee:
         # trade_logger.info("Confirming transaction...")
         confirmed = await confirm_txn(txn_sig)
         
-        if confirmed is not None:
-            trade_logger.info(f"Transaction confirmed: {confirmed}")
-            return confirmed
-        else:
-            trade_logger.warning(f"Transaction did not confirm: {confirmed}")
-            return None
+        # if confirmed is not None:
+        #     trade_logger.info(f"Transaction confirmed: {confirmed}")
+        # else:
+        #     trade_logger.warning(f"Transaction did not confirm: {confirmed}")
+        return confirmed
 
     except Exception as e:
         trade_logger.error(f"Error occurred during transaction: {e}")

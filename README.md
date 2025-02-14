@@ -2,15 +2,14 @@
 Post migration pump.fun sniper bot
 
 # To-do list:
-1. Understand why it fails sometimes!
-    - Sometimes the trade executes, but tokens received and confirmation are none. Code runs faster than propagation? Seems like this happens when chain is very slow
-2. {'InstructionError': [6, 'ProgramFailedToComplete']} is due to trading not yet being available - I suspect. Loop until trading is avaiable or due to priority fees
-4. Consider adding additional priority fee values to get_recent_prioritization_fees and in the lists for escalating trades (currently stops at 75th percentile)
-5. Look into package to handle rate limits (specifically for jupiter's price api calls)
-6. Increase buy slippage max if price is increasing (and vice verse for selling)?
+- Change startup sell to raydium 
+- Consider adding additional priority fee values to get_recent_prioritization_fees and in the lists for escalating trades (currently stops at 75th percentile)
+- Increase buy slippage max if price is increasing (and vice verse for selling)?
+- Implement stoploss mechanism
+- Look into package to handle rate limits (specifically for jupiter's price api calls)
+
 
 # Not critical:
-1. In execute_swap function, filter for multiple routes, currently defauls to first route - not critical reason: pump.fun tokens only have a single raydium route
 
 # Completed:
 1. What to do when confirm_result is None - implementation: loop and try again
@@ -23,7 +22,7 @@ Post migration pump.fun sniper bot
  - UV Loop
  - AIOjobs
  - anyio
- - tenacity
+ - tenacity -> retries when HTTP calls drop
 
 # Some other filters:
 - Some filters from PepeBoost bot

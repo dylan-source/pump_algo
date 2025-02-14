@@ -5,7 +5,7 @@ import asyncio
 import httpx
 from httpx._config import Timeout
 import numpy as np
-# from solders.transaction_status import TransactionErrorInstructionError, InstructionErrorCustom
+from solders.transaction_status import TransactionErrorInstructionError, InstructionErrorCustom
 
 from raydium.amm_v4 import buy, sell
 from config import trade_logger, RPC_URL, PRIORITY_FEE_DICT, TRADE_AMOUNT_SOL, BUY_SLIPPAGE, MAX_TRADE_TIME_MINS
@@ -45,13 +45,13 @@ async def buy_wrapper(httpx_client: httpx.AsyncClient, pair_address: str) -> Uni
         for level in fee_levels:
             fee_value = fees_dict.get(level)
             if fee_value is None:
-                trade_logger.warning(f"No priority fee found for level {level}. Skipping.")
+                trade_logger.warning(f"No priority fee found for {level}th. Skipping.")
                 continue
 
             # Start with the smallest slippage value and increase if slippage exceed error is received
             current_slippage = BUY_SLIPPAGE['MIN']
             while current_slippage <= BUY_SLIPPAGE['MAX']:
-                trade_logger.info(f"Attempting buy with priority fee (level {level}): {fee_value} and slippage: {current_slippage}")
+                trade_logger.info(f"Attempting buy with priority fee: {fee_value} ({level}th) and slippage: {current_slippage}")
                 result = await buy(
                     pair_address=pair_address,
                     sol_in=TRADE_AMOUNT_SOL,
@@ -61,22 +61,25 @@ async def buy_wrapper(httpx_client: httpx.AsyncClient, pair_address: str) -> Uni
         
                 # If None it's due to insufficient priority fees. Break loop and try next fee level
                 if not result:
-                    trade_logger.warning(f"Buy returned None with fee {fee_value} and slippage {current_slippage}. Increasing priority fee level")
+                    trade_logger.warning(f"Buy returned False/None with fee {fee_value} and slippage {current_slippage}. Increasing priority fee")
                     break 
                 
                 # Catch Raydium custom errors
-                if isinstance(result, int):
-                    if result == 30:
-                        trade_logger.warning(f"Buy failed - insufficient slippage of {current_slippage}). Increasing slippage and retrying")
+                if isinstance(result, InstructionErrorCustom):      # class 'solders.transaction_status.InstructionErrorCustom'
+                # if isinstance(result, TransactionErrorInstructionError):      
+                    # error = result.err.code
+                    error = result.code
+                    if error == 30:
+                        trade_logger.warning(f"Buy failed - insufficient slippage ({current_slippage}). Increasing slippage and retrying")
                         current_slippage = increase_slippage(current_slippage, BUY_SLIPPAGE)
                         continue
                     # Catches other errors
                     else:   
-                        trade_logger.error(f"Buy failed with unexpected error: {result}")
+                        trade_logger.error(f"Buy failed with unexpected error: {error}")
                         break
 
                 # If buy function returns True, then trade and confirmation was successful
-                trade_logger.info(f"Buy successful with priority fee {fee_value} (level {level}) and slippage {current_slippage}.")
+                trade_logger.info(f"Buy successful with priority fee {fee_value} ({level}th) and slippage {current_slippage}.")
                 return result
 
         # Fail-safe if trade exhausts slippage or priority fee levels return Fa
