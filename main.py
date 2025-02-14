@@ -54,7 +54,7 @@ async def consume_queue(queue, httpx_client):
 async def main():
     
     # Check to see if any start up tokens that need to be sold
-    # await startup_sell(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, sell_slippage=SELL_SLIPPAGE)
+    await startup_sell(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, sell_slippage=SELL_SLIPPAGE)
 
     # Create the queue to share between the producer (monitor_transactions) and consumer (consume_queue) tasks
     queue = asyncio.Queue()
@@ -64,7 +64,7 @@ async def main():
     consumer_task = asyncio.create_task(consume_queue(queue=queue, httpx_client=httpx_client))
     await asyncio.gather(producer_task, consumer_task)
 
-    # pair_address = "879F697iuDJGMevRkRcnW21fcXiAeLJK1ffsw2ATebce"
+    # pair_address = "CTRFwjyfTj245VdsJmmtFgQ8HemxXrB1UjpYUSKdm2sp"
     # await raydium_trade_wrapper(httpx_client, pair_address)
 
 

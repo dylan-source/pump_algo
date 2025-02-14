@@ -61,8 +61,6 @@ PRIORITY_FEE_DICT = {
 }
 
 # Define slippage dictionaries
-# BUY_SLIPPAGE = {'MIN': 2000, 'MAX': 3500, 'INCREMENTS': 500}                          # Dictionaries for Jupiter
-# SELL_SLIPPAGE = {'MIN': 2500, 'MAX': 4500, 'INCREMENTS': 500, 'STOPLOSS_MIN': 3500}
 BUY_SLIPPAGE = {'MIN': 5, 'MAX': 20, 'INCREMENTS': 5}
 SELL_SLIPPAGE = {'MIN': 5, 'MAX': 30, 'INCREMENTS': 5, 'STOPLOSS_MIN': 20}
 SELL_SLIPPAGE_DELAY = 5 

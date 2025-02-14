@@ -5,7 +5,7 @@ import asyncio
 import httpx
 from httpx._config import Timeout
 import numpy as np
-from pprint import pprint
+# from solders.transaction_status import TransactionErrorInstructionError, InstructionErrorCustom
 
 from raydium.amm_v4 import buy, sell
 from config import trade_logger, RPC_URL, PRIORITY_FEE_DICT, TRADE_AMOUNT_SOL, BUY_SLIPPAGE, MAX_TRADE_TIME_MINS
@@ -14,7 +14,7 @@ from config import trade_logger, RPC_URL, PRIORITY_FEE_DICT, TRADE_AMOUNT_SOL, B
 # Wrapper to house all trade logic and functions
 async def raydium_trade_wrapper(httpx_client: httpx.AsyncClient, pair_address: str):
     await buy_wrapper(httpx_client=httpx_client, pair_address=pair_address)
-    asyncio.sleep(MAX_TRADE_TIME_MINS*60)
+    await asyncio.sleep(MAX_TRADE_TIME_MINS*60)
 
 
 # Function to handle buy trade with escalating slippage and priority fees
@@ -39,54 +39,53 @@ async def buy_wrapper(httpx_client: httpx.AsyncClient, pair_address: str) -> Uni
         trade_logger.error(f"Failed to fetch priority fees - {e}")
         return False
 
-    # Create a loop of increasing priority fee levels
-    fee_levels = ['50', '60', '65', '70', '75', '85']
-    for level in fee_levels:
-        fee_value = fees_dict.get(level)
-        if fee_value is None:
-            trade_logger.warning(f"No priority fee found for level {level}. Skipping.")
-            continue
+    try:
+        # Create a loop of increasing priority fee levels
+        fee_levels = ['30', '40', '50', '60', '65', '70', '75', '85']
+        for level in fee_levels:
+            fee_value = fees_dict.get(level)
+            if fee_value is None:
+                trade_logger.warning(f"No priority fee found for level {level}. Skipping.")
+                continue
 
-        # Start with the smallest slippage value and increase if slippage exceed error is received
-        current_slippage = BUY_SLIPPAGE['MIN']
-        while current_slippage <= BUY_SLIPPAGE['MAX']:
-            trade_logger.info(f"Attempting buy with priority fee (level {level}): {fee_value} and slippage: {current_slippage}")
-            result = await buy(
-                pair_address=pair_address,
-                sol_in=TRADE_AMOUNT_SOL,
-                slippage=current_slippage,
-                priority_fee=fee_value
-            )
+            # Start with the smallest slippage value and increase if slippage exceed error is received
+            current_slippage = BUY_SLIPPAGE['MIN']
+            while current_slippage <= BUY_SLIPPAGE['MAX']:
+                trade_logger.info(f"Attempting buy with priority fee (level {level}): {fee_value} and slippage: {current_slippage}")
+                result = await buy(
+                    pair_address=pair_address,
+                    sol_in=TRADE_AMOUNT_SOL,
+                    slippage=current_slippage,
+                    priority_fee=fee_value
+                )
+        
+                # If None it's due to insufficient priority fees. Break loop and try next fee level
+                if not result:
+                    trade_logger.warning(f"Buy returned None with fee {fee_value} and slippage {current_slippage}. Increasing priority fee level")
+                    break 
+                
+                # Catch Raydium custom errors
+                if isinstance(result, int):
+                    if result == 30:
+                        trade_logger.warning(f"Buy failed - insufficient slippage of {current_slippage}). Increasing slippage and retrying")
+                        current_slippage = increase_slippage(current_slippage, BUY_SLIPPAGE)
+                        continue
+                    # Catches other errors
+                    else:   
+                        trade_logger.error(f"Buy failed with unexpected error: {result}")
+                        break
+
+                # If buy function returns True, then trade and confirmation was successful
+                trade_logger.info(f"Buy successful with priority fee {fee_value} (level {level}) and slippage {current_slippage}.")
+                return result
+
+        # Fail-safe if trade exhausts slippage or priority fee levels return Fa
+        trade_logger.error("Buy operation failed for all priority fee and slippage combinations.")
+        return False
     
-            if not result:
-                trade_logger.warning(f"Buy attempt returned None with fee {fee_value} and slippage {current_slippage}. Increasing priority fee level")
-                break  # Try the next fee level.
-
-            if isinstance(result, dict) and 'InstructionError' in result:
-                errors = result['InstructionError']
-                insufficient_slippage = False
-                if isinstance(errors, list):
-                    if len(errors) >= 2 and isinstance(errors[1], dict) and errors[1].get('Custom') == 30:
-                        insufficient_slippage = True
-                    else:
-                        for err in errors:
-                            if isinstance(err, dict) and err.get('Custom') == 30:
-                                insufficient_slippage = True
-                                break
-
-                if insufficient_slippage:
-                    trade_logger.warning(f"Buy attempt failed due to insufficient slippage (current: {current_slippage}). Increasing slippage and retrying")
-                    current_slippage = increase_slippage(current_slippage, BUY_SLIPPAGE)
-                    continue
-                else:
-                    trade_logger.error(f"Buy attempt failed with unexpected error: {result}")
-                    break
-
-            trade_logger.info(f"Buy successful with priority fee {fee_value} (level {level}) and slippage {current_slippage}.")
-            return result
-
-    trade_logger.error("Buy operation failed for all priority fee and slippage combinations.")
-    return False
+    except Exception as e:
+        trade_logger.error(f"Unexpected buy function error: {e}")
+        return False
 
 
 
@@ -145,7 +144,7 @@ async def get_qn_priority_fees(httpx_client: httpx.AsyncClient, fees_account: st
         response = json_response.get("result", "").get("per_compute_unit", "").get("percentiles", "")
 
         # Create a new dictionary with only fees greater than the median
-        keys_to_extract = {50, 60, 65, 70, 75, 85}
+        keys_to_extract = {30, 40, 50, 60, 65, 70, 75, 85}
         filtered_dict = {k: v for k, v in response.items() if int(k) in keys_to_extract}
         
         # Adjust values based on PRIORITY_FEE_MIN and PRIORITY_FEE_MAX
