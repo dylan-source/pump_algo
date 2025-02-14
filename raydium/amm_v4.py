@@ -35,12 +35,12 @@ async def buy(pair_address: str, sol_in: float = 0.01, slippage: int = 5) -> boo
     try:
         trade_logger.info(f"Starting buy transaction for pair address: {pair_address}")
 
-        # print("Fetching pool keys...")
+        trade_logger.infoint("Fetching pool keys...")
         pool_keys: Optional[AmmV4PoolKeys] = await fetch_amm_v4_pool_keys(pair_address)
         if pool_keys is None:
             trade_logger.error(f"No pool keys found for {pair_address}")
             return False
-        # trade_logger.info("Pool keys fetched successfully.")
+        trade_logger.info("Pool keys fetched successfully.")
 
         mint = (
             pool_keys.base_mint if pool_keys.base_mint != WSOL else pool_keys.quote_mint
@@ -71,7 +71,7 @@ async def buy(pair_address: str, sol_in: float = 0.01, slippage: int = 5) -> boo
             create_token_account_instruction = create_associated_token_account(
                 payer_keypair.pubkey(), payer_keypair.pubkey(), mint
             )
-            trade_logger.error("No existing token account found; creating associated token account.")
+            trade_logger.info("No existing token account found; creating associated token account.")
 
         trade_logger.info("Generating seed for WSOL account...")
         seed = base64.urlsafe_b64encode(os.urandom(24)).decode("utf-8")
@@ -156,63 +156,63 @@ async def buy(pair_address: str, sol_in: float = 0.01, slippage: int = 5) -> boo
         trade_logger.info("Confirming transaction...")
         confirmed = await confirm_txn(txn_sig)
 
-        trade_logger.info("Transaction confirmed:", confirmed)
+        trade_logger.info(f"Transaction confirmed: {confirmed}")
         return confirmed
 
     except Exception as e:
-        trade_logger.error("Error occurred during transaction:", e)
+        trade_logger.error(f"Error occurred during transaction: {e}")
         return False
 
-def sell(pair_address: str, percentage: int = 100, slippage: int = 5) -> bool:
+async def sell(pair_address: str, percentage: int = 100, slippage: int = 5) -> bool:
     try:
-        print(f"Starting sell transaction for pair address: {pair_address}")
+        trade_logger.info(f"Starting sell transaction for pair address: {pair_address}")
         if not (1 <= percentage <= 100):
-            print("Percentage must be between 1 and 100.")
+            trade_logger.error("Percentage must be between 1 and 100.")
             return False
 
-        print("Fetching pool keys...")
-        pool_keys: Optional[AmmV4PoolKeys] = fetch_amm_v4_pool_keys(pair_address)
+        trade_logger.info("Fetching pool keys...")
+        pool_keys: Optional[AmmV4PoolKeys] = await fetch_amm_v4_pool_keys(pair_address)
         if pool_keys is None:
-            print("No pool keys found...")
+            trade_logger.error("No pool keys found...")
             return False
-        print("Pool keys fetched successfully.")
+        trade_logger.info("Pool keys fetched successfully.")
 
         mint = (
             pool_keys.base_mint if pool_keys.base_mint != WSOL else pool_keys.quote_mint
         )
 
-        print("Retrieving token balance...")
-        token_balance = get_token_balance(str(mint))
-        print("Token Balance:", token_balance)
+        trade_logger.info("Retrieving token balance...")
+        token_balance = await get_token_balance(str(mint))
+        trade_logger.info(f"Token Balance: {token_balance}")
 
         if token_balance == 0 or token_balance is None:
-            print("No token balance available to sell.")
+            trade_logger.error("No token balance available to sell.")
             return False
 
         token_balance = token_balance * (percentage / 100)
-        print(
+        trade_logger.info(
             f"Selling {percentage}% of the token balance, adjusted balance: {token_balance}"
         )
 
-        print("Calculating transaction amounts...")
-        base_reserve, quote_reserve, token_decimal = get_amm_v4_reserves(pool_keys)
+        trade_logger.info("Calculating transaction amounts...")
+        base_reserve, quote_reserve, token_decimal = await get_amm_v4_reserves(pool_keys)
         amount_out = tokens_for_sol(token_balance, base_reserve, quote_reserve)
-        print(f"Estimated Amount Out: {amount_out}")
+        trade_logger.info(f"Estimated Amount Out: {amount_out}")
 
         slippage_adjustment = 1 - (slippage / 100)
         amount_out_with_slippage = amount_out * slippage_adjustment
         minimum_amount_out = int(amount_out_with_slippage * SOL_DECIMAL)
 
         amount_in = int(token_balance * 10**token_decimal)
-        print(f"Amount In: {amount_in} | Minimum Amount Out: {minimum_amount_out}")
+        trade_logger.info(f"Amount In: {amount_in} | Minimum Amount Out: {minimum_amount_out}")
         token_account = get_associated_token_address(payer_keypair.pubkey(), mint)
 
-        print("Generating seed and creating WSOL account...")
+        trade_logger.info("Generating seed and creating WSOL account...")
         seed = base64.urlsafe_b64encode(os.urandom(24)).decode("utf-8")
         wsol_token_account = Pubkey.create_with_seed(
             payer_keypair.pubkey(), seed, TOKEN_PROGRAM_ID
         )
-        balance_needed = AsyncToken.get_min_balance_rent_for_exempt_for_account(client)
+        balance_needed = await AsyncToken.get_min_balance_rent_for_exempt_for_account(client)
 
         create_wsol_account_instruction = create_account_with_seed(
             CreateAccountWithSeedParams(
@@ -235,7 +235,7 @@ def sell(pair_address: str, percentage: int = 100, slippage: int = 5) -> bool:
             )
         )
 
-        print("Creating swap instructions...")
+        trade_logger.info("Creating swap instructions...")
         swap_instructions = make_amm_v4_swap_instruction(
             amount_in=amount_in,
             minimum_amount_out=minimum_amount_out,
@@ -245,7 +245,7 @@ def sell(pair_address: str, percentage: int = 100, slippage: int = 5) -> bool:
             owner=payer_keypair.pubkey(),
         )
 
-        print("Preparing to close WSOL account after swap...")
+        trade_logger.info("Preparing to close WSOL account after swap...")
         close_wsol_account_instruction = close_account(
             CloseAccountParams(
                 program_id=TOKEN_PROGRAM_ID,
@@ -265,7 +265,7 @@ def sell(pair_address: str, percentage: int = 100, slippage: int = 5) -> bool:
         ]
 
         if percentage == 100:
-            print("Preparing to close token account after swap...")
+            trade_logger.info("Preparing to close token account after swap...")
             close_token_account_instruction = close_account(
                 CloseAccountParams(
                     program_id=TOKEN_PROGRAM_ID,
@@ -276,29 +276,33 @@ def sell(pair_address: str, percentage: int = 100, slippage: int = 5) -> bool:
             )
             instructions.append(close_token_account_instruction)
 
-        print("Compiling transaction message...")
+        trade_logger.info("Compiling transaction message...")
+        
+        latest_blockhash = await client.get_latest_blockhash()
+        latest_blockhash = latest_blockhash.value.blockhash
         compiled_message = MessageV0.try_compile(
             payer_keypair.pubkey(),
             instructions,
             [],
-            client.get_latest_blockhash().value.blockhash,
+            latest_blockhash,
         )
 
-        print("Sending transaction...")
-        txn_sig = client.send_transaction(
+        trade_logger.info("Sending transaction...")
+        txn_sig = await client.send_transaction(
             txn=VersionedTransaction(compiled_message, [payer_keypair]),
             opts=TxOpts(skip_preflight=True),
-        ).value
-        print("Transaction Signature:", txn_sig)
+        )
+        txn_sig = txn_sig.value
+        trade_logger.info(f"Transaction Signature: {txn_sig}")
 
-        print("Confirming transaction...")
-        confirmed = confirm_txn(txn_sig)
+        trade_logger.info("Confirming transaction...")
+        confirmed = await confirm_txn(txn_sig)
 
-        print("Transaction confirmed:", confirmed)
+        trade_logger.info(f"Transaction confirmed: {confirmed}")
         return confirmed
 
     except Exception as e:
-        print("Error occurred during transaction:", e)
+        trade_logger.error(f"Error occurred during transaction: {e}")
         return False
 
 def sol_for_tokens(sol_amount, base_vault_balance, quote_vault_balance, swap_fee=0.25):

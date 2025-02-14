@@ -120,7 +120,7 @@ async def fetch_amm_v4_pool_keys(pair_address: str) -> Optional[AmmV4PoolKeys]:
    
     try:
         amm_id = Pubkey.from_string(pair_address)
-        amm_data = await client.get_account_info_json_parsed(amm_id, commitment=Processed)# .value.data
+        amm_data = await client.get_account_info_json_parsed(amm_id, commitment=Processed)
         amm_data = amm_data.value.data
         
         amm_data_decoded = LIQUIDITY_STATE_LAYOUT_V4.parse(amm_data)
@@ -325,7 +325,7 @@ def make_amm_v4_swap_instruction(
         
         return swap_instruction
     except Exception as e:
-        print(f"Error occurred: {e}")
+        trade_logger.error(f"Error occurred: {e}")
         return None
 
 def make_cpmm_swap_instruction( 

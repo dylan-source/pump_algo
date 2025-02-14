@@ -48,46 +48,53 @@ async def consume_queue(queue, httpx_client):
         #             sol_address=SOL_MINT, trade_amount=SOL_AMOUNT_LAMPORTS, buy_slippage=BUY_SLIPPAGE, sell_slippage=SELL_SLIPPAGE)
         #             )        
             
-        time.sleep(2)
+        # time.sleep(2)
         sol_in = 0.0001
         slippage = 1
-        buy(pair_address, sol_in, slippage)
+        await buy(pair_address, sol_in, slippage)
         
         print("Sleeping")
         time.sleep(30)
         
         percentage = 100
         slippage = 1
-        sell(pair_address, percentage, slippage)
+        await sell(pair_address, percentage, slippage)
         
         
 
 
 async def main():
     
-    # # Check to see if any start up tokens that need to be sold
-    # await startup_sell(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, sell_slippage=SELL_SLIPPAGE)
+    # Check to see if any start up tokens that need to be sold
+    await startup_sell(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, sell_slippage=SELL_SLIPPAGE)
 
-    # # Create the queue to share between the producer (monitor_transactions) and consumer (consume_queue) tasks
-    # queue = asyncio.Queue()
+    # Create the queue to share between the producer (monitor_transactions) and consumer (consume_queue) tasks
+    queue = asyncio.Queue()
      
-    # # Run both the monitoring and consuming tasks concurrently
-    # producer_task = asyncio.create_task(listen_for_migrations(redis_client_tokens=redis_client_tokens, queue=queue))
-    # consumer_task = asyncio.create_task(consume_queue(queue=queue, httpx_client=httpx_client))
-    # await asyncio.gather(producer_task, consumer_task)
+    # Run both the monitoring and consuming tasks concurrently
+    producer_task = asyncio.create_task(listen_for_migrations(redis_client_tokens=redis_client_tokens, queue=queue))
+    consumer_task = asyncio.create_task(consume_queue(queue=queue, httpx_client=httpx_client))
+    await asyncio.gather(producer_task, consumer_task)
     
-    pair_address = "879F697iuDJGMevRkRcnW21fcXiAeLJK1ffsw2ATebce"
-    sol_in = 0.0001
-    slippage = 1
-    await buy(pair_address, sol_in, slippage)
-    
-    print("Sleeping")
-    time.sleep(30)
-    
-    percentage = 100
-    slippage = 1
-    # sell(pair_address, percentage, slippage)
-    
+    # RAYDIUM TESTING
+    # pair_address = "879F697iuDJGMevRkRcnW21fcXiAeLJK1ffsw2ATebce"
+    # sol_in = 0.0001
+    # slippage = 1
+    # await buy(pair_address, sol_in, slippage)
+    # print("Sleeping")
+    # time.sleep(30)
+    # percentage = 100
+    # slippage = 1
+    # await sell(pair_address, percentage, slippage)
+
+    # from solders.signature import Signature #type: ignore
+    # from utils.common_utils import confirm_txn
+
+    # sig = "2kifthdbbYopEvKWzGE1wiMa3RResxniMmoki7hAKSU218GcpYRSeiFpCRHiEGrdrCwVatutx3xQ1gfA8Womu9GY"
+    # sig = Signature.from_string(sig)
+    # res = await confirm_txn(txn_sig=sig)
+    # print(res)
+
 
 
 if __name__ == "__main__":
