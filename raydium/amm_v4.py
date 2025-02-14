@@ -31,7 +31,8 @@ from utils.pool_utils import (
 from config import client, payer_keypair, UNIT_BUDGET, UNIT_PRICE, trade_logger
 from raydium.constants import ACCOUNT_LAYOUT_LEN, SOL_DECIMAL, TOKEN_PROGRAM_ID, WSOL
 
-async def buy(pair_address: str, sol_in: float = 0.01, slippage: int = 5) -> bool:
+
+async def buy(pair_address:str, sol_in:float=0.01, slippage:int=5, priority_fee:int=100_000) -> bool:
     try:
         trade_logger.info(f"Starting buy transaction for pair address: {pair_address}")
 
@@ -71,7 +72,7 @@ async def buy(pair_address: str, sol_in: float = 0.01, slippage: int = 5) -> boo
             create_token_account_instruction = create_associated_token_account(
                 payer_keypair.pubkey(), payer_keypair.pubkey(), mint
             )
-            # trade_logger.info("No existing token account found; creating associated token account.")
+            trade_logger.info("No existing token account found; creating associated token account.")
 
         # trade_logger.info("Generating seed for WSOL account...")
         seed = base64.urlsafe_b64encode(os.urandom(24)).decode("utf-8")
@@ -124,7 +125,8 @@ async def buy(pair_address: str, sol_in: float = 0.01, slippage: int = 5) -> boo
 
         instructions = [
             set_compute_unit_limit(UNIT_BUDGET),
-            set_compute_unit_price(UNIT_PRICE),
+            # set_compute_unit_price(UNIT_PRICE),
+            set_compute_unit_price(priority_fee),
             create_wsol_account_instruction,
             init_wsol_account_instruction,
         ]
@@ -155,13 +157,17 @@ async def buy(pair_address: str, sol_in: float = 0.01, slippage: int = 5) -> boo
 
         # trade_logger.info("Confirming transaction...")
         confirmed = await confirm_txn(txn_sig)
-
-        trade_logger.info(f"Transaction confirmed: {confirmed}")
-        return confirmed
+        
+        if confirmed is not None:
+            trade_logger.info(f"Transaction confirmed: {confirmed}")
+            return confirmed
+        else:
+            trade_logger.warning(f"Transaction confirmed: {confirmed}")
+            return None
 
     except Exception as e:
         trade_logger.error(f"Error occurred during transaction: {e}")
-        return False
+        return e
 
 async def sell(pair_address: str, percentage: int = 100, slippage: int = 5) -> bool:
     try:
@@ -301,7 +307,7 @@ async def sell(pair_address: str, percentage: int = 100, slippage: int = 5) -> b
 
     except Exception as e:
         trade_logger.error(f"Error occurred during transaction: {e}")
-        return False
+        return e
 
 def sol_for_tokens(sol_amount, base_vault_balance, quote_vault_balance, swap_fee=0.25):
     effective_sol_used = sol_amount - (sol_amount * (swap_fee / 100))

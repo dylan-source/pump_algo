@@ -23,7 +23,7 @@ async def get_token_balance(mint_str: str) -> float | None:
                 return float(token_amount)
     return None
 
-async def confirm_txn(txn_sig: Signature, max_retries: int = 20, retry_interval: int = 3) -> bool:    
+async def confirm_txn(txn_sig: Signature, max_retries: int = 15, retry_interval: int = 3) -> bool:    
     retries = 1
     
     while retries < max_retries:
@@ -41,8 +41,9 @@ async def confirm_txn(txn_sig: Signature, max_retries: int = 20, retry_interval:
                 return True
             
             trade_logger.error("Error: Transaction not confirmed. Retrying...")
-            if txn_json['err']:
-                trade_logger.error("Transaction failed.")
+            error = txn_json['err']
+            if error:
+                trade_logger.error(f"Transaction failed...{error}")
                 return False
         except Exception as e:
             trade_logger.info(f"Awaiting confirmation... try count: {retries}")

@@ -32,7 +32,7 @@ RELAY_DELAY = 15                    # time when to reconnect to websocket after 
 TIME_TO_SLEEP = 15                  # sleep time between api calls for filters_utils functions
 TIMEOUT = 30000                     # sleep time between api calls for filters_utils functions -> mainly for scraping functions
 HTTPX_TIMEOUT = 10                  # timeout specifically for HTTPX
-MAX_TRADE_TIME_MINS = 8             # maximum trade duration
+MAX_TRADE_TIME_MINS = 5             # maximum trade duration
 SELL_LOOP_DELAY = 10                # delay between api calls in execute_sell function
 MONITOR_PRICE_DELAY = 3             # length of time between price API calls -> to prevent rate limit
 PRICE_LOOP_RETRIES = 5              # max number of times to attempt to fetch a rpice
@@ -50,12 +50,21 @@ SOL_MINT = 'So11111111111111111111111111111111111111112'
 PRIORITY_FEE_NUM_BLOCKS = 100
 PRIORITY_FEE_MULTIPLIER = 1.1
 PRIORITY_FEE_STOPLOSS_MULTIPLIER = 1.5
-PRIORITY_FEE_MIN = 30000
-PRIORITY_FEE_MAX = 500000
+PRIORITY_FEE_MIN = 50_000
+PRIORITY_FEE_MAX = 250_000
+PRIORITY_FEE_DICT = {
+    "PRIORITY_FEE_MIN": PRIORITY_FEE_MIN,
+    "PRIORITY_FEE_MAX": PRIORITY_FEE_MAX,
+    "PRIORITY_FEE_NUM_BLOCKS": PRIORITY_FEE_NUM_BLOCKS,
+    "PRIORITY_FEE_MULTIPLIER": PRIORITY_FEE_MULTIPLIER,
+    "PRIORITY_FEE_STOPLOSS_MULTIPLIER": PRIORITY_FEE_STOPLOSS_MULTIPLIER
+}
 
 # Define slippage dictionaries
-BUY_SLIPPAGE = {'MIN': 2000, 'MAX': 3500, 'INCREMENTS': 500}
-SELL_SLIPPAGE = {'MIN': 2500, 'MAX': 4500, 'INCREMENTS': 500, 'STOPLOSS_MIN': 3500}
+# BUY_SLIPPAGE = {'MIN': 2000, 'MAX': 3500, 'INCREMENTS': 500}                          # Dictionaries for Jupiter
+# SELL_SLIPPAGE = {'MIN': 2500, 'MAX': 4500, 'INCREMENTS': 500, 'STOPLOSS_MIN': 3500}
+BUY_SLIPPAGE = {'MIN': 5, 'MAX': 20, 'INCREMENTS': 5}
+SELL_SLIPPAGE = {'MIN': 5, 'MAX': 30, 'INCREMENTS': 5, 'STOPLOSS_MIN': 20}
 SELL_SLIPPAGE_DELAY = 5 
 
 # Load the Jupiter URLs
@@ -67,7 +76,7 @@ JUPITER_PRICE_URL = 'https://api.jup.ag/price/v2'
 MIGRATION_ADDRESS = '39azUYFWPz3VHgKCf3VChUwbpURdCHRxjWVowf5jUJjg'
 METADATA_PROGRAM_ID = Pubkey.from_string('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s')
 JUPITER_V6_ADDRESS = 'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4'
-RAYDIUM_ADDRESS = '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1'
+RAYDIUM_ADDRESS = '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8'   # '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1'
 
 #----------------------
 #   DEFINE LOGGER
@@ -152,8 +161,8 @@ trade_logger.info("Private key successfully decrypted and loaded.")
 #     RAYDIUM_PY CONFIGS
 #-----------------------------
 
-UNIT_BUDGET =  150_000
-UNIT_PRICE =  1_000_000
+UNIT_BUDGET =  150_000      # max compute units to use - seems to average about 65k typically
+UNIT_PRICE =  500_000       # priority fee per computer unit to use
 client = AsyncClient(RPC_URL)
 payer_keypair = PRIVATE_KEY
 

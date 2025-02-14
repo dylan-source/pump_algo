@@ -12,31 +12,15 @@ from config import MIGRATION_ADDRESS, migrations_logger, RPC_URL, SOL_MINT, SOL_
 from listen_to_raydium_migration import listen_for_migrations
 from trade_utils import trade_wrapper, startup_sell
 from solana.rpc.async_api import AsyncClient
-from storage_utils import parse_migrations_to_save, store_trade_data, fetch_trade_data
+from storage_utils import parse_migrations_to_save
 from filter_utils import process_new_tokens
-
-from raydium.amm_v4 import buy, sell
+from trade_utils_raydium import raydium_trade_wrapper
 
 # Instantiate the relevant objects
 rpc_client = AsyncClient(RPC_URL)
 httpx_client = httpx.AsyncClient(timeout=HTTPX_TIMEOUT)
 redis_client_tokens = redis.Redis(host='localhost', port=6379, db=0)
 redis_client_trades = redis.Redis(host='localhost', port=6379, db=1)
-
-async def new_trade_wrapper(pair_address: str):
-    # time.sleep(2)
-    sol_in = 0.0001
-    slippage = 1
-    await buy(pair_address, sol_in, slippage)
-    
-    print("Sleeping")
-    await asyncio.sleep(30)
-    
-    percentage = 100
-    slippage = 1
-    await sell(pair_address, percentage, slippage)
-    
-    
 
 # Create a consumer queue to take new tokens and execute trade logic
 async def consume_queue(queue, httpx_client):
@@ -55,7 +39,7 @@ async def consume_queue(queue, httpx_client):
         await parse_migrations_to_save(token_address=token_address, pair_address=pair_address, data_to_save=data_to_save, filters_result=filters_result)
 
         # Force trade for testing
-        # filters_result = True
+        filters_result = True
 
         # if filters_result:
         #     asyncio.create_task(
@@ -63,19 +47,14 @@ async def consume_queue(queue, httpx_client):
         #             sol_address=SOL_MINT, trade_amount=SOL_AMOUNT_LAMPORTS, buy_slippage=BUY_SLIPPAGE, sell_slippage=SELL_SLIPPAGE)
         #             )     
         
-        
-        asyncio.create_task(new_trade_wrapper(pair_address))      
-        
-        
-
+        if filters_result:
+            asyncio.create_task(raydium_trade_wrapper(httpx_client, pair_address))      
         
         
-
-
 async def main():
     
     # Check to see if any start up tokens that need to be sold
-    await startup_sell(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, sell_slippage=SELL_SLIPPAGE)
+    # await startup_sell(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, sell_slippage=SELL_SLIPPAGE)
 
     # Create the queue to share between the producer (monitor_transactions) and consumer (consume_queue) tasks
     queue = asyncio.Queue()
@@ -84,26 +63,9 @@ async def main():
     producer_task = asyncio.create_task(listen_for_migrations(redis_client_tokens=redis_client_tokens, queue=queue))
     consumer_task = asyncio.create_task(consume_queue(queue=queue, httpx_client=httpx_client))
     await asyncio.gather(producer_task, consumer_task)
-    
-    # RAYDIUM TESTING
+
     # pair_address = "879F697iuDJGMevRkRcnW21fcXiAeLJK1ffsw2ATebce"
-    # sol_in = 0.0001
-    # slippage = 1
-    # await buy(pair_address, sol_in, slippage)
-    # print("Sleeping")
-    # time.sleep(30)
-    # percentage = 100
-    # slippage = 1
-    # await sell(pair_address, percentage, slippage)
-
-    # from solders.signature import Signature #type: ignore
-    # from utils.common_utils import confirm_txn
-
-    # sig = "2kifthdbbYopEvKWzGE1wiMa3RResxniMmoki7hAKSU218GcpYRSeiFpCRHiEGrdrCwVatutx3xQ1gfA8Womu9GY"
-    # sig = Signature.from_string(sig)
-    # res = await confirm_txn(txn_sig=sig)
-    # print(res)
-
+    # await raydium_trade_wrapper(httpx_client, pair_address)
 
 
 if __name__ == "__main__":
