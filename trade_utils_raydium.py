@@ -232,34 +232,6 @@ async def get_qn_priority_fees(httpx_client: httpx.AsyncClient, fees_account: st
     except Exception:
         return None
 
-
-# Fetch quote from Jupiter
-async def get_jupiter_quote(httpx_client:httpx.AsyncClient, input_address:str, amount:int=1_000_000, slippage:str=1_000):
-    """
-    Fetch a quote from Jupiter v6 asynchronously.
-    'amount' is in lamport
-    'slippage_bps' in basis points
-    """
-    params = {
-        "inputMint": input_address,
-        "outputMint": WSOL,
-        "amount": amount,
-        "slippageBps": slippage,
-        # "restrictIntermediateTokens": True,
-        "swapMode": "ExactIn"
-    }
-    
-    quote_response = await httpx_client.get(JUPITER_QUOTE_URL, headers={'Accept':'application/json'}, params=params)
-    quote_response = quote_response.json()
-
-    # Define risky address for logging purposes
-    if not quote_response:
-        trade_logger.error(f"No routes found for: {input_address}")
-        return None
-    else:
-        trade_logger.info(f"Routes found for address: {input_address}")
-        return quote_response
-    
     
 # Failsafe execute sell - to clear wallet of SPL tokens
 async def startup_sell(httpx_client:httpx.AsyncClient):
@@ -349,6 +321,31 @@ async def get_spl_tokens_in_wallet(wallet_address: str) -> list[dict]:
     return tokens
 
 
-httpx_client = httpx.AsyncClient()
-if __name__ == "__main__":
-    asyncio.run(startup_sell(httpx_client))
+# Fetch quote from Jupiter
+async def get_jupiter_quote(httpx_client:httpx.AsyncClient, input_address:str, amount:int=1_000_000, slippage:str=1_000):
+    """
+    Fetch a quote from Jupiter v6 asynchronously.
+    'amount' is in lamport
+    'slippage_bps' in basis points
+    """
+    params = {
+        "inputMint": input_address,
+        "outputMint": WSOL,
+        "amount": amount,
+        "slippageBps": slippage,
+        # "restrictIntermediateTokens": True,
+        "swapMode": "ExactIn"
+    }
+    
+    quote_response = await httpx_client.get(JUPITER_QUOTE_URL, headers={'Accept':'application/json'}, params=params)
+    quote_response = quote_response.json()
+
+    # Define risky address for logging purposes
+    if not quote_response:
+        trade_logger.error(f"No routes found for: {input_address}")
+        return None
+    else:
+        trade_logger.info(f"Routes found for address: {input_address}")
+        return quote_response
+    
+

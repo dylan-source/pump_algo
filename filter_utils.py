@@ -337,11 +337,12 @@ async def fetch_token_details(httpx_client: httpx.AsyncClient, token_mint_addres
         if response.status_code == 200:
             return response.json()
         else:
-            migrations_logger.error(f'Failed to fetch token details: {response.status_code} {response.text}0')
+            migrations_logger.error(f'Failed to fetch token details: {response.status_code} {response.text}')
+            migrations_logger.error(f'Test to see json conversion: {response.json()}')
             return None
     except Exception as e:
         migrations_logger.error(f'Error during API call: {str(e)}')
-        return
+        return None
 
 
 # Uses the IPFS url to get the twitter address
@@ -749,7 +750,7 @@ async def rugcheck_analysis(httpx_client: httpx.AsyncClient, token_mint_address:
     try:
         token_details = await fetch_token_details(httpx_client, token_mint_address)
         if not token_details:
-            migrations_logger.error('Failed to fetch token details.')
+            # migrations_logger.error('Failed to fetch token details.')
             return None, None, None
         
         # Token metadata
@@ -791,10 +792,13 @@ async def rugcheck_analysis(httpx_client: httpx.AsyncClient, token_mint_address:
 
 
 # Run the various token filters
-async def process_new_tokens(httpx_client, token_address, pair_address):
+async def process_new_tokens(httpx_client, token_address):
     
     # Perform RugCheck analysis
     metadata, risks, holder_metrics = await rugcheck_analysis(httpx_client=httpx_client, token_mint_address=token_address)
+    if metadata is None:
+        return None, None
+    
     migrations_logger.info(f'Rugcheck done for {token_address}')
 
     # Extract and log token symbol and name
