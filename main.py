@@ -10,11 +10,11 @@ from pprint import pprint
 
 from config import MIGRATION_ADDRESS, migrations_logger, RPC_URL, SOL_MINT, SOL_AMOUNT_LAMPORTS, BUY_SLIPPAGE, SELL_SLIPPAGE, TRADE_AMOUNT_SOL, SOL_DECIMALS, WALLET_ADDRESS, PRIVATE_KEY, HTTPX_TIMEOUT
 from listen_to_raydium_migration import listen_for_migrations
-# from trade_utils import trade_wrapper, startup_sell, get_jupiter_quote
+from trade_utils import trade_wrapper, startup_sell, get_jupiter_quote
 from solana.rpc.async_api import AsyncClient
 from storage_utils import parse_migrations_to_save
 from filter_utils import process_new_tokens
-from trade_utils_raydium import raydium_trade_wrapper, startup_sell
+from trade_utils_raydium import raydium_trade_wrapper# , startup_sell
 
 # Instantiate the relevant objects
 rpc_client = AsyncClient(RPC_URL)
@@ -55,7 +55,8 @@ async def consume_queue(queue, httpx_client):
 async def main():
     
     # Check to see if any start up tokens that need to be sold
-    await startup_sell(httpx_client=httpx_client)
+    await startup_sell(rpc_client, httpx_client, redis_client_trades, sell_slippage=SELL_SLIPPAGE)
+    # await startup_sell(httpx_client=httpx_client)         # error code: InstructionErrorCustom(11) 
 
     # Create the queue to share between the producer (monitor_transactions) and consumer (consume_queue) tasks
     queue = asyncio.Queue()

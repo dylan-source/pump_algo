@@ -14,6 +14,7 @@ from solders.transaction_status import TransactionErrorInstructionError, Instruc
 from utils.api import get_pool_info_by_mint
 from raydium.amm_v4 import buy, sell
 from raydium.constants import TOKEN_PROGRAM_ID, WSOL
+from storage_utils import store_trade_data
 from config import client, trade_logger, RPC_URL, PRIORITY_FEE_DICT, TRADE_AMOUNT_SOL, BUY_SLIPPAGE, SELL_SLIPPAGE, MAX_TRADE_TIME_MINS, JUPITER_QUOTE_URL, WALLET_ADDRESS
 
 
@@ -80,20 +81,36 @@ async def execute_buy(httpx_client: httpx.AsyncClient, pair_address: str) -> Uni
                 
                 # Catch Raydium custom errors
                 if isinstance(result, InstructionErrorCustom):      # class 'solders.transaction_status.InstructionErrorCustom'
-                # if isinstance(result, TransactionErrorInstructionError):      
-                    # error = result.err.code
                     error = result.code
                     if error == 30:
                         trade_logger.warning(f"Buy failed - insufficient slippage ({current_slippage}%). Increasing slippage and retrying")
                         current_slippage = increase_slippage(current_slippage, BUY_SLIPPAGE)
                         continue
-                    # Catches other errors
-                    else:   
-                        trade_logger.error(f"Buy failed with unexpected error: {error}")
-                        break
+                elif isinstance(result, dict):          # {'InstructionError': [5, {'Custom': 30}]} from confirm_tx
+                    error = result.get("InstructionError")[1]
+                    error = error.get("Custom")
+                    if error == 30:
+                        trade_logger.warning(f"Buy failed - insufficient slippage ({current_slippage}%). Increasing slippage and retrying")
+                        current_slippage = increase_slippage(current_slippage, BUY_SLIPPAGE)
+                        continue
+                
+                # Fallback for any other errors
+                elif not result:   
+                    trade_logger.error(f"Buy failed with unexpected error: {error}")
+                    break
 
                 # If buy function returns True, then trade and confirmation was successful
-                trade_logger.info(f"Buy successful with priority fee {fee_value} ({level}th) and slippage {current_slippage}.")
+                trade_logger.info(f"Buy successful with priority fee {fee_value} ({level}th) and slippage {current_slippage}%.")
+                
+                # Cache trade data in redis
+                # data_to_cache = {
+                #     'buy_timestamp': timestamp, 
+                #     'buy_transaction_hash': str(signature), 
+                #     'buy_tokens_spent': tokens_spent, 
+                #     'buy_tokens_received': tokens_received
+                # }
+                # store_trade_data(redis_client_trades, signature, timestamp, token_address, tokens_spent, tokens_received)
+                
                 return result
 
         # Fail-safe if trade exhausts slippage or priority fee levels return Fa
@@ -143,7 +160,6 @@ async def execute_sell(httpx_client: httpx.AsyncClient, pair_address: str) -> Un
             while current_slippage <= SELL_SLIPPAGE['MAX']:
                 trade_logger.info(f"Attempting sell with priority fee: {fee_value} ({level}th) and slippage: {current_slippage}%")
                 
-                
                 # Lower percentage for testing
                 result = await sell(
                     pair_address=pair_address,
@@ -159,17 +175,19 @@ async def execute_sell(httpx_client: httpx.AsyncClient, pair_address: str) -> Un
                 
                 # Catch Raydium custom errors
                 if isinstance(result, InstructionErrorCustom):      # class 'solders.transaction_status.InstructionErrorCustom'
-                # if isinstance(result, TransactionErrorInstructionError):      
-                    # error = result.err.code
                     error = result.code
                     if error == 30:
                         trade_logger.warning(f"Sell failed - insufficient slippage ({current_slippage}%). Increasing slippage and retrying")
                         current_slippage = increase_slippage(current_slippage, SELL_SLIPPAGE)
                         continue
-                    # Catches other errors
-                    else:   
-                        trade_logger.error(f"Sell failed with unexpected error: {error}")
-                        break
+                    
+                elif isinstance(result, dict):          # {'InstructionError': [5, {'Custom': 30}]} from confirm_tx
+                    error = result.get("InstructionError")[1]
+                    error = error.get("Custom")
+                    if error == 30:
+                        trade_logger.warning(f"Sell failed - insufficient slippage ({current_slippage}%). Increasing slippage and retrying")
+                        current_slippage = increase_slippage(current_slippage, SELL_SLIPPAGE)
+                        continue
                 
                 # Catch all other errors
                 elif isinstance(result, Exception):
@@ -177,7 +195,7 @@ async def execute_sell(httpx_client: httpx.AsyncClient, pair_address: str) -> Un
                     continue
 
                 # If Sell function returns True, then trade and confirmation was successful
-                trade_logger.info(f"Sell successful with priority fee {fee_value} ({level}th) and slippage {current_slippage}.")
+                trade_logger.info(f"Sell successful with priority fee {fee_value} ({level}th) and slippage {current_slippage}%.")
                 return result
 
         # Fail-safe if trade exhausts slippage or priority fee levels return Fa

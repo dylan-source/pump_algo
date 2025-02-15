@@ -44,19 +44,7 @@ async def confirm_txn(txn_sig: Signature, max_retries: int = 15, retry_interval:
             # trade_logger.error("Error: Transaction not confirmed. Retrying...")
             error = txn_json['err']
             if error:
-                trade_logger.error(f"Transaction failed...{error}")     # {'InstructionError': [4, {'Custom': 30}]}
-                
-                print("\nERROR TYPE IN CONFIRM_TX FUNCTION")
-                print(error)
-                print(type(error))
-                print("\n\n")
-                
-                next_level = error["err"]
-                print("\nNEXT ERROR LEVEL IN CONFIRM_TX FUNCTION")
-                print(next_level)
-                print(type(next_level))
-                print("\n\n")
-                
+                trade_logger.error(f"Transaction failed...{error}")     # {'InstructionError': [4, {'Custom': 30}]}            
                 return error
         except Exception as e:
             trade_logger.info(f"Awaiting confirmation... try count: {retries}")

@@ -3,13 +3,16 @@ Post migration pump.fun sniper bot
 
 # IMPORTANT: fix amount_out estimation calculation
 
+# Next steps:
+- Use get_transaction call (already called in confirm_tx function) to determine tokens spent and received
+- Cache buy results and store trade results in CSV
+
 # To-do list:
 - Change startup sell to raydium 
 - Consider adding additional priority fee values to get_recent_prioritization_fees and in the lists for escalating trades (currently stops at 75th percentile)
 - Increase buy slippage max if price is increasing (and vice verse for selling)?
 - Implement stoploss mechanism
 - Look into package to handle rate limits (specifically for jupiter's price api calls)
-
 
 # Not critical:
 
