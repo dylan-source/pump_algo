@@ -66,7 +66,7 @@ SELL_SLIPPAGE = {'MIN': 0, 'MAX': 30, 'INCREMENTS': 5, 'STOPLOSS_MIN': 20}
 SELL_SLIPPAGE_DELAY = 5 
 
 # Load the Jupiter URLs
-JUPITER_QUOTE_URL = 'https://api.jup.ag/swap/v1/quote'
+JUPITER_QUOTE_URL = "https://public.jupiterapi.com/quote"   # Direct URL: 'https://api.jup.ag/swap/v1/quote'
 JUPITER_SWAP_URL = 'https://api.jup.ag/swap/v1/swap'
 JUPITER_PRICE_URL = 'https://api.jup.ag/price/v2'
 

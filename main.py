@@ -10,11 +10,11 @@ from pprint import pprint
 
 from config import MIGRATION_ADDRESS, migrations_logger, RPC_URL, SOL_MINT, SOL_AMOUNT_LAMPORTS, BUY_SLIPPAGE, SELL_SLIPPAGE, TRADE_AMOUNT_SOL, SOL_DECIMALS, WALLET_ADDRESS, PRIVATE_KEY, HTTPX_TIMEOUT
 from listen_to_raydium_migration import listen_for_migrations
-from trade_utils import trade_wrapper, startup_sell
+# from trade_utils import trade_wrapper, startup_sell, get_jupiter_quote
 from solana.rpc.async_api import AsyncClient
 from storage_utils import parse_migrations_to_save
 from filter_utils import process_new_tokens
-from trade_utils_raydium import raydium_trade_wrapper
+from trade_utils_raydium import raydium_trade_wrapper, startup_sell
 
 # Instantiate the relevant objects
 rpc_client = AsyncClient(RPC_URL)
@@ -56,17 +56,16 @@ async def main():
     # Check to see if any start up tokens that need to be sold
     # await startup_sell(rpc_client=rpc_client, httpx_client=httpx_client, redis_client_trades=redis_client_trades, sell_slippage=SELL_SLIPPAGE)
 
-    # # Create the queue to share between the producer (monitor_transactions) and consumer (consume_queue) tasks
-    # queue = asyncio.Queue()
+    # Create the queue to share between the producer (monitor_transactions) and consumer (consume_queue) tasks
+    queue = asyncio.Queue()
      
-    # # Run both the monitoring and consuming tasks concurrently
-    # producer_task = asyncio.create_task(listen_for_migrations(redis_client_tokens=redis_client_tokens, queue=queue))
-    # consumer_task = asyncio.create_task(consume_queue(queue=queue, httpx_client=httpx_client))
-    # await asyncio.gather(producer_task, consumer_task)
+    # Run both the monitoring and consuming tasks concurrently
+    producer_task = asyncio.create_task(listen_for_migrations(redis_client_tokens=redis_client_tokens, queue=queue))
+    consumer_task = asyncio.create_task(consume_queue(queue=queue, httpx_client=httpx_client))
+    await asyncio.gather(producer_task, consumer_task)
 
-    pair_address = "CTRFwjyfTj245VdsJmmtFgQ8HemxXrB1UjpYUSKdm2sp"   # 879F697iuDJGMevRkRcnW21fcXiAeLJK1ffsw2ATebce MEW address
-    await raydium_trade_wrapper(httpx_client, pair_address)
-
+    # pair_address = "CTRFwjyfTj245VdsJmmtFgQ8HemxXrB1UjpYUSKdm2sp"   # 879F697iuDJGMevRkRcnW21fcXiAeLJK1ffsw2ATebce MEW address
+    # await raydium_trade_wrapper(httpx_client, pair_address)
 
 if __name__ == "__main__":
     asyncio.run(main())
