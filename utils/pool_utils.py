@@ -424,7 +424,7 @@ def make_clmm_swap_instruction(
         
         return swap_instruction
     except Exception as e:
-        print(f"Error occurred: {e}")
+        trade_logger.error(f"Error occurred: {e}")
         return None
 
 async def get_amm_v4_reserves(pool_keys: AmmV4PoolKeys) -> tuple:
@@ -442,7 +442,7 @@ async def get_amm_v4_reserves(pool_keys: AmmV4PoolKeys) -> tuple:
             Processed
         )
         balances = balances_response.value
-
+        
         quote_account = balances[0]
         base_account = balances[1]
         
@@ -496,7 +496,7 @@ def get_cpmm_reserves(pool_keys: CpmmPoolKeys):
     base_account_balance = base_account.data.parsed['info']['tokenAmount']['uiAmount']
     
     if quote_account_balance is None or base_account_balance is None:
-        print("Error: One of the account balances is None.")
+        trade_logger.error("Error: One of the account balances is None.")
         return None, None, None
     
     if base_mint == WSOL:

@@ -1,6 +1,8 @@
 # Pump.fun Migration Sniper
 Post migration pump.fun sniper bot
 
+# IMPORTANT: fix amount_out estimation calculation
+
 # To-do list:
 - Change startup sell to raydium 
 - Consider adding additional priority fee values to get_recent_prioritization_fees and in the lists for escalating trades (currently stops at 75th percentile)

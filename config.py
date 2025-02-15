@@ -40,7 +40,7 @@ START_UP_SLEEP = 5                  # number of seconds after migration before a
 
 # Define SOL constants
 SOL_DECIMALS = 9
-TRADE_AMOUNT_SOL = 0.0001
+TRADE_AMOUNT_SOL = 0.001
 SOL_AMOUNT_LAMPORTS = int(TRADE_AMOUNT_SOL * 10 ** SOL_DECIMALS)
 MIN_SOL_BALANCE = 0.1
 SOL_MIN_BALANCE_LAMPORTS = int(MIN_SOL_BALANCE * 10 ** SOL_DECIMALS)
@@ -61,8 +61,8 @@ PRIORITY_FEE_DICT = {
 }
 
 # Define slippage dictionaries
-BUY_SLIPPAGE = {'MIN': 0, 'MAX': 20, 'INCREMENTS': 5}
-SELL_SLIPPAGE = {'MIN': 5, 'MAX': 30, 'INCREMENTS': 5, 'STOPLOSS_MIN': 20}
+BUY_SLIPPAGE = {'MIN': 5, 'MAX': 20, 'INCREMENTS': 5}
+SELL_SLIPPAGE = {'MIN': 0, 'MAX': 30, 'INCREMENTS': 5, 'STOPLOSS_MIN': 20}
 SELL_SLIPPAGE_DELAY = 5 
 
 # Load the Jupiter URLs
@@ -160,7 +160,7 @@ trade_logger.info("Private key successfully decrypted and loaded.")
 #-----------------------------
 
 UNIT_BUDGET =  150_000      # max compute units to use - seems to average about 65k typically
-UNIT_PRICE =  500_000       # priority fee per computer unit to use
+# UNIT_PRICE =  500_000       # priority fee per computer unit to use
 client = AsyncClient(RPC_URL)
 payer_keypair = PRIVATE_KEY
 

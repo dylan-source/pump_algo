@@ -28,14 +28,12 @@ from utils.pool_utils import (
     get_amm_v4_reserves,
     make_amm_v4_swap_instruction
 )
-from config import client, payer_keypair, UNIT_BUDGET, UNIT_PRICE, trade_logger
+from config import client, payer_keypair, UNIT_BUDGET, trade_logger
 from raydium.constants import ACCOUNT_LAYOUT_LEN, SOL_DECIMAL, TOKEN_PROGRAM_ID, WSOL
 
 
-async def buy(pair_address:str, sol_in:float=0.01, slippage:int=5, priority_fee:int=100_000) -> bool:
+async def buy(pair_address:str, sol_in:float=0.01, slippage:int=5, priority_fee:int=100_000):
     try:
-        trade_logger.info(f"Starting buy transaction for pair address: {pair_address}")
-
         # trade_logger.info("Fetching pool keys...")
         pool_keys: Optional[AmmV4PoolKeys] = await fetch_amm_v4_pool_keys(pair_address)
         if pool_keys is None:
@@ -43,16 +41,14 @@ async def buy(pair_address:str, sol_in:float=0.01, slippage:int=5, priority_fee:
             return False
         # trade_logger.info("Pool keys fetched successfully.")
 
-        mint = (
-            pool_keys.base_mint if pool_keys.base_mint != WSOL else pool_keys.quote_mint
-        )
+        mint = (pool_keys.base_mint if pool_keys.base_mint != WSOL else pool_keys.quote_mint)
 
         # trade_logger.info("Calculating transaction amounts...")
         amount_in = int(sol_in * SOL_DECIMAL)
 
         base_reserve, quote_reserve, token_decimal = await get_amm_v4_reserves(pool_keys)
         amount_out = sol_for_tokens(sol_in, base_reserve, quote_reserve)
-        trade_logger.info(f"Estimated Amount Out: {amount_out}")
+        trade_logger.info(f"Estimated Amount Out: {int(amount_out*10**token_decimal)}")
 
         slippage_adjustment = 1 - (slippage / 100)
         amount_out_with_slippage = amount_out * slippage_adjustment
@@ -146,7 +142,7 @@ async def buy(pair_address:str, sol_in:float=0.01, slippage:int=5, priority_fee:
             latest_blockhash,
         )
         
-        trade_logger.info("Simulating transaction...")
+        trade_logger.info("Simulating buy transaction...")
         simulation_txn_sig = await client.simulate_transaction(
             txn=VersionedTransaction(compiled_message, [payer_keypair]),
             sig_verify=False,
@@ -155,7 +151,7 @@ async def buy(pair_address:str, sol_in:float=0.01, slippage:int=5, priority_fee:
         
         simulation_status = simulation_txn_sig.value.err
         if simulation_status is not None:
-            error = simulation_status.err# .code
+            error = simulation_status.err
             trade_logger.error(f"Simulation error - error code: {error} ")
             return error
         
@@ -169,20 +165,14 @@ async def buy(pair_address:str, sol_in:float=0.01, slippage:int=5, priority_fee:
 
         # trade_logger.info("Confirming transaction...")
         confirmed = await confirm_txn(txn_sig)
-        
-        # if confirmed is not None:
-        #     trade_logger.info(f"Transaction confirmed: {confirmed}")
-        # else:
-        #     trade_logger.warning(f"Transaction did not confirm: {confirmed}")
         return confirmed
 
     except Exception as e:
         trade_logger.error(f"Error occurred during transaction: {e}")
         return e
 
-async def sell(pair_address: str, percentage: int = 100, slippage: int = 5) -> bool:
+async def sell(pair_address:str, percentage:int=100, slippage:int=5, priority_fee:int=100_000):
     try:
-        trade_logger.info(f"Starting sell transaction for pair address: {pair_address}")
         if not (1 <= percentage <= 100):
             trade_logger.error("Percentage must be between 1 and 100.")
             return False
@@ -192,18 +182,15 @@ async def sell(pair_address: str, percentage: int = 100, slippage: int = 5) -> b
         if pool_keys is None:
             trade_logger.error("No pool keys found...")
             return False
-        # trade_logger.info("Pool keys fetched successfully.")
-
-        mint = (
-            pool_keys.base_mint if pool_keys.base_mint != WSOL else pool_keys.quote_mint
-        )
+        
+        mint = (pool_keys.base_mint if pool_keys.base_mint != WSOL else pool_keys.quote_mint)
 
         # trade_logger.info("Retrieving token balance...")
         token_balance = await get_token_balance(str(mint))
-        trade_logger.info(f"Token Balance: {token_balance}")
+        trade_logger.info(f"Wallet balance: {token_balance}")
 
         if token_balance == 0 or token_balance is None:
-            trade_logger.error("No token balance available to sell.")
+            trade_logger.error("No tokens available to sell.")
             return False
 
         token_balance = token_balance * (percentage / 100)
@@ -212,7 +199,7 @@ async def sell(pair_address: str, percentage: int = 100, slippage: int = 5) -> b
         # trade_logger.info("Calculating transaction amounts...")
         base_reserve, quote_reserve, token_decimal = await get_amm_v4_reserves(pool_keys)
         amount_out = tokens_for_sol(token_balance, base_reserve, quote_reserve)
-        trade_logger.info(f"Estimated Amount Out: {amount_out}")
+        trade_logger.info(f"Estimated Amount Out: {int(amount_out * SOL_DECIMAL)}")
 
         slippage_adjustment = 1 - (slippage / 100)
         amount_out_with_slippage = amount_out * slippage_adjustment
@@ -272,7 +259,7 @@ async def sell(pair_address: str, percentage: int = 100, slippage: int = 5) -> b
 
         instructions = [
             set_compute_unit_limit(UNIT_BUDGET),
-            set_compute_unit_price(UNIT_PRICE),
+            set_compute_unit_price(priority_fee),
             create_wsol_account_instruction,
             init_wsol_account_instruction,
             swap_instructions,
@@ -302,7 +289,21 @@ async def sell(pair_address: str, percentage: int = 100, slippage: int = 5) -> b
             latest_blockhash,
         )
 
-        # trade_logger.info("Sending transaction...")
+        trade_logger.info("Simulating sell transaction...")
+        simulation_txn_sig = await client.simulate_transaction(
+            txn=VersionedTransaction(compiled_message, [payer_keypair]),
+            sig_verify=False,
+            commitment=Processed
+        )
+        
+        simulation_status = simulation_txn_sig.value.err
+        if simulation_status is not None:
+            error = simulation_status.err
+            trade_logger.error(f"Simulation error - error code: {error} ")
+            return error
+        # return False
+    
+        trade_logger.info("Sending transaction...")
         txn_sig = await client.send_transaction(
             txn=VersionedTransaction(compiled_message, [payer_keypair]),
             opts=TxOpts(skip_preflight=True),
@@ -312,8 +313,6 @@ async def sell(pair_address: str, percentage: int = 100, slippage: int = 5) -> b
 
         # trade_logger.info("Confirming transaction...")
         confirmed = await confirm_txn(txn_sig)
-
-        trade_logger.info(f"Transaction confirmed: {confirmed}")
         return confirmed
 
     except Exception as e:
@@ -333,3 +332,5 @@ def tokens_for_sol(token_amount, base_vault_balance, quote_vault_balance, swap_f
     updated_quote_vault_balance = constant_product / (base_vault_balance + effective_tokens_sold)
     sol_received = quote_vault_balance - updated_quote_vault_balance
     return round(sol_received, 9)
+
+
