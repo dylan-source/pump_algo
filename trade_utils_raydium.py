@@ -22,6 +22,7 @@ async def raydium_trade_wrapper(httpx_client: httpx.AsyncClient, pair_address: s
     
     buy_result = await execute_buy(httpx_client=httpx_client, pair_address=pair_address)
     if buy_result:
+        trade_logger.info(f"Trade in progress: {pair_address}")
         await asyncio.sleep(MAX_TRADE_TIME_MINS*60)
         await execute_sell(httpx_client=httpx_client, pair_address=pair_address)
     else:
