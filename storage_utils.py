@@ -41,7 +41,7 @@ async def warmup_fetch_trades(redis_client):
     matching_keys = [key async for key in redis_client.scan_iter(pattern)]
     values = await asyncio.gather(*(redis_client.get(key) for key in matching_keys))
     trades = dict(zip(matching_keys, values))
-    print(trades)
+    # print(trades)
 
 
 # Store the newly migrated token's address
@@ -186,14 +186,15 @@ async def write_trades_to_csv(redis_client, tx_address, sell_data_dict):
     
     # Get buy trade data from cache
     buy_data_dict = await fetch_trade_data(redis_client, tx_address)
+    pair_address = buy_data_dict.get("pair_address", "Not pair_address in cache")
     
     try:
         effective_buy_price = -buy_data_dict['buy_tokens_spent'] / buy_data_dict['buy_tokens_received']
         effective_sell_price = sell_data_dict['sell_tokens_received'] / -sell_data_dict['sell_tokens_spent']
         return_value = sell_data_dict['sell_tokens_received'] + buy_data_dict['buy_tokens_spent']
         return_perc = (sell_data_dict['sell_tokens_received'] / -buy_data_dict['buy_tokens_spent'] - 1) * 100
-        trade_logger.info(f'Return value in SOL for {tx_address}: {return_value}')
-        trade_logger.info(f'Return % for {tx_address}: {return_perc}')
+        trade_logger.info(f'Return value in SOL for {pair_address}: {return_value}')
+        trade_logger.info(f'Return % for {pair_address}: {return_perc}')
 
         token_columns = [
             'token_address', 
@@ -237,9 +238,9 @@ async def write_trades_to_csv(redis_client, tx_address, sell_data_dict):
             # Delete the key from Redis and log accordingly
             result = await redis_client.delete(tx_address)
             if result:
-                trade_logger.info(f'Redis key deleted for {tx_address}: True')
+                trade_logger.info(f'Redis key deleted for {pair_address}: True')
             else:
-                trade_logger.error(f'Redis key NOT deleted for {tx_address}: False')
+                trade_logger.error(f'Redis key NOT deleted for {pair_address}: False')
 
     except Exception as e:
         trade_logger.error(f'Error with write_trades_to_csv function: {e}')

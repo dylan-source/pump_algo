@@ -34,7 +34,7 @@ async def raydium_trade_wrapper(
                             )
     
     if buy_result:
-        trade_logger.info(f"Trade in progress: {token_mint}")
+        trade_logger.info(f"Trade in progress: {pair_address}")
         await asyncio.sleep(MAX_TRADE_TIME_MINS*60)
         await execute_sell(
                     httpx_client=httpx_client, 
@@ -119,19 +119,21 @@ async def execute_buy(httpx_client: httpx.AsyncClient,
                     trade_logger.error(f"Buy failed with unexpected error: {error}")
                     break
 
-                # If buy function returns True, then trade and confirmation was successful
-                trade_logger.info(f"Buy successful with priority fee {fee_value} ({level}th) and slippage {current_slippage}%.")
                 
-                # Cache trade data in redis
-                data_to_cache = {
-                        'buy_timestamp': trade_data.get("Timestamp", ""), 
-                        'buy_transaction_hash': trade_data.get("buy_transaction_hash", ""), 
-                        'pair_address': pair_address, 
-                        'buy_tokens_spent': trade_data.get("SOL change", ""),  
-                        'buy_tokens_received': trade_data.get("Token change", ""), 
-                    }
-                cache_result = await store_trade_data(redis=redis_client_trades, token_address=token_mint, trade_data=data_to_cache)
-                trade_logger.info(f"Buy trade cached for {token_mint}: {cache_result}")
+                if result:
+                    # If buy function returns True, then trade and confirmation was successful
+                    trade_logger.info(f"Buy successful with priority fee {fee_value} ({level}th) and slippage {current_slippage}%.")
+                    
+                    # Cache trade data in redis
+                    data_to_cache = {
+                            'buy_timestamp': trade_data.get("Timestamp", ""), 
+                            'buy_transaction_hash': trade_data.get("buy_transaction_hash", ""), 
+                            'pair_address': pair_address, 
+                            'buy_tokens_spent': trade_data.get("SOL change", ""),  
+                            'buy_tokens_received': trade_data.get("Token change", ""), 
+                        }
+                    cache_result = await store_trade_data(redis=redis_client_trades, token_address=token_mint, trade_data=data_to_cache)
+                    trade_logger.info(f"Buy trade cached for {pair_address}: {cache_result}")
                 return result
 
         # Fail-safe if trade exhausts slippage or priority fee levels return Fa
@@ -194,7 +196,7 @@ async def execute_sell(
                     slippage=current_slippage,
                     priority_fee=fee_value
                 )
-        
+                
                 # If False/None is returned - typically due to insufficient priority fees. Break loop and try next fee level
                 if not result:
                     trade_logger.warning(f"Sell failed with fee {fee_value} and slippage {current_slippage}%. Increasing priority fee")
@@ -221,22 +223,23 @@ async def execute_sell(
                     trade_logger.error(f"Generic error - type: {type(result)} - error: {result}")
                     continue
 
-                # If Sell function returns True, then trade and confirmation was successful
-                trade_logger.info(f"Sell successful with priority fee {fee_value} ({level}th) and slippage {current_slippage}%.")
-                                
-                data_to_cache = {
-                    'sell_timestamp': trade_data.get("Timestamp", ""),  
-                    'sell_transaction_hash': trade_data.get("sell_transaction_hash", ""), 
-                    'sell_tokens_spent': trade_data.get("Token change", ""),  
-                    'sell_tokens_received': trade_data.get("SOL change", "")
-                }
-                
-                # Store the trade data for further analysis
-                await write_trades_to_csv(
-                    redis_client=redis_client_trades,
-                    tx_address=token_mint,
-                    sell_data_dict=data_to_cache
-                )   
+                if result:
+                    # If Sell function returns True, then trade and confirmation was successful
+                    trade_logger.info(f"Sell successful with priority fee {fee_value} ({level}th) and slippage {current_slippage}%.")
+                                    
+                    data_to_cache = {
+                        'sell_timestamp': trade_data.get("Timestamp", ""),  
+                        'sell_transaction_hash': trade_data.get("sell_transaction_hash", ""), 
+                        'sell_tokens_spent': trade_data.get("Token change", ""),  
+                        'sell_tokens_received': trade_data.get("SOL change", "")
+                    }
+                    
+                    # Store the trade data for further analysis
+                    await write_trades_to_csv(
+                        redis_client=redis_client_trades,
+                        tx_address=token_mint,
+                        sell_data_dict=data_to_cache
+                    )   
                 
                 return result
 

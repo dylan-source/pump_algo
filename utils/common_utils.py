@@ -117,33 +117,33 @@ async def confirm_txn(txn_sig: Signature, spl_mint:str, max_retries: int = 15, r
 
 
 
-async def confirm_txn_original(txn_sig: Signature, max_retries: int = 15, retry_interval: int = 3) -> bool:    
-    retries = 1
+# async def confirm_txn_original(txn_sig: Signature, max_retries: int = 15, retry_interval: int = 3) -> bool:    
+#     retries = 1
     
-    while retries < max_retries:
-        try:
-            txn_res = await client.get_transaction(
-                txn_sig, 
-                encoding="json", 
-                commitment=Confirmed, 
-                max_supported_transaction_version=0)
+#     while retries < max_retries:
+#         try:
+#             txn_res = await client.get_transaction(
+#                 txn_sig, 
+#                 encoding="json", 
+#                 commitment=Confirmed, 
+#                 max_supported_transaction_version=0)
             
-            txn_json = json.loads(txn_res.value.transaction.meta.to_json())
+#             txn_json = json.loads(txn_res.value.transaction.meta.to_json())
             
-            if txn_json['err'] is None:
-                trade_logger.info(f"Transaction confirmed")
-                return True
+#             if txn_json['err'] is None:
+#                 trade_logger.info(f"Transaction confirmed")
+#                 return True
             
-            # trade_logger.error("Error: Transaction not confirmed. Retrying...")
-            error = txn_json['err']
-            if error:
-                trade_logger.error(f"Transaction failed...{error}")     # {'InstructionError': [4, {'Custom': 30}]}            
-                return error
-        except Exception as e:
-            trade_logger.info(f"Awaiting confirmation... try count: {retries}")
-            retries += 1
-            await asyncio.sleep(retry_interval)
+#             # trade_logger.error("Error: Transaction not confirmed. Retrying...")
+#             error = txn_json['err']
+#             if error:
+#                 trade_logger.error(f"Transaction failed...{error}")     # {'InstructionError': [4, {'Custom': 30}]}            
+#                 return error
+#         except Exception as e:
+#             trade_logger.info(f"Awaiting confirmation... try count: {retries}")
+#             retries += 1
+#             await asyncio.sleep(retry_interval)
     
-    trade_logger.error("Max retries reached. Transaction confirmation failed.")
-    return None
+#     trade_logger.error("Max retries reached. Transaction confirmation failed.")
+#     return None
 

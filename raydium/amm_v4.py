@@ -165,12 +165,13 @@ async def buy(pair_address:str, token_mint:str, sol_in:float=0.01, slippage:int=
 
         # trade_logger.info("Confirming transaction...")
         confirmed, trade_data = await confirm_txn(txn_sig, token_mint)
-        trade_data["buy_transaction_hash"] = str(txn_sig)
+        if confirmed is True:
+            trade_data["buy_transaction_hash"] = str(txn_sig)
         return confirmed, trade_data
 
     except Exception as e:
-        trade_logger.error(f"Error occurred during transaction: {e}")
-        return e, None
+        trade_logger.error(f"Error occurred during buy transaction: {e}")
+        return None, None
 
 async def sell(pair_address:str, token_mint:str, percentage:int=100, slippage:int=5, priority_fee:int=100_000):
     try:
@@ -314,12 +315,13 @@ async def sell(pair_address:str, token_mint:str, percentage:int=100, slippage:in
 
         # trade_logger.info("Confirming transaction...")
         confirmed, trade_data = await confirm_txn(txn_sig, token_mint)
-        trade_data["sell_transaction_hash"] = str(txn_sig)
+        if confirmed is True:
+            trade_data["sell_transaction_hash"] = str(txn_sig)
         return confirmed, trade_data
 
     except Exception as e:
-        trade_logger.error(f"Error occurred during transaction: {e}")
-        return e, None
+        trade_logger.error(f"Error occurred during sell transaction: {e}")
+        return None, None
 
 def sol_for_tokens(sol_amount, base_vault_balance, quote_vault_balance, swap_fee=0.25):
     effective_sol_used = sol_amount - (sol_amount * (swap_fee / 100))
