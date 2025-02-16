@@ -10,15 +10,20 @@ from config import CSV_MIGRATIONS_FILE, CSV_TRADES_FILE, migrations_logger, trad
 #---------------------
 
 # Cache the trade data when a buy is executed
-async def store_trade_data(redis_client_trades, signature, timestamp, token_address, tokens_spent, tokens_received):
-    trade_data = {
-        'buy_timestamp': timestamp, 
-        'buy_transaction_hash': str(signature), 
-        'buy_tokens_spent': tokens_spent, 
-        'buy_tokens_received': tokens_received
-        }
+async def store_trade_data(redis, token_address, trade_data):
+    '''
+        trade_data schema:
+                {
+                    'buy_timestamp': timestamp, 
+                    'buy_transaction_hash': str(signature), 
+                    'buy_pair_address': str(signature), 
+                    'buy_tokens_spent': tokens_spent, 
+                    'buy_tokens_received': tokens_received
+                 }
+    '''
+
     trade_data_json = json.dumps(trade_data)
-    result = await redis_client_trades.set(token_address, trade_data_json)
+    result = await redis.set(token_address, trade_data_json)
     return result
 
 
@@ -177,10 +182,16 @@ async def write_migrations_to_csv(data_dict):
 
 
 # Save trade data to a csv
-async def write_trades_to_csv(tx_address, buy_data_dict, sell_data_dict, redis_client):
+async def write_trades_to_csv(redis_client, tx_address, sell_data_dict):
+    
+    # Get buy trade data from cache
+    buy_data_dict = await fetch_trade_data(redis_client, tx_address)
+    print(f"Buy data dict: {buy_data_dict}")
+    print(f"Buy data dict type: {type(buy_data_dict)}")
+    
     try:
         effective_buy_price = -buy_data_dict['buy_tokens_spent'] / buy_data_dict['buy_tokens_received']
-        effective_sell_price = -sell_data_dict['sell_tokens_received'] / sell_data_dict['sell_tokens_spent']
+        effective_sell_price = sell_data_dict['sell_tokens_received'] / -sell_data_dict['sell_tokens_spent']
         return_value = sell_data_dict['sell_tokens_received'] + buy_data_dict['buy_tokens_spent']
         return_perc = (sell_data_dict['sell_tokens_received'] / -buy_data_dict['buy_tokens_spent'] - 1) * 100
         trade_logger.info(f'Return value in SOL for {tx_address}: {return_value}')
@@ -188,6 +199,7 @@ async def write_trades_to_csv(tx_address, buy_data_dict, sell_data_dict, redis_c
 
         token_columns = [
             'token_address', 
+            'pair_address', 
             'buy_timestamp', 
             'buy_transaction_hash', 
             'buy_tokens_spent', 

@@ -32,13 +32,13 @@ from config import client, payer_keypair, UNIT_BUDGET, trade_logger
 from raydium.constants import ACCOUNT_LAYOUT_LEN, SOL_DECIMAL, TOKEN_PROGRAM_ID, WSOL
 
 
-async def buy(pair_address:str, sol_in:float=0.01, slippage:int=5, priority_fee:int=100_000):
+async def buy(pair_address:str, token_mint:str, sol_in:float=0.01, slippage:int=5, priority_fee:int=100_000):
     try:
         # trade_logger.info("Fetching pool keys...")
         pool_keys: Optional[AmmV4PoolKeys] = await fetch_amm_v4_pool_keys(pair_address)
         if pool_keys is None:
             trade_logger.error(f"No pool keys found for {pair_address}")
-            return False
+            return False, None
         # trade_logger.info("Pool keys fetched successfully.")
 
         mint = (pool_keys.base_mint if pool_keys.base_mint != WSOL else pool_keys.quote_mint)
@@ -153,7 +153,7 @@ async def buy(pair_address:str, sol_in:float=0.01, slippage:int=5, priority_fee:
         if simulation_status is not None:
             error = simulation_status.err
             trade_logger.error(f"Simulation error - error code: {error} ")
-            return error
+            return error, None
         
         trade_logger.info("Sending transaction...")
         txn_sig = await client.send_transaction(
@@ -164,24 +164,25 @@ async def buy(pair_address:str, sol_in:float=0.01, slippage:int=5, priority_fee:
         trade_logger.info(f"Transaction Signature: {txn_sig}")
 
         # trade_logger.info("Confirming transaction...")
-        confirmed = await confirm_txn(txn_sig)
-        return confirmed
+        confirmed, trade_data = await confirm_txn(txn_sig, token_mint)
+        trade_data["buy_transaction_hash"] = str(txn_sig)
+        return confirmed, trade_data
 
     except Exception as e:
         trade_logger.error(f"Error occurred during transaction: {e}")
-        return e
+        return e, None
 
-async def sell(pair_address:str, percentage:int=100, slippage:int=5, priority_fee:int=100_000):
+async def sell(pair_address:str, token_mint:str, percentage:int=100, slippage:int=5, priority_fee:int=100_000):
     try:
         if not (1 <= percentage <= 100):
             trade_logger.error("Percentage must be between 1 and 100.")
-            return False
+            return False, None
 
         # trade_logger.info("Fetching pool keys...")
         pool_keys: Optional[AmmV4PoolKeys] = await fetch_amm_v4_pool_keys(pair_address)
         if pool_keys is None:
             trade_logger.error("No pool keys found...")
-            return False
+            return False, None
         
         mint = (pool_keys.base_mint if pool_keys.base_mint != WSOL else pool_keys.quote_mint)
 
@@ -191,7 +192,7 @@ async def sell(pair_address:str, percentage:int=100, slippage:int=5, priority_fe
 
         if token_balance == 0 or token_balance is None:
             trade_logger.error("No tokens available to sell.")
-            return False
+            return False, None
 
         token_balance = token_balance * (percentage / 100)
         # trade_logger.info(f"Selling {percentage}% of the token balance, adjusted balance: {token_balance}")
@@ -300,7 +301,7 @@ async def sell(pair_address:str, percentage:int=100, slippage:int=5, priority_fe
         if simulation_status is not None:
             error = simulation_status.err
             trade_logger.error(f"Simulation error - error code: {error} ")
-            return error
+            return error, None
         # return False
     
         trade_logger.info("Sending transaction...")
@@ -312,12 +313,13 @@ async def sell(pair_address:str, percentage:int=100, slippage:int=5, priority_fe
         trade_logger.info(f"Transaction Signature: {txn_sig}")
 
         # trade_logger.info("Confirming transaction...")
-        confirmed = await confirm_txn(txn_sig)
-        return confirmed
+        confirmed, trade_data = await confirm_txn(txn_sig, token_mint)
+        trade_data["sell_transaction_hash"] = str(txn_sig)
+        return confirmed, trade_data
 
     except Exception as e:
         trade_logger.error(f"Error occurred during transaction: {e}")
-        return e
+        return e, None
 
 def sol_for_tokens(sol_amount, base_vault_balance, quote_vault_balance, swap_fee=0.25):
     effective_sol_used = sol_amount - (sol_amount * (swap_fee / 100))

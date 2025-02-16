@@ -2,6 +2,7 @@ from typing import Union, Any, Dict
 import statistics
 import json
 import asyncio
+import redis.asyncio as redis
 import httpx
 from httpx._config import Timeout
 import numpy as np
@@ -9,29 +10,47 @@ from solana.rpc.types import TokenAccountOpts
 from solana.rpc.commitment import Processed, Confirmed, Finalized
 
 from solders.pubkey import Pubkey # type: ignore
-from solders.transaction_status import TransactionErrorInstructionError, InstructionErrorCustom # type: ignore
+from solders.transaction_status import InstructionErrorCustom # type: ignore
 
 from utils.api import get_pool_info_by_mint
 from raydium.amm_v4 import buy, sell
 from raydium.constants import TOKEN_PROGRAM_ID, WSOL
-from storage_utils import store_trade_data
+from storage_utils import store_trade_data, write_trades_to_csv
 from config import client, trade_logger, RPC_URL, PRIORITY_FEE_DICT, TRADE_AMOUNT_SOL, BUY_SLIPPAGE, SELL_SLIPPAGE, MAX_TRADE_TIME_MINS, JUPITER_QUOTE_URL, WALLET_ADDRESS
 
 
 # Wrapper to house all trade logic and functions
-async def raydium_trade_wrapper(httpx_client: httpx.AsyncClient, pair_address: str):
+async def raydium_trade_wrapper(
+                    httpx_client: httpx.AsyncClient, 
+                    redis_trades: redis.Redis, 
+                    pair_address: str, 
+                    token_mint: str) -> None:
+        
+    buy_result = await execute_buy(
+                            httpx_client=httpx_client, 
+                            redis_client_trades=redis_trades, 
+                            pair_address=pair_address, 
+                            token_mint=token_mint
+                            )
     
-    buy_result = await execute_buy(httpx_client=httpx_client, pair_address=pair_address)
     if buy_result:
-        trade_logger.info(f"Trade in progress: {pair_address}")
+        trade_logger.info(f"Trade in progress: {token_mint}")
         await asyncio.sleep(MAX_TRADE_TIME_MINS*60)
-        await execute_sell(httpx_client=httpx_client, pair_address=pair_address)
+        await execute_sell(
+                    httpx_client=httpx_client, 
+                    redis_client_trades=redis_trades,
+                    pair_address=pair_address, 
+                    token_mint=token_mint
+                    )
     else:
         return None
 
 
 # Function to handle buy trade with escalating slippage and priority fees
-async def execute_buy(httpx_client: httpx.AsyncClient, pair_address: str) -> Union[Dict[str, Any], bool]:
+async def execute_buy(httpx_client: httpx.AsyncClient, 
+                      redis_client_trades: redis.Redis, 
+                      pair_address: str, 
+                      token_mint: str) -> Union[Dict[str, Any], bool]:
     """
     Executes a Raydium trade (buy) with incremental adjustments for priority fee and slippage.
     
@@ -67,8 +86,9 @@ async def execute_buy(httpx_client: httpx.AsyncClient, pair_address: str) -> Uni
             current_slippage = BUY_SLIPPAGE['MIN']
             while current_slippage <= BUY_SLIPPAGE['MAX']:
                 trade_logger.info(f"Attempting buy with priority fee: {fee_value} ({level}th) and slippage: {current_slippage}%")
-                result = await buy(
+                result, trade_data = await buy(
                     pair_address=pair_address,
+                    token_mint=token_mint,
                     sol_in=TRADE_AMOUNT_SOL,
                     slippage=current_slippage,
                     priority_fee=fee_value
@@ -103,14 +123,15 @@ async def execute_buy(httpx_client: httpx.AsyncClient, pair_address: str) -> Uni
                 trade_logger.info(f"Buy successful with priority fee {fee_value} ({level}th) and slippage {current_slippage}%.")
                 
                 # Cache trade data in redis
-                # data_to_cache = {
-                #     'buy_timestamp': timestamp, 
-                #     'buy_transaction_hash': str(signature), 
-                #     'buy_tokens_spent': tokens_spent, 
-                #     'buy_tokens_received': tokens_received
-                # }
-                # store_trade_data(redis_client_trades, signature, timestamp, token_address, tokens_spent, tokens_received)
-                
+                data_to_cache = {
+                        'buy_timestamp': trade_data.get("Timestamp", ""), 
+                        'buy_transaction_hash': trade_data.get("buy_transaction_hash", ""), 
+                        'pair_address': pair_address, 
+                        'buy_tokens_spent': trade_data.get("SOL change", ""),  
+                        'buy_tokens_received': trade_data.get("Token change", ""), 
+                    }
+                cache_result = await store_trade_data(redis=redis_client_trades, token_address=token_mint, trade_data=data_to_cache)
+                trade_logger.info(f"Buy trade cached for {token_mint}: {cache_result}")
                 return result
 
         # Fail-safe if trade exhausts slippage or priority fee levels return Fa
@@ -123,7 +144,12 @@ async def execute_buy(httpx_client: httpx.AsyncClient, pair_address: str) -> Uni
 
 
 # Function to handle sell trade with escalating slippage and priority fees
-async def execute_sell(httpx_client: httpx.AsyncClient, pair_address: str) -> Union[Dict[str, Any], bool]:
+async def execute_sell(
+    httpx_client: httpx.AsyncClient, 
+    redis_client_trades: redis.Redis,
+    pair_address: str, 
+    token_mint: str
+    ) -> Union[Dict[str, Any], bool]:
     """
     Executes a Raydium trade (sell) with incremental adjustments for priority fee and slippage.
     
@@ -161,8 +187,9 @@ async def execute_sell(httpx_client: httpx.AsyncClient, pair_address: str) -> Un
                 trade_logger.info(f"Attempting sell with priority fee: {fee_value} ({level}th) and slippage: {current_slippage}%")
                 
                 # Lower percentage for testing
-                result = await sell(
+                result, trade_data = await sell(
                     pair_address=pair_address,
+                    token_mint=token_mint,
                     percentage=100,
                     slippage=current_slippage,
                     priority_fee=fee_value
@@ -196,6 +223,21 @@ async def execute_sell(httpx_client: httpx.AsyncClient, pair_address: str) -> Un
 
                 # If Sell function returns True, then trade and confirmation was successful
                 trade_logger.info(f"Sell successful with priority fee {fee_value} ({level}th) and slippage {current_slippage}%.")
+                                
+                data_to_cache = {
+                    'sell_timestamp': trade_data.get("Timestamp", ""),  
+                    'sell_transaction_hash': trade_data.get("sell_transaction_hash", ""), 
+                    'sell_tokens_spent': trade_data.get("Token change", ""),  
+                    'sell_tokens_received': trade_data.get("SOL change", "")
+                }
+                
+                # Store the trade data for further analysis
+                await write_trades_to_csv(
+                    redis_client=redis_client_trades,
+                    tx_address=token_mint,
+                    sell_data_dict=data_to_cache
+                )   
+                
                 return result
 
         # Fail-safe if trade exhausts slippage or priority fee levels return Fa

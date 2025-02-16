@@ -3,10 +3,6 @@ Post migration pump.fun sniper bot
 
 # IMPORTANT: fix amount_out estimation calculation
 
-# Next steps:
-- Use get_transaction call (already called in confirm_tx function) to determine tokens spent and received
-- Cache buy results and store trade results in CSV
-
 # To-do list:
 - Change startup sell to raydium 
 - Consider adding additional priority fee values to get_recent_prioritization_fees and in the lists for escalating trades (currently stops at 75th percentile)
@@ -22,6 +18,8 @@ Post migration pump.fun sniper bot
 3. When stoploss is triggered use a higher priority fee and slippage values - implementation: done using additional config parameters
 4. Use DexScreener for prices - implementation: done, fetching the priceNative (token_price/sol) value - DexScreener prices very slow. Jupiter is ok. Codex.io is best
 5. Switch trading directly to raydium rather than Jupiter (jupiter has a time lag after migration and also extra fees) - done: raydium swap integrated
+6. Use get_transaction call (already called in confirm_tx function) to determine tokens spent and received
+7. Cache buy results and store trade results in CSV
 
 # Other packages to look into:
  - UV Loop

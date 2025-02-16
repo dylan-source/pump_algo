@@ -15,6 +15,7 @@ from solana.rpc.async_api import AsyncClient
 from storage_utils import parse_migrations_to_save
 from filter_utils import process_new_tokens
 from trade_utils_raydium import raydium_trade_wrapper# , startup_sell
+# from utils.common_utils import confirm_txn
 
 # Instantiate the relevant objects
 rpc_client = AsyncClient(RPC_URL)
@@ -49,25 +50,37 @@ async def consume_queue(queue, httpx_client):
         #             )     
         
         if filters_result:
-            asyncio.create_task(raydium_trade_wrapper(httpx_client, pair_address))      
+            asyncio.create_task(raydium_trade_wrapper(httpx_client=httpx_client, redis_trades=redis_client_trades, 
+                                                      pair_address=pair_address, token_mint=token_address))      
         
         
 async def main():
     
     # Check to see if any start up tokens that need to be sold
-    await startup_sell(rpc_client, httpx_client, redis_client_trades, sell_slippage=SELL_SLIPPAGE)
-    # await startup_sell(httpx_client=httpx_client)         # error code: InstructionErrorCustom(11) 
+    # await startup_sell(rpc_client, httpx_client, redis_client_trades, sell_slippage=SELL_SLIPPAGE)
+    # # await startup_sell(httpx_client=httpx_client)         # error code: InstructionErrorCustom(11) 
 
-    # Create the queue to share between the producer (monitor_transactions) and consumer (consume_queue) tasks
-    queue = asyncio.Queue()
+    # # Create the queue to share between the producer (monitor_transactions) and consumer (consume_queue) tasks
+    # queue = asyncio.Queue()
      
-    # Run both the monitoring and consuming tasks concurrently
-    producer_task = asyncio.create_task(listen_for_migrations(redis_client_tokens=redis_client_tokens, queue=queue))
-    consumer_task = asyncio.create_task(consume_queue(queue=queue, httpx_client=httpx_client))
-    await asyncio.gather(producer_task, consumer_task)
+    # # Run both the monitoring and consuming tasks concurrently
+    # producer_task = asyncio.create_task(listen_for_migrations(redis_client_tokens=redis_client_tokens, queue=queue))
+    # consumer_task = asyncio.create_task(consume_queue(queue=queue, httpx_client=httpx_client))
+    # await asyncio.gather(producer_task, consumer_task)
 
-    # pair_address = "CTRFwjyfTj245VdsJmmtFgQ8HemxXrB1UjpYUSKdm2sp"   # 879F697iuDJGMevRkRcnW21fcXiAeLJK1ffsw2ATebce MEW address
-    # await raydium_trade_wrapper(httpx_client, pair_address)
+    pair_address = "879F697iuDJGMevRkRcnW21fcXiAeLJK1ffsw2ATebce"
+    token_mint = "MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5"
+    await raydium_trade_wrapper(httpx_client, redis_client_trades, pair_address, token_mint)
+
+    # from solders.signature import Signature #type: ignore
+    # str_tx = "2ZSGQVdYsQS6TJByVfG2TQEZNb8JTbiCsSrYE3bFMB24CaF2sCJhWrmWqGg9wxkNNwrat6fwZXiwiivEbUY3q91j"
+    # sig_sig = Signature.from_string(str_tx)
+    # print(sig_sig)
+    # print(type(sig_sig))
+    # print(str(sig_sig))
+    # print(type(sig_sig.to_json()))
+
+
 
 if __name__ == "__main__":
     asyncio.run(main())
