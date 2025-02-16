@@ -8,6 +8,7 @@ trade.log
 trade_all_trades.log
 .venv
 /Scripts/encryption.txt
+/Scripts/encryption_backup.txt
 trade_data.csv
 trade_data_all_trades.csv
 migration_data.csv

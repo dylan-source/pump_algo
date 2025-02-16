@@ -186,8 +186,6 @@ async def write_trades_to_csv(redis_client, tx_address, sell_data_dict):
     
     # Get buy trade data from cache
     buy_data_dict = await fetch_trade_data(redis_client, tx_address)
-    print(f"Buy data dict: {buy_data_dict}")
-    print(f"Buy data dict type: {type(buy_data_dict)}")
     
     try:
         effective_buy_price = -buy_data_dict['buy_tokens_spent'] / buy_data_dict['buy_tokens_received']
