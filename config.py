@@ -32,7 +32,7 @@ RELAY_DELAY = 15                    # time when to reconnect to websocket after 
 TIME_TO_SLEEP = 15                  # sleep time between api calls for filters_utils functions
 TIMEOUT = 30000                     # sleep time between api calls for filters_utils functions -> mainly for scraping functions
 HTTPX_TIMEOUT = 10                  # timeout specifically for HTTPX
-MAX_TRADE_TIME_MINS = 5             # maximum trade duration
+MAX_TRADE_TIME_MINS = 8             # maximum trade duration
 SELL_LOOP_DELAY = 10                # delay between api calls in execute_sell function
 MONITOR_PRICE_DELAY = 3             # length of time between price API calls -> to prevent rate limit
 PRICE_LOOP_RETRIES = 5              # max number of times to attempt to fetch a rpice
@@ -40,20 +40,20 @@ START_UP_SLEEP = 5                  # number of seconds after migration before a
 
 # Define SOL constants
 SOL_DECIMALS = 9
-TRADE_AMOUNT_SOL = 0.0001
+TRADE_AMOUNT_SOL = 0.01
 SOL_AMOUNT_LAMPORTS = int(TRADE_AMOUNT_SOL * 10 ** SOL_DECIMALS)
 MIN_SOL_BALANCE = 0.1
 SOL_MIN_BALANCE_LAMPORTS = int(MIN_SOL_BALANCE * 10 ** SOL_DECIMALS)
 SOL_MINT = 'So11111111111111111111111111111111111111112'
 
 # Define priority fee ranges
-PRIORITY_FEE_MIN=20_000
+PRIORITY_FEE_MIN=30_000
 PRIORITY_FEE_MAX=500_000
 PRIORITY_FEE_NUM_BLOCKS=100
 PRIORITY_FEE_MULTIPLIER=1.1
 PRIORITY_FEE_STOPLOSS_MULTIPLIER=1.5
 PRIORITY_FEE_DICT = {
-    "PRIORITY_FEE_MIN": 20_000,
+    "PRIORITY_FEE_MIN": 30_000,
     "PRIORITY_FEE_MAX": 250_000,
     "PRIORITY_FEE_NUM_BLOCKS": 100,
     "PRIORITY_FEE_MULTIPLIER": 1.1,

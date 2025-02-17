@@ -96,7 +96,7 @@ async def execute_buy(httpx_client: httpx.AsyncClient,
         
                 # If False/None is returned - typically due to insufficient priority fees. Break loop and try next fee level
                 if not result:
-                    trade_logger.warning(f"Buy failed with fee {fee_value} and slippage {current_slippage}%. Increasing priority fee")
+                    trade_logger.warning(f"Buy failed with fee: {fee_value} and slippage: {current_slippage}%. Increasing priority fee")
                     break 
                 
                 # Catch Raydium custom errors
@@ -199,7 +199,7 @@ async def execute_sell(
                 
                 # If False/None is returned - typically due to insufficient priority fees. Break loop and try next fee level
                 if not result:
-                    trade_logger.warning(f"Sell failed with fee {fee_value} and slippage {current_slippage}%. Increasing priority fee")
+                    trade_logger.warning(f"Sell failed with fee: {fee_value} and slippage: {current_slippage}%. Increasing priority fee")
                     break 
                 
                 # Catch Raydium custom errors
