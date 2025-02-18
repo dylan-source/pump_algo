@@ -463,7 +463,8 @@ async def get_amm_v4_reserves(pool_keys: AmmV4PoolKeys) -> tuple:
             token_decimal = base_decimal
 
         # trade_logger.info(f"Base Mint: {base_mint} | Quote Mint: {quote_mint}")
-        trade_logger.info(f"Base Reserve: {base_reserve} | Quote Reserve: {quote_reserve} | Token Decimal: {token_decimal}")
+        price = round(quote_reserve/base_reserve,9)
+        trade_logger.info(f"Base Reserve: {base_reserve} | Quote Reserve: {quote_reserve} | Token Decimal: {token_decimal} | price: {price}")
         return base_reserve, quote_reserve, token_decimal
 
     except Exception as e:

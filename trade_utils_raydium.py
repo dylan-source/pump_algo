@@ -46,19 +46,19 @@ async def raydium_trade_wrapper(httpx_client: httpx.AsyncClient, redis_trades: r
             # Exit 1: if trade duration has expired
             elapsed_time = time.time() - trade_start_time
             if elapsed_time >= (MAX_TRADE_TIME_MINS * 60):
-                trade_logger.info(f"Trade duration for {pair_address} completed. Initiating ordered sell")
+                trade_logger.info(f"Trade duration for {pair_address} completed. Initiating ordered sell | Current price: {current_price}")
                 await execute_sell(httpx_client=httpx_client, redis_client_trades=redis_trades, pair_address=pair_address, token_mint=token_mint)
                 break
                 
             # Exit 2: Take profit target is hit
             elif current_price >= take_profit_price:
-                trade_logger.info(f"Take profit triggered for {pair_address}")
+                trade_logger.info(f"Take profit triggered for {pair_address} at price: {current_price}")
                 await execute_sell(httpx_client=httpx_client, redis_client_trades=redis_trades, pair_address=pair_address, token_mint=token_mint)
                 break
             
             # Exit 3: Stop loss
             elif current_price <= stoploss_price:
-                trade_logger.info(f"Stoploss triggered for {pair_address}")
+                trade_logger.info(f"Stoploss triggered for {pair_address} at price: {current_price}")
                 await execute_sell(httpx_client=httpx_client, redis_client_trades=redis_trades, pair_address=pair_address, token_mint=token_mint)
                 break
             
@@ -107,7 +107,7 @@ async def execute_buy(httpx_client: httpx.AsyncClient,
             current_slippage = BUY_SLIPPAGE['MIN']
             while current_slippage <= BUY_SLIPPAGE['MAX']:
                 trade_logger.info(f"Attempting buy with priority fee: {fee_value} ({level}th) and slippage: {current_slippage}%")
-                result, trade_data, sol_reserves = await buy(
+                result, trade_data, buy_price = await buy(
                     pair_address=pair_address,
                     token_mint=token_mint,
                     sol_in=TRADE_AMOUNT_SOL,
@@ -155,7 +155,7 @@ async def execute_buy(httpx_client: httpx.AsyncClient,
                         }
                     cache_result = await store_trade_data(redis=redis_client_trades, token_address=token_mint, trade_data=data_to_cache)
                     trade_logger.info(f"Buy trade cached for {pair_address}: {cache_result}")
-                return result, sol_reserves
+                return result, buy_price
 
         # Fail-safe if trade exhausts slippage or priority fee levels return Fa
         trade_logger.error("Buy operation failed for all priority fee and slippage combinations.")
@@ -281,7 +281,7 @@ async def get_raydium_price(pair_address):
 
     # mint = (pool_keys.base_mint if pool_keys.base_mint != WSOL else pool_keys.quote_mint)
     base_reserve, quote_reserve, _ = await get_amm_v4_reserves(pool_keys)
-    return quote_reserve
+    return round(quote_reserve/base_reserve,9)
 
 
 # Helper function to increase slippage in line with dict settings

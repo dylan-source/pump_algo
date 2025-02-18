@@ -167,7 +167,7 @@ async def buy(pair_address:str, token_mint:str, sol_in:float=0.01, slippage:int=
         confirmed, trade_data = await confirm_txn(txn_sig, token_mint)
         if confirmed is True:
             trade_data["buy_transaction_hash"] = str(txn_sig)
-        return confirmed, trade_data, quote_reserve
+        return confirmed, trade_data, quote_reserve/base_reserve
 
     except Exception as e:
         trade_logger.error(f"Error occurred during buy transaction: {e}")
