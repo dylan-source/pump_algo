@@ -1,6 +1,7 @@
-from typing import Union, Any, Dict
+from typing import Union, Any, Dict, Optional
 import statistics
 import json
+import time
 import asyncio
 import redis.asyncio as redis
 import httpx
@@ -13,35 +14,56 @@ from solders.pubkey import Pubkey # type: ignore
 from solders.transaction_status import InstructionErrorCustom # type: ignore
 
 from utils.api import get_pool_info_by_mint
+from utils.pool_utils import (
+    AmmV4PoolKeys,
+    fetch_amm_v4_pool_keys,
+    get_amm_v4_reserves)
+
 from raydium.amm_v4 import buy, sell
 from raydium.constants import TOKEN_PROGRAM_ID, WSOL
 from storage_utils import store_trade_data, write_trades_to_csv
-from config import client, trade_logger, RPC_URL, PRIORITY_FEE_DICT, TRADE_AMOUNT_SOL, BUY_SLIPPAGE, SELL_SLIPPAGE, MAX_TRADE_TIME_MINS, JUPITER_QUOTE_URL, WALLET_ADDRESS
+from config import client, trade_logger, RPC_URL, PRIORITY_FEE_DICT, TRADE_AMOUNT_SOL, BUY_SLIPPAGE, SELL_SLIPPAGE, MAX_TRADE_TIME_MINS, JUPITER_QUOTE_URL, WALLET_ADDRESS, FEE_LEVELS
 
 
 # Wrapper to house all trade logic and functions
-async def raydium_trade_wrapper(
-                    httpx_client: httpx.AsyncClient, 
-                    redis_trades: redis.Redis, 
-                    pair_address: str, 
-                    token_mint: str) -> None:
+async def raydium_trade_wrapper(httpx_client: httpx.AsyncClient, redis_trades: redis.Redis, pair_address: str, token_mint: str) -> None:
         
-    buy_result = await execute_buy(
-                            httpx_client=httpx_client, 
-                            redis_client_trades=redis_trades, 
-                            pair_address=pair_address, 
-                            token_mint=token_mint
-                            )
+    buy_result, buy_price = await execute_buy(httpx_client=httpx_client, redis_client_trades=redis_trades, pair_address=pair_address, token_mint=token_mint)
+    trade_logger.info(f"Buy price: {buy_price}")
     
     if buy_result:
         trade_logger.info(f"Trade in progress: {pair_address}")
-        await asyncio.sleep(MAX_TRADE_TIME_MINS*60)
-        await execute_sell(
-                    httpx_client=httpx_client, 
-                    redis_client_trades=redis_trades,
-                    pair_address=pair_address, 
-                    token_mint=token_mint
-                    )
+        
+        # Calculate trade parameters
+        trade_start_time = time.time()
+        take_profit_price = buy_price*(1 + 0.3)
+        stoploss_price = buy_price*(1 - 0.1)
+        while True:
+            
+            # Get current price
+            current_price = await get_raydium_price(pair_address)
+            
+            # Exit 1: if trade duration has expired
+            elapsed_time = time.time() - trade_start_time
+            if elapsed_time >= (MAX_TRADE_TIME_MINS * 60):
+                trade_logger.info(f"Trade duration for {pair_address} completed. Initiating ordered sell")
+                await execute_sell(httpx_client=httpx_client, redis_client_trades=redis_trades, pair_address=pair_address, token_mint=token_mint)
+                break
+                
+            # Exit 2: Take profit target is hit
+            elif current_price >= take_profit_price:
+                trade_logger.info(f"Take profit triggered for {pair_address}")
+                await execute_sell(httpx_client=httpx_client, redis_client_trades=redis_trades, pair_address=pair_address, token_mint=token_mint)
+                break
+            
+            # Exit 3: Stop loss
+            elif current_price <= stoploss_price:
+                trade_logger.info(f"Stoploss triggered for {pair_address}")
+                await execute_sell(httpx_client=httpx_client, redis_client_trades=redis_trades, pair_address=pair_address, token_mint=token_mint)
+                break
+            
+            await asyncio.sleep(1)
+        
     else:
         return None
 
@@ -71,12 +93,11 @@ async def execute_buy(httpx_client: httpx.AsyncClient,
         trade_logger.info(f"Priority fees: {fees_dict}")
     except Exception as e:
         trade_logger.error(f"Failed to fetch priority fees - {e}")
-        return False
+        return False, None
 
     try:
         # Create a loop of increasing priority fee levels
-        fee_levels = ['30', '40', '50', '60', '65', '70', '75', '85']
-        for level in fee_levels:
+        for level in FEE_LEVELS:
             fee_value = fees_dict.get(level)
             if fee_value is None:
                 trade_logger.warning(f"No priority fee found for {level}th. Skipping.")
@@ -86,7 +107,7 @@ async def execute_buy(httpx_client: httpx.AsyncClient,
             current_slippage = BUY_SLIPPAGE['MIN']
             while current_slippage <= BUY_SLIPPAGE['MAX']:
                 trade_logger.info(f"Attempting buy with priority fee: {fee_value} ({level}th) and slippage: {current_slippage}%")
-                result, trade_data = await buy(
+                result, trade_data, sol_reserves = await buy(
                     pair_address=pair_address,
                     token_mint=token_mint,
                     sol_in=TRADE_AMOUNT_SOL,
@@ -134,15 +155,15 @@ async def execute_buy(httpx_client: httpx.AsyncClient,
                         }
                     cache_result = await store_trade_data(redis=redis_client_trades, token_address=token_mint, trade_data=data_to_cache)
                     trade_logger.info(f"Buy trade cached for {pair_address}: {cache_result}")
-                return result
+                return result, sol_reserves
 
         # Fail-safe if trade exhausts slippage or priority fee levels return Fa
         trade_logger.error("Buy operation failed for all priority fee and slippage combinations.")
-        return False
+        return False, None
     
     except Exception as e:
         trade_logger.error(f"Unexpected buy function error: {e}")
-        return False
+        return False, None
 
 
 # Function to handle sell trade with escalating slippage and priority fees
@@ -176,8 +197,7 @@ async def execute_sell(
 
     try:
         # Create a loop of increasing priority fee levels
-        fee_levels = ['30', '40', '50', '60', '65', '70', '75', '85']
-        for level in fee_levels:
+        for level in FEE_LEVELS:
             fee_value = fees_dict.get(level)
             if fee_value is None:
                 trade_logger.warning(f"No priority fee found for {level}th. Skipping.")
@@ -252,6 +272,18 @@ async def execute_sell(
         return False
 
 
+# Get the token price
+async def get_raydium_price(pair_address):
+    pool_keys: Optional[AmmV4PoolKeys] = await fetch_amm_v4_pool_keys(pair_address)
+    if pool_keys is None:
+        trade_logger.error(f"No pool keys found for {pair_address}")
+        return None
+
+    # mint = (pool_keys.base_mint if pool_keys.base_mint != WSOL else pool_keys.quote_mint)
+    base_reserve, quote_reserve, _ = await get_amm_v4_reserves(pool_keys)
+    return quote_reserve
+
+
 # Helper function to increase slippage in line with dict settings
 def increase_slippage(current: int, slippage_dict: dict) -> int:
     return min(current + slippage_dict['INCREMENTS'], slippage_dict['MAX'])
@@ -267,7 +299,6 @@ async def get_qn_priority_fees(httpx_client: httpx.AsyncClient, fees_account: st
     min_fee = priority_fee_dict.get("PRIORITY_FEE_MIN","")
     
     try:
-
         payload = json.dumps({
             "jsonrpc": "2.0",
             "id": 1,
@@ -276,8 +307,7 @@ async def get_qn_priority_fees(httpx_client: httpx.AsyncClient, fees_account: st
                 "last_n_blocks": num_blocks,
                 "account": fees_account,
                 "api_version": 2
-            }
-            })
+            }})
 
         # Fetch the recent fees and filter for the percentiles and in per_compute_unit section
         response = await httpx_client.post(RPC_URL, headers={'Content-Type':'application/json'}, data=payload)
@@ -285,7 +315,8 @@ async def get_qn_priority_fees(httpx_client: httpx.AsyncClient, fees_account: st
         response = json_response.get("result", "").get("per_compute_unit", "").get("percentiles", "")
 
         # Create a new dictionary with only fees greater than the median
-        keys_to_extract = {30, 40, 50, 60, 65, 70, 75, 85}
+        # keys_to_extract = {50, 55, 60, 65, 70, 75, 85}
+        keys_to_extract = {int(fee) for fee in FEE_LEVELS}
         filtered_dict = {k: v for k, v in response.items() if int(k) in keys_to_extract}
         
         # Adjust values based on PRIORITY_FEE_MIN and PRIORITY_FEE_MAX

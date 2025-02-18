@@ -34,14 +34,14 @@ async def consume_queue(queue, httpx_client):
             migrations_logger.info(f"Consumer triggered with no token")
 
         # Run the various filters and save the info for future analysis
-        filters_result, data_to_save = await process_new_tokens(httpx_client=httpx_client, token_address=token_address)
+        filters_result, data_to_save = await process_new_tokens(httpx_client=httpx_client, token_address=token_address, pair_address=pair_address)
 
         # Save results to a CSV for further analysis
         if filters_result is not None:
             await parse_migrations_to_save(token_address=token_address, pair_address=pair_address, data_to_save=data_to_save, filters_result=filters_result)
 
         # Force trade for testing
-        # filters_result = True
+        filters_result = True
 
         # if filters_result:
         #     asyncio.create_task(

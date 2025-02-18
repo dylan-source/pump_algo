@@ -12,6 +12,7 @@ import httpx
 import requests
 from config import WALLET_ADDRESS, SIGNATURE, TWEET_SCOUT_KEY, TIME_TO_SLEEP, TIMEOUT, PRIVATE_KEY, RAYDIUM_ADDRESS, migrations_logger
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
+from trade_utils_raydium import get_raydium_price
 
 # TweetScout endpoint to get twitter ID from the username. The also have the reverse endpoing (get handle from ID)
 # https://api.tweetscout.io/v2/handle-to-id/{user_handle}
@@ -792,7 +793,7 @@ async def rugcheck_analysis(httpx_client: httpx.AsyncClient, token_mint_address:
 
 
 # Run the various token filters
-async def process_new_tokens(httpx_client, token_address):
+async def process_new_tokens(httpx_client, token_address, pair_address):
     
     # Perform RugCheck analysis
     metadata, risks, holder_metrics = await rugcheck_analysis(httpx_client=httpx_client, token_mint_address=token_address)
@@ -813,8 +814,11 @@ async def process_new_tokens(httpx_client, token_address):
     is_dex_paid_parsed, is_dex_paid_raw = await get_dex_paid(httpx_client=httpx_client, token_mint_address=token_address)
     migrations_logger.info(f'DexScreener done for {token_address}')
 
+    # Get amount of SOL in the pool (more SOL = higher price)
+    sol_reserves = await get_raydium_price(pair_address)
+
     # Perform trade filters and log the result
-    filters_result = await trade_filters(risks, holder_metrics, is_dex_paid_parsed)
+    filters_result = await trade_filters(risks, holder_metrics, is_dex_paid_parsed, sol_reserves)
     migrations_logger.info(f'Potential trade: {symbol} - {token_address} - {filters_result}')
     
     data_to_save = {
@@ -829,7 +833,7 @@ async def process_new_tokens(httpx_client, token_address):
 
 
 # Trade logic function to determine if we trade a token or not
-async def trade_filters(risks, holder_metrics, is_dex_paid_parsed):
+async def trade_filters(risks, holder_metrics, is_dex_paid_parsed, sol_reserves):
     """
         Current trade logic - return True if:
         - is_dex_paid_parsed: TRUE
@@ -838,8 +842,11 @@ async def trade_filters(risks, holder_metrics, is_dex_paid_parsed):
         - twitter_handles_count: [0,1] -> paused for now
     """
 
-    if risks is None or holder_metrics is None:
+    if risks is None or holder_metrics is None or sol_reserves is None:
         return False
+
+    # Has the price increased from launch (LP is seeded with 79 SOL)
+    price_change = sol_reserves - 79
 
     # Count how many risks there are after filtering out default pump.fun risks
     irrelevant_risks = ['Large Amount of LP Unlocked', 'Low Liquidity', 'Low amount of LP Providers']
@@ -851,7 +858,7 @@ async def trade_filters(risks, holder_metrics, is_dex_paid_parsed):
     risk_holder_interaction_5 = relevant_risks_count * total_pct_top_5
 
     # If all conditions are met return True else False
-    if is_dex_paid_parsed==True and risk_holder_interaction_5<35 and total_pct_top_5<50:
+    if is_dex_paid_parsed==True and risk_holder_interaction_5<35 and total_pct_top_5<50 and price_change>0:
         return True
     else:
         return False
