@@ -41,7 +41,7 @@ async def consume_queue(queue, httpx_client):
             await parse_migrations_to_save(token_address=token_address, pair_address=pair_address, data_to_save=data_to_save, filters_result=filters_result)
 
         # Force trade for testing
-        filters_result = True
+        # filters_result = True
 
         # if filters_result:
         #     asyncio.create_task(

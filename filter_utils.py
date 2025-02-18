@@ -815,10 +815,10 @@ async def process_new_tokens(httpx_client, token_address, pair_address):
     migrations_logger.info(f'DexScreener done for {token_address}')
 
     # Get amount of SOL in the pool (more SOL = higher price)
-    sol_reserves = await get_raydium_price(pair_address)
+    launch_price = await get_raydium_price(pair_address)
 
     # Perform trade filters and log the result
-    filters_result = await trade_filters(risks, holder_metrics, is_dex_paid_parsed, sol_reserves)
+    filters_result = await trade_filters(risks, holder_metrics, is_dex_paid_parsed, launch_price)
     migrations_logger.info(f'Potential trade: {symbol} - {token_address} - {filters_result}')
     
     data_to_save = {
@@ -833,7 +833,7 @@ async def process_new_tokens(httpx_client, token_address, pair_address):
 
 
 # Trade logic function to determine if we trade a token or not
-async def trade_filters(risks, holder_metrics, is_dex_paid_parsed, sol_reserves):
+async def trade_filters(risks, holder_metrics, is_dex_paid_parsed, current_price):
     """
         Current trade logic - return True if:
         - is_dex_paid_parsed: TRUE
@@ -842,11 +842,11 @@ async def trade_filters(risks, holder_metrics, is_dex_paid_parsed, sol_reserves)
         - twitter_handles_count: [0,1] -> paused for now
     """
 
-    if risks is None or holder_metrics is None or sol_reserves is None:
+    if risks is None or holder_metrics is None or current_price is None:
         return False
 
-    # Has the price increased from launch (LP is seeded with 79 SOL)
-    price_change = sol_reserves - 79
+    # Has the price increased from launch (LP is seeded with 79 SOL and 206.9m Pump tokens)
+    price_change = current_price - (79/206_900_000)
 
     # Count how many risks there are after filtering out default pump.fun risks
     irrelevant_risks = ['Large Amount of LP Unlocked', 'Low Liquidity', 'Low amount of LP Providers']
