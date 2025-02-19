@@ -1,6 +1,11 @@
 # Pump.fun Migration Sniper
 Post migration pump.fun sniper bot
 
+# New listener
+- This new branch listens to the pump.fun "withdraw" instruction
+- Thereafter it processes filters
+- If passes filters it listens to the relevant initialize2 instruction
+
 # IMPORTANT: fix amount_out estimation calculation
 
 # To-do list:
