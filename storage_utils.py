@@ -194,7 +194,7 @@ async def write_trades_to_csv(redis_client, tx_address, sell_data_dict):
         return_value = sell_data_dict['sell_tokens_received'] + buy_data_dict['buy_tokens_spent']
         return_perc = (sell_data_dict['sell_tokens_received'] / -buy_data_dict['buy_tokens_spent'] - 1) * 100
         trade_logger.info(f'Return value in SOL for {pair_address}: {return_value}')
-        trade_logger.info(f'Return % for {pair_address}: {return_perc}')
+        trade_logger.info(f'Return % for {pair_address}: {round(return_perc,2)}%')
 
         token_columns = [
             'token_address', 

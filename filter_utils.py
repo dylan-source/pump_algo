@@ -847,18 +847,25 @@ async def trade_filters(risks, holder_metrics, is_dex_paid_parsed, current_price
 
     # Has the price increased from launch (LP is seeded with 79 SOL and 206.9m Pump tokens)
     price_change = current_price - (79/206_900_000)
+    total_pct_top_5 = float(holder_metrics['total_pct_top_5'])
 
     # Count how many risks there are after filtering out default pump.fun risks
-    irrelevant_risks = ['Large Amount of LP Unlocked', 'Low Liquidity', 'Low amount of LP Providers']
-    relevant_risks = [risk for risk in risks['risks'] if risk not in irrelevant_risks]
-    relevant_risks_count = int(len(relevant_risks))
+    # irrelevant_risks = ['Large Amount of LP Unlocked', 'Low Liquidity', 'Low amount of LP Providers']
+    # relevant_risks = [risk for risk in risks['risks'] if risk not in irrelevant_risks]
+    # relevant_risks_count = int(len(relevant_risks))
+    # risk_holder_interaction_5 = relevant_risks_count * total_pct_top_5
 
-    # Calculate the risk-holder interaction score
-    total_pct_top_5 = float(holder_metrics['total_pct_top_5'])
-    risk_holder_interaction_5 = relevant_risks_count * total_pct_top_5
+    # Filter out high risks
+    risks_list = risks.get("risks", "")
+    high_risks = ['High holder concentration', 'High holder correlation', 'Top 10 holders high ownership']
+    number_of_risks = sum(1 for risk in high_risks if risk in risks_list)
 
     # If all conditions are met return True else False
-    if is_dex_paid_parsed==True and risk_holder_interaction_5<35 and total_pct_top_5<50 and price_change>0:
+    max_start_price = 1.4*10**-6   # ~150 SOL
+        
+    # if is_dex_paid_parsed==True and risk_holder_interaction_5<35 and total_pct_top_5<50 and price_change>0 and current_price<=max_start_price:
+    # if number_of_risks==0 and total_pct_top_5<35 and price_change>0 and current_price<=max_start_price:
+    if number_of_risks==0 and total_pct_top_5<35 and current_price<=max_start_price:
         return True
     else:
         return False
