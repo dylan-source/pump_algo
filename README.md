@@ -7,6 +7,8 @@ Post migration pump.fun sniper bot
 - If passes filters it listens to the relevant initialize2 instruction
 
 # IMPORTANT: fix amount_out estimation calculation
+- Current the code swaps the Quote and Base reverse values around
+- But then corrects the error in the sol_for_tokens and tokens_for_sol functions
 
 # To-do list:
 - Change startup sell to raydium 
