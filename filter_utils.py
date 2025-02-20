@@ -686,7 +686,7 @@ async def trade_filters(risks, holder_metrics, is_dex_paid_parsed):
         - twitter_handles_count: [0,1] -> paused for now
     """
 
-    if risks is None or holder_metrics is None:
+    if risks is None or holder_metrics is None or is_dex_paid_parsed is None:
         return False
 
     # Has the price increased from launch (LP is seeded with 79 SOL and 206.9m Pump tokens)
@@ -709,7 +709,7 @@ async def trade_filters(risks, holder_metrics, is_dex_paid_parsed):
         
     # if is_dex_paid_parsed==True and risk_holder_interaction_5<35 and total_pct_top_5<50 and price_change>0 and current_price<=max_start_price:
     # if number_of_risks==0 and total_pct_top_5<35 and price_change>0 and current_price<=max_start_price:
-    if number_of_risks==0 and total_pct_top_5<35 :
+    if is_dex_paid_parsed==True and number_of_risks==0 and total_pct_top_5<35:
         return True
     else:
         return False

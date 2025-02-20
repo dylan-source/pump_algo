@@ -15,18 +15,19 @@ async def process_withdraw_transaction(data, withdraw_tokens, httpx_client):
     After running your risk filters (not shown here), if the token passes,
     it is added to the in-memory dictionary.
     """
-    
     try:
         account_keys = data['transaction']['message']['accountKeys']
         if len(account_keys) > 10:
             token_address = account_keys[10] # consider fetching the address from postTokenBalances where owner is the migration address
             if token_address not in withdraw_tokens:
+                migrations_logger.info(f'Withdraw event detected - {token_address}')
+                withdraw_tokens.add(token_address)
+                
+                # Run the token filters and save the data to the spreadsheet
                 filters_result, data_to_save = await process_new_tokens(httpx_client, token_address)
                 if filters_result is not None:
                     await parse_migrations_to_save(token_address=token_address, data_to_save=data_to_save, filters_result=filters_result)
-                
-                migrations_logger.info(f'Withdraw event detected - {token_address}')
-                withdraw_tokens.add(token_address)
+                    
             else:
                 migrations_logger.info(f'Withdraw event already processed for token {token_address}')
         else:
@@ -50,10 +51,8 @@ async def process_initialize2_transaction(data, queue, withdraw_tokens):
                 # Check if token has already been processed (cached)
                 migrations_logger.info(f'Both events confirmed for token: {token_address} - Pair: {pair_address}')
                 
-                
-                
                 # await execute_buy(token_address, pair_address)
-                await queue.put((token_address, pair_address))
+                # await queue.put((token_address, pair_address))
                 
                 # Remove token from the set once processed
                 withdraw_tokens.remove(token_address)
@@ -122,7 +121,7 @@ async def listen_for_migrations(queue, httpx_client):
                                         if 'Program log: Instruction: Withdraw' in log:
                                             await process_withdraw_transaction(tx, withdraw_tokens, httpx_client)
                                         elif 'Program log: initialize2: InitializeInstruction2' in log:
-                                            await process_initialize2_transaction(tx, queue, withdraw_tokens, httpx_client)
+                                            await process_initialize2_transaction(tx, queue, withdraw_tokens)
                 except asyncio.TimeoutError:
                     pass
 
@@ -130,4 +129,4 @@ async def listen_for_migrations(queue, httpx_client):
         migrations_logger.error(f'Connection error: {str(e)}')
         migrations_logger.error(f'Retrying in {RELAY_DELAY} seconds...')
         await asyncio.sleep(RELAY_DELAY)
-        await listen_for_migrations(queue)
+        await listen_for_migrations(queue, httpx_client)

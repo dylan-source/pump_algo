@@ -128,7 +128,6 @@ async def write_migrations_to_csv(data_dict):
     token_columns = [
         'timestamp', 
         'token_address', 
-        'pair_address', 
         'name', 
         'symbol', 
         'description', 
