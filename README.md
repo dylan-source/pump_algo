@@ -6,6 +6,13 @@ Post migration pump.fun sniper bot
 - Thereafter it processes filters
 - If passes filters it listens to the relevant initialize2 instruction
 
+# Speed improvements
+- Call await client.get_token_accounts_by_owner once at instantiation
+- The associated token addresses will always be new. Therefore always derive them
+- This call should also always be the same: await AsyncToken.get_min_balance_rent_for_exempt_for_account(client)
+- Can also potentially remove the tx simulation
+- Change blockSubscribe commitment level to Processed
+
 # IMPORTANT: fix amount_out estimation calculation
 - Current the code swaps the Quote and Base reverse values around
 - But then corrects the error in the sol_for_tokens and tokens_for_sol functions

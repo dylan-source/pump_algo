@@ -9,13 +9,15 @@ import redis.asyncio as redis
 from pprint import pprint
 
 from config import MIGRATION_ADDRESS, migrations_logger, RPC_URL, SOL_MINT, SOL_AMOUNT_LAMPORTS, BUY_SLIPPAGE, SELL_SLIPPAGE, TRADE_AMOUNT_SOL, SOL_DECIMALS, WALLET_ADDRESS, PRIVATE_KEY, HTTPX_TIMEOUT
-from listen_to_raydium_migration import listen_for_migrations
+# from listen_to_raydium_migration import listen_for_migrations
 from trade_utils import trade_wrapper, startup_sell, get_jupiter_quote
 from solana.rpc.async_api import AsyncClient
 from storage_utils import parse_migrations_to_save
 from filter_utils import process_new_tokens
 from trade_utils_raydium import raydium_trade_wrapper# , startup_sell
-# from utils.common_utils import confirm_txn
+
+from migration_listener import listen_for_migrations
+
 
 # Instantiate the relevant objects
 rpc_client = AsyncClient(RPC_URL)
@@ -65,8 +67,9 @@ async def main():
      
     # Run both the monitoring and consuming tasks concurrently
     producer_task = asyncio.create_task(listen_for_migrations(redis_client_tokens=redis_client_tokens, queue=queue))
-    consumer_task = asyncio.create_task(consume_queue(queue=queue, httpx_client=httpx_client))
-    await asyncio.gather(producer_task, consumer_task)
+    # consumer_task = asyncio.create_task(consume_queue(queue=queue, httpx_client=httpx_client))
+    # await asyncio.gather(producer_task, consumer_task)
+    await asyncio.gather(producer_task)
 
     # pair_address = "879F697iuDJGMevRkRcnW21fcXiAeLJK1ffsw2ATebce"
     # token_mint = "MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5"
