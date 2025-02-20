@@ -6,23 +6,25 @@ from datetime import datetime, timezone
 from config import MIGRATION_ADDRESS, WS_URL, RPC_URL, RELAY_DELAY, migrations_logger
 from storage_utils import store_token_address, fetch_token_address
 
-async def process_withdraw_transaction(data, withdraw_tokens_set):
+async def process_withdraw_transaction(data, withdraw_tokens):
     """Process and decode a withdraw transaction.
     
-    This function extracts the token (and pair) addresses from the transaction
-    when a withdraw instruction is seen and adds the token to our local cache.
+    This function extracts the token and pair addresses from the transaction.
+    After running your risk filters (not shown here), if the token passes,
+    it is added to the in-memory dictionary.
     """
-    # print(data)
+    
     try:
-        print(data)
-        # signature = data['transaction']['signatures'][0]
         account_keys = data['transaction']['message']['accountKeys']
         if len(account_keys) > 10:
-            token_address = account_keys[18]
-            pair_address = account_keys[2]
-            if token_address not in withdraw_tokens_set:
-                migrations_logger.info(f'Withdraw event detected: Token {token_address} - Pair {pair_address}')
-                withdraw_tokens_set.add(token_address)
+            token_address = account_keys[10] # consider fetching the address from postTokenBalances where owner is the migration address
+            if token_address not in withdraw_tokens:
+                
+                # Run your risk filters here. If they pass, add the token.
+                # For demonstration, we assume the token passes the risk filters.
+                
+                migrations_logger.info(f'Withdraw event detected - {token_address}')
+                withdraw_tokens.add(token_address)
             else:
                 migrations_logger.info(f'Withdraw event already processed for token {token_address}')
         else:
@@ -31,29 +33,25 @@ async def process_withdraw_transaction(data, withdraw_tokens_set):
         migrations_logger.error(f'Error processing withdraw transaction: {str(e)}')
 
 
-async def process_initialize2_transaction(data, redis_client_tokens, queue, withdraw_tokens_set):
+async def process_initialize2_transaction(data, queue, withdraw_tokens):
     """Process and decode an initialize2 transaction only if a prior withdraw event was detected.
     
     If the token (extracted from account_keys[18]) has been seen via a withdraw event,
     then we push it to our queue, store it, and log the event.
     """
     try:
-        signature = data['transaction']['signatures'][0]
         account_keys = data['transaction']['message']['accountKeys']
         if len(account_keys) > 18:
             token_address = account_keys[18]
             pair_address = account_keys[2]
-            if token_address in withdraw_tokens_set:
+            if token_address in withdraw_tokens:
                 # Check if token has already been processed (cached)
-                cached_token_data = await fetch_token_address(redis_client_tokens, token_address)
-                if not cached_token_data:
-                    migrations_logger.info(f'Both events confirmed for token: {token_address} - Pair: {pair_address}')
-                    await queue.put((token_address, pair_address))
-                    timestamp_str = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
-                    await store_token_address(redis_client_tokens, timestamp_str, signature, token_address)
-                    migrations_logger.info(f'Token processed and cached: {token_address}')
+                migrations_logger.info(f'Both events confirmed for token: {token_address} - Pair: {pair_address}')
+                # await execute_buy(token_address, pair_address)
+                await queue.put((token_address, pair_address))
+                
                 # Remove token from the set once processed
-                withdraw_tokens_set.remove(token_address)
+                withdraw_tokens.remove(token_address)
             else:
                 migrations_logger.info(f'Initialize2 event for token {token_address} but no prior withdraw event found.')
         else:
@@ -62,7 +60,12 @@ async def process_initialize2_transaction(data, redis_client_tokens, queue, with
         migrations_logger.error(f'Error processing initialize2 transaction: {str(e)}')
 
 
-async def listen_for_migrations(redis_client_tokens, queue):
+
+
+
+
+
+async def listen_for_migrations(queue):
     """
     Listen for both withdraw and initialize2 instructions.
 
@@ -81,7 +84,7 @@ async def listen_for_migrations(redis_client_tokens, queue):
                 'params': [{
                     'mentionsAccountOrProgram': str(MIGRATION_ADDRESS)
                 }, {
-                    'commitment': 'confirmed',  
+                    'commitment': 'confirmed',      
                     'transactionDetails': 'full', 
                     'showRewards': False, 
                     'encoding': 'json', 
@@ -111,10 +114,9 @@ async def listen_for_migrations(redis_client_tokens, queue):
                                     logs = tx.get('meta', {}).get('logMessages', [])
                                     for log in logs:
                                         if 'Program log: Instruction: Withdraw' in log:
-                                            print("\n\n WITHDRAW INSTRUCTION FOUND\n\n")
                                             await process_withdraw_transaction(tx, withdraw_tokens)
                                         elif 'Program log: initialize2: InitializeInstruction2' in log:
-                                            await process_initialize2_transaction(tx, redis_client_tokens, queue, withdraw_tokens)
+                                            await process_initialize2_transaction(tx, queue, withdraw_tokens)
                 except asyncio.TimeoutError:
                     pass
 
@@ -122,4 +124,4 @@ async def listen_for_migrations(redis_client_tokens, queue):
         migrations_logger.error(f'Connection error: {str(e)}')
         migrations_logger.error(f'Retrying in {RELAY_DELAY} seconds...')
         await asyncio.sleep(RELAY_DELAY)
-        await listen_for_migrations(redis_client_tokens, queue)
+        await listen_for_migrations(queue)

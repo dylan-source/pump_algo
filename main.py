@@ -66,7 +66,7 @@ async def main():
     queue = asyncio.Queue()
      
     # Run both the monitoring and consuming tasks concurrently
-    producer_task = asyncio.create_task(listen_for_migrations(redis_client_tokens=redis_client_tokens, queue=queue))
+    producer_task = asyncio.create_task(listen_for_migrations(queue=queue))
     # consumer_task = asyncio.create_task(consume_queue(queue=queue, httpx_client=httpx_client))
     # await asyncio.gather(producer_task, consumer_task)
     await asyncio.gather(producer_task)
