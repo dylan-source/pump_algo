@@ -59,14 +59,14 @@ async def consume_queue(queue, httpx_client):
 async def main():
     
     # Check to see if any start up tokens that need to be sold
-    await startup_sell(rpc_client, httpx_client, redis_client_trades, sell_slippage=SELL_SLIPPAGE)
+    await startup_sell(rpc_client, redis_client_trades, sell_slippage=SELL_SLIPPAGE)
     # await startup_sell(httpx_client=httpx_client)         # error code: InstructionErrorCustom(11) 
 
     # Create the queue to share between the producer (monitor_transactions) and consumer (consume_queue) tasks
     queue = asyncio.Queue()
      
     # Run both the monitoring and consuming tasks concurrently
-    producer_task = asyncio.create_task(listen_for_migrations(queue=queue))
+    producer_task = asyncio.create_task(listen_for_migrations(queue=queue, httpx_client=httpx_client))
     # consumer_task = asyncio.create_task(consume_queue(queue=queue, httpx_client=httpx_client))
     # await asyncio.gather(producer_task, consumer_task)
     await asyncio.gather(producer_task)

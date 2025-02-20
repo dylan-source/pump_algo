@@ -11,7 +11,6 @@ import time
 import httpx
 import requests
 from config import WALLET_ADDRESS, SIGNATURE, TWEET_SCOUT_KEY, TIME_TO_SLEEP, TIMEOUT, PRIVATE_KEY, RAYDIUM_ADDRESS, migrations_logger
-from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
 from trade_utils_raydium import get_raydium_price
 
 # TweetScout endpoint to get twitter ID from the username. The also have the reverse endpoing (get handle from ID)
@@ -118,161 +117,6 @@ async def tweet_scout_get_recycled_handles(twitter_handle):
         migrations_logger.error(f'TweetScout get_user_info error: {e}0')
         time.sleep(TIME_TO_SLEEP)
         return {}
-    
-
-# CoinGecko scraper
-async def get_gecko_terminal_data(pool_id: str, headless=True, timeout=TIMEOUT):
-    """
-    Fetches three data points from GeckoTerminal for a given Solana pool:
-      1) 'Bundled Buy %' (li:nth-child(2))
-      2) 'Creator's Token Launches' (li:nth-child(5))
-      3) 'CoinGecko Score' (span.text-sell.!leading-none.text-2xl)
-
-    Returns a dict with 'bundled_buy_percent', 'creator_token_launches', 'coingecko_score'.
-    If a timeout occurs on any data point, returns None for that specific value.
-    """
-    url = f"https://www.geckoterminal.com/solana/pools/{pool_id}"
-
-    # CSS selectors for the three data points
-    bundled_buy_selector = (
-        "#__next > div > main > "
-        "div.flex.w-full.flex-col.gap-y-2.md\\:flex-row.md\\:gap-x-4."
-        "md\\:gap-y-0.md\\:px-4 > "
-        "div.scrollbar-thin.flex.flex-col.md\\:overflow-x-hidden."
-        "md\\:overflow-y-hidden.gap-2.px-4.pt-4.md\\:px-0."
-        "w-full.shrink-0.md\\:max-w-\\[22\\.5rem\\] > "
-        "div.hidden.flex-col.gap-2.md\\:flex > "
-        "div.rounded.border.border-gray-800.p-4.flex.flex-col.gap-y-3 > "
-        "div.flex-col.gap-y-3.flex > "
-        "div.flex.scroll-mt-40.flex-col.gap-y-2.sm\\:scroll-mt-24 > "
-        "ul > li:nth-child(2) > "
-        "div.ml-auto.flex.shrink-0.items-center.gap-1.truncate.pl-2 > span"
-    )
-    creator_token_launches_selector = (
-        "#__next > div > main > "
-        "div.flex.w-full.flex-col.gap-y-2.md\\:flex-row.md\\:gap-x-4."
-        "md\\:gap-y-0.md\\:px-4 > "
-        "div.scrollbar-thin.flex.flex-col.md\\:overflow-x-hidden."
-        "md\\:overflow-y-hidden.gap-2.px-4.pt-4.md\\:px-0."
-        "w-full.shrink-0.md\\:max-w-\\[22\\.5rem\\] > "
-        "div.hidden.flex-col.gap-2.md\\:flex > "
-        "div.rounded.border.border-gray-800.p-4.flex.flex-col.gap-y-3 > "
-        "div.flex-col.gap-y-3.flex > "
-        "div.flex.scroll-mt-40.flex-col.gap-y-2.sm\\:scroll-mt-24 > "
-        "ul > li:nth-child(5) > "
-        "div.ml-auto.flex.shrink-0.items-center.gap-1.truncate.pl-2 > span"
-    )
-
-    async with async_playwright() as p:
-        # Launch browser in headless mode with some stealth-friendly args
-        browser = await p.chromium.launch(
-            headless=headless,
-            args=["--disable-blink-features=AutomationControlled"]
-        )
-        context = await browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                       "AppleWebKit/537.36 (KHTML, like Gecko) "
-                       "Chrome/114.0.5735.110 Safari/537.36"
-        )
-        page = await context.new_page()
-
-        # Optionally set default timeouts (milliseconds)
-        page.set_default_timeout(timeout)
-        page.set_default_navigation_timeout(timeout)
-
-        try:
-            # Navigate to the page
-            await page.goto(url, timeout=timeout)
-
-            # BUNDLED BUY %
-            try:
-                await page.wait_for_selector(bundled_buy_selector, timeout=timeout)
-                bundled_buy_percent = await page.locator(bundled_buy_selector).nth(0).inner_text()
-            except PlaywrightTimeoutError:
-                migrations_logger.error(f"{pool_id} Timed out waiting for Bundled Buy % selector")
-                bundled_buy_percent = None
-
-            # CREATOR TOKEN LAUNCHES
-            try:
-                await page.wait_for_selector(creator_token_launches_selector, timeout=timeout)
-                creator_token_launches = await page.locator(creator_token_launches_selector).nth(0).inner_text()
-            except PlaywrightTimeoutError:
-                migrations_logger.error(f"{pool_id} Timed out waiting for Creator's Token Launches selector.")
-                creator_token_launches = None
-
-            return {"bundled_buy_percent": bundled_buy_percent, "creator_token_launches": creator_token_launches}
-
-        except PlaywrightTimeoutError:
-            migrations_logger.error("Timeout error on CoinGecko")
-            return {"bundled_buy_percent": None, "creator_token_launches": None}
-        
-        except Exception as e:
-            migrations_logger.error(f"CoinGecko scraper error: {e}")
-            return {"bundled_buy_percent": None, "creator_token_launches": None}
-
-        finally:
-            await browser.close()
-
-
-# Get the "Chance of Cabal Coin" and Fake Volume from GateKept
-async def gatekept_data(token_mint, timeout=120_000, headless=False):
-
-    async with async_playwright() as p:
-       
-       # Launch browser in headless mode
-        browser = await p.chromium.launch(headless=headless)
-
-        context = await browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                       "AppleWebKit/537.36 (KHTML, like Gecko) "
-                       "Chrome/114.0.5735.110 Safari/537.36"
-        )
-        page = await context.new_page()
-
-        # page = await browser.new_page()
-        # await page.set_extra_http_headers({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"}) # -> set custom headers to mimick normal browser
-
-        try:
-            # Go to GateKept
-            await page.goto("https://gatekept.io/", wait_until="networkidle")
-
-            # Fill the input using the placeholder text and click the "Search" button
-            await page.get_by_placeholder("Enter A Solana Token").fill(token_mint)
-
-            await asyncio.sleep(3)
-            await page.locator(".search-button").click()
-
-            # Wait for the "Loading" text in p.cabal-chance-value to finish
-            await page.wait_for_function(
-                """
-                () => {
-                    const el = document.querySelector("p.cabal-chance-value");
-                    return el && el.textContent.trim() !== "Loading...";
-                }
-                """,
-                timeout=timeout
-            )
-
-            # Once finished loading, get the value from p.cabal-chance-value
-            cabal_chance = await page.inner_text("p.cabal-chance-value")
-
-            # Next, wait for the container with class="meta-value-container" to appear
-            # await page.wait_for_selector("div.meta-value-container", timeout=timeout)
-            fake_volume = await page.inner_text("div.meta-value-container")
-
-            return cabal_chance, fake_volume
-
-        except TimeoutError as e:
-            migrations_logger.error("GateKept timeout occurred:")
-            return None, None
-        
-        except Exception as e:
-            migrations_logger.error("GateKept other error occurred:")
-            return None, None
-
-        finally:
-            # Ensure the browser is always closed
-            await browser.close()
 
 
 # Function to get the RugCheck.xyz authentication message
@@ -793,7 +637,7 @@ async def rugcheck_analysis(httpx_client: httpx.AsyncClient, token_mint_address:
 
 
 # Run the various token filters
-async def process_new_tokens(httpx_client, token_address, pair_address):
+async def process_new_tokens(httpx_client, token_address):
     
     # Perform RugCheck analysis
     metadata, risks, holder_metrics = await rugcheck_analysis(httpx_client=httpx_client, token_mint_address=token_address)
@@ -815,10 +659,10 @@ async def process_new_tokens(httpx_client, token_address, pair_address):
     migrations_logger.info(f'DexScreener done for {token_address}')
 
     # Get amount of SOL in the pool (more SOL = higher price)
-    launch_price = await get_raydium_price(pair_address)
+    # launch_price = await get_raydium_price(pair_address)
 
     # Perform trade filters and log the result
-    filters_result = await trade_filters(risks, holder_metrics, is_dex_paid_parsed, launch_price)
+    filters_result = await trade_filters(risks, holder_metrics, is_dex_paid_parsed)
     migrations_logger.info(f'Potential trade: {symbol} - {token_address} - {filters_result}')
     
     data_to_save = {
@@ -833,7 +677,7 @@ async def process_new_tokens(httpx_client, token_address, pair_address):
 
 
 # Trade logic function to determine if we trade a token or not
-async def trade_filters(risks, holder_metrics, is_dex_paid_parsed, current_price):
+async def trade_filters(risks, holder_metrics, is_dex_paid_parsed):
     """
         Current trade logic - return True if:
         - is_dex_paid_parsed: TRUE
@@ -842,11 +686,11 @@ async def trade_filters(risks, holder_metrics, is_dex_paid_parsed, current_price
         - twitter_handles_count: [0,1] -> paused for now
     """
 
-    if risks is None or holder_metrics is None or current_price is None:
+    if risks is None or holder_metrics is None:
         return False
 
     # Has the price increased from launch (LP is seeded with 79 SOL and 206.9m Pump tokens)
-    price_change = current_price - (79/206_900_000)
+    # price_change = current_price - (79/206_900_000)
     total_pct_top_5 = float(holder_metrics['total_pct_top_5'])
 
     # Count how many risks there are after filtering out default pump.fun risks
@@ -861,11 +705,11 @@ async def trade_filters(risks, holder_metrics, is_dex_paid_parsed, current_price
     number_of_risks = sum(1 for risk in high_risks if risk in risks_list)
 
     # If all conditions are met return True else False
-    max_start_price = 1.4*10**-6   # ~150 SOL
+    # max_start_price = 1.4*10**-6   # ~150 SOL
         
     # if is_dex_paid_parsed==True and risk_holder_interaction_5<35 and total_pct_top_5<50 and price_change>0 and current_price<=max_start_price:
     # if number_of_risks==0 and total_pct_top_5<35 and price_change>0 and current_price<=max_start_price:
-    if number_of_risks==0 and total_pct_top_5<35 and current_price<=max_start_price:
+    if number_of_risks==0 and total_pct_top_5<35 :
         return True
     else:
         return False

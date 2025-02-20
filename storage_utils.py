@@ -67,7 +67,7 @@ async def fetch_token_address(redis_client_token, token_address):
 #--------------------
 
 # Parse migrations to be saved in a csv
-async def parse_migrations_to_save(token_address, pair_address, data_to_save, filters_result):
+async def parse_migrations_to_save(token_address, data_to_save, filters_result):
     
     # Get the current timestamp
     current_time_utc = datetime.now(timezone.utc)
@@ -83,7 +83,6 @@ async def parse_migrations_to_save(token_address, pair_address, data_to_save, fi
     results = {
         'timestamp': timestamp_str, 
         'token_address': token_address, 
-        'pair_address': pair_address, 
 
         # Rugcheck token metadata
         'name': metadata.get('name', ''), 
@@ -198,7 +197,6 @@ async def write_trades_to_csv(redis_client, tx_address, sell_data_dict):
 
         token_columns = [
             'token_address', 
-            'pair_address', 
             'buy_timestamp', 
             'buy_transaction_hash', 
             'buy_tokens_spent', 
@@ -236,11 +234,11 @@ async def write_trades_to_csv(redis_client, tx_address, sell_data_dict):
             trade_logger.info('Saved new trade to csv')
             
             # Delete the key from Redis and log accordingly
-            result = await redis_client.delete(tx_address)
-            if result:
-                trade_logger.info(f'Redis key deleted for {pair_address}: True')
-            else:
-                trade_logger.error(f'Redis key NOT deleted for {pair_address}: False')
+            # result = await redis_client.delete(tx_address)
+            # if result:
+            #     trade_logger.info(f'Redis key deleted for {pair_address}: True')
+            # else:
+            #     trade_logger.error(f'Redis key NOT deleted for {pair_address}: False')
 
     except Exception as e:
         trade_logger.error(f'Error with write_trades_to_csv function: {e}')

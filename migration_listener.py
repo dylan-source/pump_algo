@@ -4,9 +4,11 @@ import json
 from solders.pubkey import Pubkey   # type: ignore
 from datetime import datetime, timezone
 from config import MIGRATION_ADDRESS, WS_URL, RPC_URL, RELAY_DELAY, migrations_logger
-from storage_utils import store_token_address, fetch_token_address
 
-async def process_withdraw_transaction(data, withdraw_tokens):
+from filter_utils import process_new_tokens, trade_filters
+from storage_utils import parse_migrations_to_save
+
+async def process_withdraw_transaction(data, withdraw_tokens, httpx_client):
     """Process and decode a withdraw transaction.
     
     This function extracts the token and pair addresses from the transaction.
@@ -19,9 +21,9 @@ async def process_withdraw_transaction(data, withdraw_tokens):
         if len(account_keys) > 10:
             token_address = account_keys[10] # consider fetching the address from postTokenBalances where owner is the migration address
             if token_address not in withdraw_tokens:
-                
-                # Run your risk filters here. If they pass, add the token.
-                # For demonstration, we assume the token passes the risk filters.
+                filters_result, data_to_save = await process_new_tokens(httpx_client, token_address)
+                if filters_result is not None:
+                    await parse_migrations_to_save(token_address=token_address, data_to_save=data_to_save, filters_result=filters_result)
                 
                 migrations_logger.info(f'Withdraw event detected - {token_address}')
                 withdraw_tokens.add(token_address)
@@ -47,6 +49,9 @@ async def process_initialize2_transaction(data, queue, withdraw_tokens):
             if token_address in withdraw_tokens:
                 # Check if token has already been processed (cached)
                 migrations_logger.info(f'Both events confirmed for token: {token_address} - Pair: {pair_address}')
+                
+                
+                
                 # await execute_buy(token_address, pair_address)
                 await queue.put((token_address, pair_address))
                 
@@ -61,17 +66,18 @@ async def process_initialize2_transaction(data, queue, withdraw_tokens):
 
 
 
-
-
-
-
-async def listen_for_migrations(queue):
+async def listen_for_migrations(queue, httpx_client):
     """
     Listen for both withdraw and initialize2 instructions.
 
     A local set (withdraw_tokens) keeps track of tokens that have had a withdraw event.
     Later, when an initialize2 event is seen for a token already in that set, it is processed.
     """
+    
+    # async with httpx.AsyncClient(timeout=HTTPX_TIMEOUT) as httpx_client:
+    # use the client for your HTTP calls
+
+    
     # Local cache to record tokens with a withdraw event
     withdraw_tokens = set()
 
@@ -114,9 +120,9 @@ async def listen_for_migrations(queue):
                                     logs = tx.get('meta', {}).get('logMessages', [])
                                     for log in logs:
                                         if 'Program log: Instruction: Withdraw' in log:
-                                            await process_withdraw_transaction(tx, withdraw_tokens)
+                                            await process_withdraw_transaction(tx, withdraw_tokens, httpx_client)
                                         elif 'Program log: initialize2: InitializeInstruction2' in log:
-                                            await process_initialize2_transaction(tx, queue, withdraw_tokens)
+                                            await process_initialize2_transaction(tx, queue, withdraw_tokens, httpx_client)
                 except asyncio.TimeoutError:
                     pass
 
