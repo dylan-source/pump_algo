@@ -64,7 +64,6 @@ async def process_initialize2_transaction(data, queue, withdraw_tokens):
         migrations_logger.error(f'Error processing initialize2 transaction: {str(e)}')
 
 
-
 async def listen_for_migrations(queue, httpx_client):
     """
     Listen for both withdraw and initialize2 instructions.
