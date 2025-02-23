@@ -22,7 +22,7 @@ from utils.pool_utils import (
 from raydium.amm_v4 import buy, sell
 from raydium.constants import TOKEN_PROGRAM_ID, WSOL
 from storage_utils import store_trade_data, write_trades_to_csv
-from config import client, trade_logger, RPC_URL, PRIORITY_FEE_DICT, TRADE_AMOUNT_SOL, BUY_SLIPPAGE, SELL_SLIPPAGE, MAX_TRADE_TIME_MINS, JUPITER_QUOTE_URL, WALLET_ADDRESS, FEE_LEVELS
+from config import client, trade_logger, RPC_URL, QN_RPC_URL, PRIORITY_FEE_DICT, TRADE_AMOUNT_SOL, BUY_SLIPPAGE, SELL_SLIPPAGE, MAX_TRADE_TIME_MINS, JUPITER_QUOTE_URL, WALLET_ADDRESS, FEE_LEVELS
 
 
 # Wrapper to house all trade logic and functions
@@ -310,7 +310,7 @@ async def get_qn_priority_fees(httpx_client: httpx.AsyncClient, fees_account: st
             }})
 
         # Fetch the recent fees and filter for the percentiles and in per_compute_unit section
-        response = await httpx_client.post(RPC_URL, headers={'Content-Type':'application/json'}, data=payload)
+        response = await httpx_client.post(QN_RPC_URL, headers={'Content-Type':'application/json'}, data=payload)
         json_response = response.json()
         response = json_response.get("result", "").get("per_compute_unit", "").get("percentiles", "")
 

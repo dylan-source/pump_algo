@@ -11,7 +11,6 @@ import time
 import httpx
 import requests
 from config import WALLET_ADDRESS, SIGNATURE, TWEET_SCOUT_KEY, TIME_TO_SLEEP, TIMEOUT, PRIVATE_KEY, RAYDIUM_ADDRESS, migrations_logger
-from trade_utils_raydium import get_raydium_price
 
 # TweetScout endpoint to get twitter ID from the username. The also have the reverse endpoing (get handle from ID)
 # https://api.tweetscout.io/v2/handle-to-id/{user_handle}
@@ -125,17 +124,6 @@ async def generate_rugcheck_signature():
     Generates the signature and wallet address for Rugcheck authentication,
     and stores them in the .env file as RUGCHECK_SIGNATURE and WALLET_ADDRESS.
     """
-    # private_key_base58 = os.getenv('PRIVATE_KEY')
-    # if not private_key_base58:
-    #     migrations_logger.error('Private key not found in .env file.')
-    #     return
-    # try:
-    #     private_key_bytes = base58.b58decode(private_key_base58)
-    # except Exception as e:
-    #     migrations_logger.error('Invalid private key format. Ensure it\'s base58-encoded.')
-    #     return
-    # keypair = Keypair.from_bytes(private_key_bytes)
-
     # Fetch the private key to sign the challenge message
     keypair = PRIVATE_KEY
     
@@ -481,58 +469,6 @@ def extract_twitter_handle_or_false(url: str):
     return path
 
 
-# Old twitter handle extraction from the url function
-def parse_twitter_handle(url: str) -> str:
-    parsed = urlparse(url)
-    return parsed.path.lstrip('/')
-
-
-# Is the website valid
-def is_valid_website(url: str) -> bool:
-    """
-    Returns True if the URL domain is NOT in the disallowed list,
-    otherwise returns False.
-    """
-
-    DISALLOWED_DOMAINS = [
-        'twitter.com', 
-        'tiktok.com', 
-        'discord.com', 
-        'youtube.com', 
-        'instagram.com', 
-        'google.com',
-        'x.com', 
-        'github.com', 
-        'drive.google.com', 
-        'facebook.com', 
-        't.me', 
-        'pypi.org', 
-        'reddit.com', 
-        'en.wikipedia.org', 
-        't.co', 
-        'telegram.com'
-        ]
-    
-    parsed_url = urlparse(url.lower())
-    domain = parsed_url.netloc
-    
-    # Remove any leading "www." (or other subdomains) for comparison
-    # so that "www.twitter.com" and "twitter.com" are treated the same.
-    if domain.startswith('www.'):
-        domain = domain[4:]
-
-    # Check if the domain ends with any of the disallowed domains    
-    for d in DISALLOWED_DOMAINS:
-        # For example, "twitter.com" should match "api.twitter.com", 
-        # so we check endswith(). However, you might refine this if 
-        # you only want exact matches.
-        if domain.endswith(d):
-            return False
-
-    # Return True is filters are passed
-    return True
-
-
 # Original function to check if the website is valid
 def is_domain_allowed(url: str) -> bool:
     """
@@ -658,9 +594,6 @@ async def process_new_tokens(httpx_client, token_address):
     is_dex_paid_parsed, is_dex_paid_raw = await get_dex_paid(httpx_client=httpx_client, token_mint_address=token_address)
     migrations_logger.info(f'DexScreener done for {token_address}')
 
-    # Get amount of SOL in the pool (more SOL = higher price)
-    # launch_price = await get_raydium_price(pair_address)
-
     # Perform trade filters and log the result
     filters_result = await trade_filters(risks, holder_metrics, is_dex_paid_parsed)
     migrations_logger.info(f'Potential trade: {symbol} - {token_address} - {filters_result}')
@@ -689,8 +622,6 @@ async def trade_filters(risks, holder_metrics, is_dex_paid_parsed):
     if risks is None or holder_metrics is None or is_dex_paid_parsed is None:
         return False
 
-    # Has the price increased from launch (LP is seeded with 79 SOL and 206.9m Pump tokens)
-    # price_change = current_price - (79/206_900_000)
     total_pct_top_5 = float(holder_metrics['total_pct_top_5'])
 
     # Count how many risks there are after filtering out default pump.fun risks
@@ -703,9 +634,6 @@ async def trade_filters(risks, holder_metrics, is_dex_paid_parsed):
     risks_list = risks.get("risks", "")
     high_risks = ['High holder concentration', 'High holder correlation', 'Top 10 holders high ownership']
     number_of_risks = sum(1 for risk in high_risks if risk in risks_list)
-
-    # If all conditions are met return True else False
-    # max_start_price = 1.4*10**-6   # ~150 SOL
         
     # if is_dex_paid_parsed==True and risk_holder_interaction_5<35 and total_pct_top_5<50 and price_change>0 and current_price<=max_start_price:
     # if number_of_risks==0 and total_pct_top_5<35 and price_change>0 and current_price<=max_start_price:

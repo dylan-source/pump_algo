@@ -1,3 +1,4 @@
+import redis
 import asyncio
 import websockets
 import json
@@ -19,6 +20,7 @@ from trade_utils_raydium import raydium_trade_wrapper# , startup_sell
 # Initialize the rpc_client and httpx_client globally.
 rpc_client = AsyncClient(RPC_URL)
 httpx_client = httpx.AsyncClient(timeout=HTTPX_TIMEOUT)
+redis_client_trades = redis.Redis(host='localhost', port=6379, db=1)
 
 async def fetch_transaction_details(signature, pending_trades, is_withdraw=True):
     """Fetch full transaction details using getParsedTransaction."""
@@ -80,10 +82,12 @@ async def fetch_transaction_details(signature, pending_trades, is_withdraw=True)
                     trade_info = pending_trades[token_mint]
                     if trade_info["passed"]:
                         migrations_logger.info(f"Token mint: {token_mint} | LP address: {liquidity_pool_address} - executing trade")
-                        
-                        print(f"EXECUTE TRADE FOR {token_mint}")
-                        # Execute trade logic here (e.g., call an async function to perform the trade)
-                        # asyncio.create_task(execute_trade(token_mint, liquidity_pool_address, trade_info["data"]))
+                        asyncio.create_task(raydium_trade_wrapper(
+                                httpx_client=httpx_client, 
+                                redis_trades=redis_client_trades, 
+                                pair_address=liquidity_pool_address, 
+                                token_mint=token_mint)
+                                )
                     else:
                         migrations_logger.info(f"Token mint: {token_mint} | LP address: {liquidity_pool_address} - risk filters did not pass.")
                     # Remove the token from pending trades after processing.
@@ -105,8 +109,11 @@ def contains_initialize2_log(logs):
     return any(pattern.search(log) for log in logs)
 
 async def listen_logs():
+    # Instantiate global connection objects
     global rpc_client
     global httpx_client
+    global redis_client_trades
+    
     # Use a dictionary to track tokens from withdraw events and their filter outcomes.
     pending_trades = {}
     
@@ -156,20 +163,13 @@ async def listen_logs():
             try:
                 await rpc_client.close()
                 await httpx_client.aclose()
+                await redis_client_trades.close()
             except Exception as close_e:
                 migrations_logger.error(f"Error closing async clients: {close_e}")
             rpc_client = AsyncClient(RPC_URL)
             httpx_client = httpx.AsyncClient(timeout=HTTPX_TIMEOUT)
+            redis_client_trades = redis.Redis(host='localhost', port=6379, db=1)
             await asyncio.sleep(RELAY_DELAY)
-
-async def execute_trade(token_mint, liquidity_pool_address, extra_data):
-    """
-    Placeholder for your trade logic. This function should contain the code to execute a trade
-    using the token mint, LP address, and any additional data from the filters.
-    """
-    migrations_logger.info(f"Executing trade for token {token_mint} with LP {liquidity_pool_address}")
-    # Insert your trade execution code here.
-    await asyncio.sleep(0)  # For example purposes.
 
 async def main():
     try:

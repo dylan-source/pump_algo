@@ -14,6 +14,7 @@ load_dotenv()
 # Load remaining environment varialbes
 WS_URL = os.getenv('WS_URL', '')
 RPC_URL = os.getenv('RPC_URL', '')
+QN_RPC_URL = os.getenv('QN_RPC_URL', '')
 METIS_RPC_URL = os.getenv('METIS_RPC_URL', '')
 WALLET_ADDRESS = os.getenv('WALLET_ADDRESS', '')
 COLD_WALLET_ADDRESS = os.getenv('COLD_WALLET_ADDRESS', '')
@@ -39,7 +40,7 @@ START_UP_SLEEP = 5                  # number of seconds after migration before a
 
 # Define SOL constants
 SOL_DECIMALS = 9
-TRADE_AMOUNT_SOL = 0.01
+TRADE_AMOUNT_SOL = 0.001
 SOL_AMOUNT_LAMPORTS = int(TRADE_AMOUNT_SOL * 10 ** SOL_DECIMALS)
 MIN_SOL_BALANCE = 0.1
 SOL_MIN_BALANCE_LAMPORTS = int(MIN_SOL_BALANCE * 10 ** SOL_DECIMALS)
