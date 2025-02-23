@@ -8,7 +8,7 @@ from solana.rpc.types import MemcmpOpts
 from solders.instruction import AccountMeta, Instruction  # type: ignore
 from solders.pubkey import Pubkey  # type: ignore
 
-from config import client, trade_logger
+from config import client, qn_client, trade_logger
 from layouts.amm_v4 import LIQUIDITY_STATE_LAYOUT_V4, MARKET_STATE_LAYOUT_V3
 from layouts.clmm import CLMM_POOL_STATE_LAYOUT
 from layouts.cpmm import CPMM_POOL_STATE_LAYOUT
@@ -120,12 +120,12 @@ async def fetch_amm_v4_pool_keys(pair_address: str) -> Optional[AmmV4PoolKeys]:
    
     try:
         amm_id = Pubkey.from_string(pair_address)
-        amm_data = await client.get_account_info_json_parsed(amm_id, commitment=Processed)
+        amm_data = await qn_client.get_account_info_json_parsed(amm_id, commitment=Processed)
         amm_data = amm_data.value.data
         
         amm_data_decoded = LIQUIDITY_STATE_LAYOUT_V4.parse(amm_data)
         marketId = Pubkey.from_bytes(amm_data_decoded.serumMarket)
-        marketInfo = await client.get_account_info_json_parsed(marketId, commitment=Processed)
+        marketInfo = await qn_client.get_account_info_json_parsed(marketId, commitment=Processed)
         marketInfo = marketInfo.value.data
         
         market_decoded = MARKET_STATE_LAYOUT_V3.parse(marketInfo)
@@ -437,7 +437,7 @@ async def get_amm_v4_reserves(pool_keys: AmmV4PoolKeys) -> tuple:
         base_decimal = pool_keys.base_decimals
         base_mint = pool_keys.base_mint
     
-        balances_response = await client.get_multiple_accounts_json_parsed(
+        balances_response = await qn_client.get_multiple_accounts_json_parsed(
             [quote_vault, base_vault], 
             Processed
         )

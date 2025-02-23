@@ -164,7 +164,7 @@ async def listen_logs():
             try:
                 await rpc_client.close()
                 await httpx_client.aclose()
-                await redis_client_trades.close()
+                await redis_client_trades.aclose()
             except Exception as close_e:
                 migrations_logger.error(f"Error closing async clients: {close_e}")
             rpc_client = AsyncClient(RPC_URL)
@@ -174,7 +174,7 @@ async def listen_logs():
 
 async def main():
     
-    await startup_sell(rpc_client, redis_client_trades, sell_slippage=SELL_SLIPPAGE)
+    # await startup_sell(rpc_client, redis_client_trades, sell_slippage=SELL_SLIPPAGE)
     
     try:
         await listen_logs()

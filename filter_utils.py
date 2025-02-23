@@ -638,8 +638,6 @@ async def trade_filters(risks, holder_metrics, is_dex_paid_parsed):
     # if is_dex_paid_parsed==True and risk_holder_interaction_5<35 and total_pct_top_5<50 and price_change>0 and current_price<=max_start_price:
     # if number_of_risks==0 and total_pct_top_5<35 and price_change>0 and current_price<=max_start_price:
     
-    return True # force True for testing
-    
     if is_dex_paid_parsed==True and number_of_risks==0 and total_pct_top_5<35:
         return True
     else:

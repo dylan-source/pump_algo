@@ -12,6 +12,8 @@ You mentioned that the trade logic is already housed in its own task using async
 Minimal Blocking in the Listener:
 Ensure that any heavy processing (risk checks, API calls) inside tasks is also done asynchronously. Use asynchronous HTTP libraries (like aiohttp) for any API calls.
 
+# Items to note
+- pool_utils has been updated to use quicknode RPC to avoid helius rate limit with getting prices (qn_client used rather than client)
 
 # Speed improvements
 - Call await client.get_token_accounts_by_owner once at instantiation

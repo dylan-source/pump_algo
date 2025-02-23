@@ -196,6 +196,7 @@ async def write_trades_to_csv(redis_client, tx_address, sell_data_dict):
 
         token_columns = [
             'token_address', 
+            'pair_address',
             'buy_timestamp', 
             'buy_transaction_hash', 
             'buy_tokens_spent', 

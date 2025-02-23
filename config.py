@@ -32,7 +32,7 @@ RELAY_DELAY = 5                    # time when to reconnect to websocket after i
 TIME_TO_SLEEP = 15                  # sleep time between api calls for filters_utils functions
 TIMEOUT = 30000                     # sleep time between api calls for filters_utils functions -> mainly for scraping functions
 HTTPX_TIMEOUT = 10                  # timeout specifically for HTTPX
-MAX_TRADE_TIME_MINS = 3             # maximum trade duration
+MAX_TRADE_TIME_MINS = 5             # maximum trade duration
 SELL_LOOP_DELAY = 10                # delay between api calls in execute_sell function
 MONITOR_PRICE_DELAY = 3             # length of time between price API calls -> to prevent rate limit
 PRICE_LOOP_RETRIES = 5              # max number of times to attempt to fetch a rpice
@@ -54,8 +54,8 @@ PRIORITY_FEE_NUM_BLOCKS=100
 PRIORITY_FEE_MULTIPLIER=1.1
 PRIORITY_FEE_STOPLOSS_MULTIPLIER=1.5
 PRIORITY_FEE_DICT = {
-    "PRIORITY_FEE_MIN": 100_000,
-    "PRIORITY_FEE_MAX": 450_000,
+    "PRIORITY_FEE_MIN": 250_000,
+    "PRIORITY_FEE_MAX": 750_000,
     "PRIORITY_FEE_NUM_BLOCKS": 100,
     "PRIORITY_FEE_MULTIPLIER": 1.1,
     "PRIORITY_FEE_STOPLOSS_MULTIPLIER": 1.5
@@ -162,6 +162,7 @@ trade_logger.info("Private key successfully decrypted and loaded.")
 
 UNIT_BUDGET =  150_000      # max compute units to use - seems to average about 65k typically
 client = AsyncClient(RPC_URL)
+qn_client = AsyncClient(QN_RPC_URL)
 payer_keypair = PRIVATE_KEY
 
 
