@@ -14,12 +14,13 @@ from solana.rpc.async_api import AsyncClient
 
 from filter_utils import process_new_tokens, trade_filters
 from storage_utils import parse_migrations_to_save
+from trade_utils_raydium import raydium_trade_wrapper# , startup_sell
 
-# Initialize the rpc_client globally.
+# Initialize the rpc_client and httpx_client globally.
 rpc_client = AsyncClient(RPC_URL)
 httpx_client = httpx.AsyncClient(timeout=HTTPX_TIMEOUT)
 
-async def fetch_transaction_details(signature, withdraw_tokens, is_withdraw=True):
+async def fetch_transaction_details(signature, pending_trades, is_withdraw=True):
     """Fetch full transaction details using getParsedTransaction."""
     try:
         # Convert the signature string to the appropriate Signature type.
@@ -44,41 +45,53 @@ async def fetch_transaction_details(signature, withdraw_tokens, is_withdraw=True
             migrations_logger.warning("No result in transaction details.")
             return None
 
+        # Fetch token mint from postTokenBalances using the same logic for both cases.
         post_token_balances = result.get("meta", {}).get("postTokenBalances", [])
         token_mint = next(
             (tb.get("mint") for tb in post_token_balances if tb.get("owner") == MIGRATION_ADDRESS),
             None
         )
-
+        
         if is_withdraw:
-            
-            if token_mint and token_mint not in withdraw_tokens:
+            if token_mint and token_mint not in pending_trades:
                 migrations_logger.info(f"Withdraw detected | token mint: {token_mint}")
-                withdraw_tokens.add(token_mint)
-                
-                # Run the token filters and save the data to the spreadsheet
+                # Run the risk filters.
                 filters_result, data_to_save = await process_new_tokens(httpx_client, token_mint)
-                if filters_result is not None:
+                
+                # Save data regardless, but mark whether the token passed.
+                if filters_result is True:
+                    pending_trades[token_mint] = {"data": data_to_save, "passed": True}
                     await parse_migrations_to_save(token_address=token_mint, data_to_save=data_to_save, filters_result=filters_result)
+                else:
+                    pending_trades[token_mint] = {"data": data_to_save, "passed": False}
                 
                 return token_mint
             else:
-                migrations_logger.warning("Withdraw detected | no token mint found in getTransaction call")
+                migrations_logger.warning("Withdraw detected | no token mint found or token already processed.")
                 return None
         
         else:
-            # Fetch the liquidity pool (pair) address from accountKeys in the transaction message.
+            # For initialize2 events, also fetch the liquidity pool (pair) address.
             account_keys = result.get("transaction", {}).get("message", {}).get("accountKeys", [])
             if len(account_keys) > 2:
                 liquidity_pool_address = account_keys[2]
-                
-                if token_mint in withdraw_tokens:
-                    migrations_logger.info(f"Token mint: {token_mint} | LP address: {liquidity_pool_address}")
-                    withdraw_tokens.remove(token_mint)
+                # Check if we have recorded this token from a previous withdraw event.
+                if token_mint in pending_trades:
+                    trade_info = pending_trades[token_mint]
+                    if trade_info["passed"]:
+                        migrations_logger.info(f"Token mint: {token_mint} | LP address: {liquidity_pool_address} - executing trade")
+                        
+                        print(f"EXECUTE TRADE FOR {token_mint}")
+                        # Execute trade logic here (e.g., call an async function to perform the trade)
+                        # asyncio.create_task(execute_trade(token_mint, liquidity_pool_address, trade_info["data"]))
+                    else:
+                        migrations_logger.info(f"Token mint: {token_mint} | LP address: {liquidity_pool_address} - risk filters did not pass.")
+                    # Remove the token from pending trades after processing.
+                    pending_trades.pop(token_mint)
                     return (token_mint, liquidity_pool_address)
                 else:
-                    migrations_logger.info(f'Initialize2 event for token {token_mint} but no prior withdraw event found.')
-                    
+                    migrations_logger.info(f"Initialize2 event for token {token_mint} but no prior withdraw event found.")
+                    return None
             else:
                 migrations_logger.warning("Token mint or LP address not found in the account keys.")
                 return None
@@ -92,16 +105,15 @@ def contains_initialize2_log(logs):
     return any(pattern.search(log) for log in logs)
 
 async def listen_logs():
-    # Declare as global since we may reinitialize it.
-    global rpc_client  
+    global rpc_client
     global httpx_client
+    # Use a dictionary to track tokens from withdraw events and their filter outcomes.
+    pending_trades = {}
     
-    withdraw_tokens = set()
     while True:
         try:
             # Pass ping_interval and ping_timeout to maintain a heartbeat.
             async with websockets.connect(WS_URL, ping_interval=60, ping_timeout=20) as websocket:
-                # Subscribe to logs that mention the migration address.
                 subscription_request = json.dumps({
                     "jsonrpc": "2.0",
                     "id": 1,
@@ -113,48 +125,51 @@ async def listen_logs():
                 })
                 await websocket.send(subscription_request)
                 response = await websocket.recv()
-                migrations_logger.info(f'Subscription response: {response}')
-                migrations_logger.info('Listening for Pump.fun migrations - withdraw and initialize2 instructions...')
+                migrations_logger.info(f"Subscription response: {response}")
+                migrations_logger.info("Listening for Pump.fun migrations - withdraw and initialize2 instructions...")
 
                 while True:
-                    # Wait for a new message; if nothing is received within 30 seconds, a TimeoutError is raised.
                     message = await asyncio.wait_for(websocket.recv(), timeout=300)
                     data = json.loads(message)
                     
                     if (
-                        'method' in data and data['method'] == 'logsNotification' and
-                        'params' in data and 'result' in data['params']
+                        "method" in data and data["method"] == "logsNotification" and
+                        "params" in data and "result" in data["params"]
                     ):
-                        block_data = data['params']['result']
-                        if 'value' in block_data and 'logs' in block_data['value']:
-                            logs = block_data['value']['logs']
-                            sig = block_data['value'].get("signature")
+                        block_data = data["params"]["result"]
+                        if "value" in block_data and "logs" in block_data["value"]:
+                            logs = block_data["value"]["logs"]
+                            sig = block_data["value"].get("signature")
                             if not sig:
                                 continue
                             
-                            if 'Program log: Instruction: Withdraw' in logs:
+                            if "Program log: Instruction: Withdraw" in logs:
                                 migrations_logger.info(f"Withdraw signature: {sig}")
-                                # Launch as a separate task to avoid blocking.
-                                asyncio.create_task(fetch_transaction_details(sig, withdraw_tokens, True))
+                                asyncio.create_task(fetch_transaction_details(sig, pending_trades, True))
                             
                             elif contains_initialize2_log(logs):
                                 migrations_logger.info(f"Initialize2 signature: {sig}")
-                                asyncio.create_task(fetch_transaction_details(sig, withdraw_tokens, False))
-                                
+                                asyncio.create_task(fetch_transaction_details(sig, pending_trades, False))
         except Exception as e:
             migrations_logger.error(f"Exception in listen_logs: {e}")
             migrations_logger.info(f"Reconnecting in {RELAY_DELAY} seconds...")
-            
-            # Close the current async clients and reinitialize.
             try:
                 await rpc_client.close()
                 await httpx_client.aclose()
             except Exception as close_e:
                 migrations_logger.error(f"Error closing async clients: {close_e}")
-            
             rpc_client = AsyncClient(RPC_URL)
             httpx_client = httpx.AsyncClient(timeout=HTTPX_TIMEOUT)
             await asyncio.sleep(RELAY_DELAY)
+
+async def execute_trade(token_mint, liquidity_pool_address, extra_data):
+    """
+    Placeholder for your trade logic. This function should contain the code to execute a trade
+    using the token mint, LP address, and any additional data from the filters.
+    """
+    migrations_logger.info(f"Executing trade for token {token_mint} with LP {liquidity_pool_address}")
+    # Insert your trade execution code here.
+    await asyncio.sleep(0)  # For example purposes.
 
 async def main():
     try:
@@ -165,7 +180,4 @@ async def main():
         await asyncio.sleep(RELAY_DELAY)
 
 if __name__ == "__main__":
-    # sig = "4Qfkfhag5ehzp3xef8MMveNjzheUkoptJKxCiSi4enyg1LutCcpcJC46i9wWwLAKV14qrXS62FfGhx9i45nQ5YzG"
-    # asyncio.run(fetch_transaction_details(sig, is_withdraw=False))
-    
     asyncio.run(main())

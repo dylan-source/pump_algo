@@ -6,6 +6,13 @@ Post migration pump.fun sniper bot
 - Thereafter it processes filters
 - If passes filters it listens to the relevant initialize2 instruction
 
+# CONCERNS TO ADDRESS (ChatGPT feedback on new listener trade logic):
+- Trade Logic in a Separate Task:
+You mentioned that the trade logic is already housed in its own task using asyncio.create_task(). That’s a good approach. Just ensure that your tasks are properly managed (e.g. cancellations on shutdown) and that shared state (if any) is protected.
+Minimal Blocking in the Listener:
+Ensure that any heavy processing (risk checks, API calls) inside tasks is also done asynchronously. Use asynchronous HTTP libraries (like aiohttp) for any API calls.
+
+
 # Speed improvements
 - Call await client.get_token_accounts_by_owner once at instantiation
 - The associated token addresses will always be new. Therefore always derive them

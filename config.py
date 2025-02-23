@@ -27,7 +27,7 @@ CSV_TRADES_FILE = 'trade_data.csv'
 # Define trading parameters
 STOPLOSS = 0.10                     # trailing stoploss value
 COMMITTMENT_LEVEL = 'finalized'     # level at which sol processing occurs
-RELAY_DELAY = 15                    # time when to reconnect to websocket after it drops
+RELAY_DELAY = 5                    # time when to reconnect to websocket after it drops
 TIME_TO_SLEEP = 15                  # sleep time between api calls for filters_utils functions
 TIMEOUT = 30000                     # sleep time between api calls for filters_utils functions -> mainly for scraping functions
 HTTPX_TIMEOUT = 10                  # timeout specifically for HTTPX
