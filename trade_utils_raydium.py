@@ -62,7 +62,7 @@ async def raydium_trade_wrapper(httpx_client: httpx.AsyncClient, redis_trades: r
                 await execute_sell(httpx_client=httpx_client, redis_client_trades=redis_trades, pair_address=pair_address, token_mint=token_mint)
                 break
             
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.5)
         
     else:
         return None
@@ -153,7 +153,8 @@ async def execute_buy(httpx_client: httpx.AsyncClient,
                             'buy_tokens_spent': trade_data.get("SOL change", ""),  
                             'buy_tokens_received': trade_data.get("Token change", ""), 
                         }
-                    cache_result = await store_trade_data(redis=redis_client_trades, token_address=token_mint, trade_data=data_to_cache)
+
+                    cache_result = await store_trade_data(redis_object=redis_client_trades, token_address=token_mint, trade_data=data_to_cache)
                     trade_logger.info(f"Buy trade cached for {pair_address}: {cache_result}")
                 return result, buy_price
 

@@ -10,7 +10,7 @@ from config import CSV_MIGRATIONS_FILE, CSV_TRADES_FILE, migrations_logger, trad
 #---------------------
 
 # Cache the trade data when a buy is executed
-async def store_trade_data(redis, token_address, trade_data):
+async def store_trade_data(redis_object, token_address, trade_data):
     '''
         trade_data schema:
                 {
@@ -23,7 +23,7 @@ async def store_trade_data(redis, token_address, trade_data):
     '''
 
     trade_data_json = json.dumps(trade_data)
-    result = await redis.set(token_address, trade_data_json)
+    result = await redis_object.set(token_address, trade_data_json)
     return result
 
 

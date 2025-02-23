@@ -1,4 +1,4 @@
-import redis
+import redis.asyncio as redis
 import asyncio
 import websockets
 import json
@@ -6,7 +6,7 @@ import httpx
 import re
 import aiohttp
 from datetime import datetime
-from config import MIGRATION_ADDRESS, WS_URL, RPC_URL, RELAY_DELAY, migrations_logger, HTTPX_TIMEOUT
+from config import MIGRATION_ADDRESS, WS_URL, RPC_URL, RELAY_DELAY, migrations_logger, HTTPX_TIMEOUT, SELL_SLIPPAGE
 from pprint import pprint
 
 from solders.signature import Signature  # type: ignore
@@ -16,6 +16,7 @@ from solana.rpc.async_api import AsyncClient
 from filter_utils import process_new_tokens, trade_filters
 from storage_utils import parse_migrations_to_save
 from trade_utils_raydium import raydium_trade_wrapper# , startup_sell
+from trade_utils import startup_sell
 
 # Initialize the rpc_client and httpx_client globally.
 rpc_client = AsyncClient(RPC_URL)
@@ -172,6 +173,9 @@ async def listen_logs():
             await asyncio.sleep(RELAY_DELAY)
 
 async def main():
+    
+    await startup_sell(rpc_client, redis_client_trades, sell_slippage=SELL_SLIPPAGE)
+    
     try:
         await listen_logs()
     except Exception as e:
@@ -180,4 +184,14 @@ async def main():
         await asyncio.sleep(RELAY_DELAY)
 
 if __name__ == "__main__":
+    # token_mint = "MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5"
+    # liquidity_pool_address = "879F697iuDJGMevRkRcnW21fcXiAeLJK1ffsw2ATebce"
+
+    # asyncio.run(raydium_trade_wrapper(
+    #         httpx_client=httpx_client, 
+    #         redis_trades=redis_client_trades, 
+    #         pair_address=liquidity_pool_address, 
+    #         token_mint=token_mint)
+    #         )
+
     asyncio.run(main())
