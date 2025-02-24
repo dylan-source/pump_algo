@@ -625,10 +625,10 @@ async def trade_filters(risks, holder_metrics, is_dex_paid_parsed):
     total_pct_top_5 = float(holder_metrics['total_pct_top_5'])
 
     # Count how many risks there are after filtering out default pump.fun risks
-    # irrelevant_risks = ['Large Amount of LP Unlocked', 'Low Liquidity', 'Low amount of LP Providers']
-    # relevant_risks = [risk for risk in risks['risks'] if risk not in irrelevant_risks]
-    # relevant_risks_count = int(len(relevant_risks))
-    # risk_holder_interaction_5 = relevant_risks_count * total_pct_top_5
+    irrelevant_risks = ['Large Amount of LP Unlocked', 'Low Liquidity', 'Low amount of LP Providers']
+    relevant_risks = [risk for risk in risks['risks'] if risk not in irrelevant_risks]
+    relevant_risks_count = int(len(relevant_risks))
+    risk_holder_interaction_5 = relevant_risks_count * total_pct_top_5
 
     # Filter out high risks
     risks_list = risks.get("risks", "")
@@ -637,8 +637,8 @@ async def trade_filters(risks, holder_metrics, is_dex_paid_parsed):
         
     # if is_dex_paid_parsed==True and risk_holder_interaction_5<35 and total_pct_top_5<50 and price_change>0 and current_price<=max_start_price:
     # if number_of_risks==0 and total_pct_top_5<35 and price_change>0 and current_price<=max_start_price:
-    
-    if is_dex_paid_parsed==True and number_of_risks==0 and total_pct_top_5<35:
+    # if is_dex_paid_parsed==True and number_of_risks==0 and total_pct_top_5<50:
+    if is_dex_paid_parsed==True and total_pct_top_5<50 and risk_holder_interaction_5<35:
         return True
     else:
         return False

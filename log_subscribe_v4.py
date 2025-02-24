@@ -174,7 +174,7 @@ async def listen_logs():
 
 async def main():
     
-    # await startup_sell(rpc_client, redis_client_trades, sell_slippage=SELL_SLIPPAGE)
+    await startup_sell(rpc_client, redis_client_trades, sell_slippage=SELL_SLIPPAGE)
     
     try:
         await listen_logs()

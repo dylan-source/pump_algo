@@ -36,8 +36,8 @@ async def raydium_trade_wrapper(httpx_client: httpx.AsyncClient, redis_trades: r
         
         # Calculate trade parameters
         trade_start_time = time.time()
-        take_profit_price = buy_price*(1 + 0.3)
-        stoploss_price = buy_price*(1 - 0.1)
+        take_profit_price = buy_price*(1 + 0.4)
+        stoploss_price = buy_price*(1 - 0.2)
         while True:
             
             # Get current price
