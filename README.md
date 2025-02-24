@@ -1,6 +1,9 @@
 # Pump.fun Migration Sniper
 Post migration pump.fun sniper bot
 
+# Notes:
+- log_subscribe_v4.py contains the final logic for the logsSubscribe implementation
+
 # New listener
 - This new branch listens to the pump.fun "withdraw" instruction
 - Thereafter it processes filters
