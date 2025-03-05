@@ -60,28 +60,6 @@ async def fetch_transaction_details(signature, pending_trades, is_withdraw=True)
             None
         )
         
-        # # Extract the uiAmount for the stable token (mint is always this constant)
-        # stable_token_amount = next(
-        #     (tb.get("uiTokenAmount", {}).get("uiAmount")
-        #     for tb in post_token_balances
-        #     if tb.get("mint") == SOL_MINT),
-        #     None
-        # )
-
-        # # Extract the uiAmount for the token whose mint matches token_mint
-        # token_mint_amount = next(
-        #     (tb.get("uiTokenAmount", {}).get("uiAmount")
-        #     for tb in post_token_balances
-        #     if tb.get("mint") == token_mint),
-        #     None
-        # )
-
-        # if stable_token_amount is not None and token_mint_amount:
-        #     token_launch_price = stable_token_amount / token_mint_amount
-        #     print("Token launch price:", token_launch_price)
-        # else:
-        #     print("One of the token amounts is missing.")
-        
         if is_withdraw:
             if token_mint and token_mint not in pending_trades:
                 migrations_logger.info(f"Withdraw detected | token mint: {token_mint}")
@@ -120,14 +98,14 @@ async def fetch_transaction_details(signature, pending_trades, is_withdraw=True)
                 None
             )
 
+            print(79/206_900_000)
             if stable_token_amount is not None and token_mint_amount:
                 token_launch_price = stable_token_amount / token_mint_amount
-                migrations_logger.info(f"Token launch price: {token_launch_price}")
             else:
-                migrations_logger.error("One of the token amounts is missing.")
+                migrations_logger.error(f"Cannot calculate token launch price for {token_mint} - one of the token amounts is missing.")
+                token_launch_price = 79/206_900_000  # Default to typical launch price
             
-            
-            # For initialize2 events, also fetch the liquidity pool (pair) address.
+            # Get the LP address and execute the trade if filters are passed
             account_keys = result.get("transaction", {}).get("message", {}).get("accountKeys", [])
             if len(account_keys) > 2:
                 liquidity_pool_address = account_keys[2]
@@ -136,13 +114,14 @@ async def fetch_transaction_details(signature, pending_trades, is_withdraw=True)
                     trade_info = pending_trades[token_mint]
                     if trade_info["passed"]:
                         migrations_logger.info(f"Token mint: {token_mint} | LP address: {liquidity_pool_address} - executing trade")
-                        # asyncio.create_task(raydium_trade_wrapper(
-                        #         httpx_client=httpx_client, 
-                        #         redis_trades=redis_client_trades, 
-                        #         pair_address=liquidity_pool_address, 
-                        #         token_mint=token_mint,
-                        #         tx_time=init2_time)
-                        #         )
+                        asyncio.create_task(raydium_trade_wrapper(
+                                httpx_client=httpx_client, 
+                                redis_trades=redis_client_trades, 
+                                pair_address=liquidity_pool_address, 
+                                token_mint=token_mint,
+                                tx_time=init2_time,
+                                launch_price=token_launch_price)
+                                )
                     else:
                         migrations_logger.info(f"Token mint: {token_mint} | LP address: {liquidity_pool_address} - risk filters did not pass.")
                     # Remove the token from pending trades after processing.

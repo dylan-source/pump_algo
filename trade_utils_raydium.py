@@ -38,19 +38,18 @@ async def raydium_trade_wrapper(httpx_client: httpx.AsyncClient, redis_trades: r
     
     trade_logger.info(f"Block time for {pair_address}: {formatted_time}")
     trade_logger.info(f"Trade entry time for {pair_address}: {entry_time_str}")
+    trade_logger.info(f"Token launch price: {launch_price}")
     trade_logger.info(f"Maximum high price during warmup: {max_high_during_warmup}")
     
-    # Wait until after the warm-up period before executing the trade
+    # Wait until after the warm-up period before executing the trade and cancel the trade if the price exceeds the maximum allowed high
     while datetime.now() < entry_time:
-        
-        # Cancel the trade if the price exceeds the maximum allowed high
         current_price = await get_raydium_price(pair_address)
         if current_price > max_high_during_warmup:
             trade_logger.info(f"Price too high during warm-up for {pair_address} - aborting trade")
             return None
-        trade_logger.info(f"Waiting for warm-up period to complete for {pair_address} | Current price: {current_price} | Max high: {max_high_during_warmup}")
-        # print(datetime.now())
-        await asyncio.sleep(1)
+        else:
+            trade_logger.info(f"Waiting for warm-up period to complete for {pair_address} | Current price: {current_price} | Max high: {max_high_during_warmup}")
+            await asyncio.sleep(1)
     
     trade_logger.info(f"Warm-up completed - executing trade for {pair_address}")
     buy_result, buy_price = await execute_buy(httpx_client=httpx_client, redis_client_trades=redis_trades, pair_address=pair_address, token_mint=token_mint)
