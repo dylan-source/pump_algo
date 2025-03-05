@@ -25,17 +25,18 @@ TWEET_SCOUT_KEY = os.getenv('TWEET_SCOUT_API_KEY')
 CSV_MIGRATIONS_FILE = 'migration_data.csv'
 CSV_TRADES_FILE = 'trade_data.csv'
 
-# Define trading parameters
-STOPLOSS = 0.30                     # stoploss %
-TAKE_PROFIT = 2                     # take profit %
+# Define some trade parameters
+STOPLOSS = 0.30                     # stoploss value (30%)
+TAKE_PROFIT = 2                     # take profit value (200%)
 WARM_UP = 1                         # warm up minutes after LP launched before executing trade
+MAX_TRADE_TIME_MINS = 4             # maximum trade duration
+MAX_WARMUP_HIGH = 3                 # maximum increase in price from open during warmup time
 
 COMMITTMENT_LEVEL = 'finalized'     # level at which sol processing occurs
 RELAY_DELAY = 2                     # time when to reconnect to websocket after it drops
 TIME_TO_SLEEP = 15                  # sleep time between api calls for filters_utils functions
 TIMEOUT = 30000                     # sleep time between api calls for filters_utils functions -> mainly for scraping functions
 HTTPX_TIMEOUT = 10                  # timeout specifically for HTTPX
-MAX_TRADE_TIME_MINS = 8             # maximum trade duration
 SELL_LOOP_DELAY = 10                # delay between api calls in execute_sell function
 MONITOR_PRICE_DELAY = 3             # length of time between price API calls -> to prevent rate limit
 PRICE_LOOP_RETRIES = 5              # max number of times to attempt to fetch a rpice
@@ -43,7 +44,7 @@ START_UP_SLEEP = 5                  # number of seconds after migration before a
 
 # Define SOL constants
 SOL_DECIMALS = 9
-TRADE_AMOUNT_SOL = 0.01
+TRADE_AMOUNT_SOL = 0.001
 SOL_AMOUNT_LAMPORTS = int(TRADE_AMOUNT_SOL * 10 ** SOL_DECIMALS)
 MIN_SOL_BALANCE = 0.1
 SOL_MIN_BALANCE_LAMPORTS = int(MIN_SOL_BALANCE * 10 ** SOL_DECIMALS)

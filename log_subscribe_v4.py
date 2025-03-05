@@ -45,19 +45,15 @@ async def fetch_transaction_details(signature, pending_trades, is_withdraw=True)
         
         result = data.get("result")
         
+        # Get launch timestamp
         block_time = data['result']['blockTime']
-        print(block_time)
-        dt_block = datetime.fromtimestamp(block_time)
-        formatted_time = dt_block.strftime('%Y-%m-%d %H:%M:%S')
-        print("Block time:", formatted_time)
-                
-        entry_time = dt_block + timedelta(minutes=WARM_UP)
-        entry_time_str = entry_time.strftime('%Y-%m-%d %H:%M:%S')
-        print("Entry time:", entry_time_str)
+        init2_time = datetime.fromtimestamp(block_time)
         
         if not result:
             migrations_logger.warning("No result in transaction details.")
             return None
+
+        pprint(result)
 
         # Fetch token mint from postTokenBalances using the same logic for both cases.
         post_token_balances = result.get("meta", {}).get("postTokenBalances", [])
@@ -99,7 +95,8 @@ async def fetch_transaction_details(signature, pending_trades, is_withdraw=True)
                         #         httpx_client=httpx_client, 
                         #         redis_trades=redis_client_trades, 
                         #         pair_address=liquidity_pool_address, 
-                        #         token_mint=token_mint)
+                        #         token_mint=token_mint,
+                        #         tx_time=init2_time)
                         #         )
                     else:
                         migrations_logger.info(f"Token mint: {token_mint} | LP address: {liquidity_pool_address} - risk filters did not pass.")
@@ -140,7 +137,7 @@ async def listen_logs():
                     "method": "logsSubscribe",
                     "params": [
                         {"mentions": [MIGRATION_ADDRESS]},
-                        {"commitment": "confirmed"}
+                        {"commitment": "processed"}
                     ]
                 })
                 await websocket.send(subscription_request)
