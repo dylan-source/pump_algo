@@ -5,7 +5,11 @@
 __pycache__
 migrations.log
 trade.log
+trade_all_trades.log
 .venv
-/Scripts
+/scripts/encryption.txt
+/scripts/encryption_backup.txt
 trade_data.csv
+trade_data_all_trades.csv
 migration_data.csv
+/analysis

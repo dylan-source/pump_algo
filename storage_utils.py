@@ -10,15 +10,20 @@ from config import CSV_MIGRATIONS_FILE, CSV_TRADES_FILE, migrations_logger, trad
 #---------------------
 
 # Cache the trade data when a buy is executed
-async def store_trade_data(redis_client_trades, signature, timestamp, token_address, tokens_spent, tokens_received):
-    trade_data = {
-        'buy_timestamp': timestamp, 
-        'buy_transaction_hash': str(signature), 
-        'buy_tokens_spent': tokens_spent, 
-        'buy_tokens_received': tokens_received
-        }
+async def store_trade_data(redis_object, token_address, trade_data):
+    '''
+        trade_data schema:
+                {
+                    'buy_timestamp': timestamp, 
+                    'buy_transaction_hash': str(signature), 
+                    'buy_pair_address': str(signature), 
+                    'buy_tokens_spent': tokens_spent, 
+                    'buy_tokens_received': tokens_received
+                 }
+    '''
+
     trade_data_json = json.dumps(trade_data)
-    result = await redis_client_trades.set(token_address, trade_data_json)
+    result = await redis_object.set(token_address, trade_data_json)
     return result
 
 
@@ -36,7 +41,7 @@ async def warmup_fetch_trades(redis_client):
     matching_keys = [key async for key in redis_client.scan_iter(pattern)]
     values = await asyncio.gather(*(redis_client.get(key) for key in matching_keys))
     trades = dict(zip(matching_keys, values))
-    print(trades)
+    # print(trades)
 
 
 # Store the newly migrated token's address
@@ -62,7 +67,7 @@ async def fetch_token_address(redis_client_token, token_address):
 #--------------------
 
 # Parse migrations to be saved in a csv
-async def parse_migrations_to_save(token_address, pair_address, data_to_save, filters_result):
+async def parse_migrations_to_save(token_address, data_to_save, filters_result):
     
     # Get the current timestamp
     current_time_utc = datetime.now(timezone.utc)
@@ -78,7 +83,6 @@ async def parse_migrations_to_save(token_address, pair_address, data_to_save, fi
     results = {
         'timestamp': timestamp_str, 
         'token_address': token_address, 
-        'pair_address': pair_address, 
 
         # Rugcheck token metadata
         'name': metadata.get('name', ''), 
@@ -124,7 +128,6 @@ async def write_migrations_to_csv(data_dict):
     token_columns = [
         'timestamp', 
         'token_address', 
-        'pair_address', 
         'name', 
         'symbol', 
         'description', 
@@ -177,17 +180,23 @@ async def write_migrations_to_csv(data_dict):
 
 
 # Save trade data to a csv
-async def write_trades_to_csv(tx_address, buy_data_dict, sell_data_dict, redis_client):
+async def write_trades_to_csv(redis_client, tx_address, sell_data_dict):
+    
+    # Get buy trade data from cache
+    buy_data_dict = await fetch_trade_data(redis_client, tx_address)
+    pair_address = buy_data_dict.get("pair_address", "Not pair_address in cache")
+    
     try:
         effective_buy_price = -buy_data_dict['buy_tokens_spent'] / buy_data_dict['buy_tokens_received']
-        effective_sell_price = -sell_data_dict['sell_tokens_received'] / sell_data_dict['sell_tokens_spent']
+        effective_sell_price = sell_data_dict['sell_tokens_received'] / -sell_data_dict['sell_tokens_spent']
         return_value = sell_data_dict['sell_tokens_received'] + buy_data_dict['buy_tokens_spent']
         return_perc = (sell_data_dict['sell_tokens_received'] / -buy_data_dict['buy_tokens_spent'] - 1) * 100
-        trade_logger.info(f'Return value in SOL for {tx_address}: {return_value}')
-        trade_logger.info(f'Return % for {tx_address}: {return_perc}')
+        trade_logger.info(f'Return value in SOL for {pair_address}: {return_value}')
+        trade_logger.info(f'Return % for {pair_address}: {round(return_perc,2)}%')
 
         token_columns = [
             'token_address', 
+            'pair_address',
             'buy_timestamp', 
             'buy_transaction_hash', 
             'buy_tokens_spent', 
@@ -225,11 +234,11 @@ async def write_trades_to_csv(tx_address, buy_data_dict, sell_data_dict, redis_c
             trade_logger.info('Saved new trade to csv')
             
             # Delete the key from Redis and log accordingly
-            result = await redis_client.delete(tx_address)
-            if result:
-                trade_logger.info(f'Redis key deleted for {tx_address}: True')
-            else:
-                trade_logger.error(f'Redis key NOT deleted for {tx_address}: False')
+            # result = await redis_client.delete(tx_address)
+            # if result:
+            #     trade_logger.info(f'Redis key deleted for {pair_address}: True')
+            # else:
+            #     trade_logger.error(f'Redis key NOT deleted for {pair_address}: False')
 
     except Exception as e:
         trade_logger.error(f'Error with write_trades_to_csv function: {e}')

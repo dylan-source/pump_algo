@@ -4,8 +4,8 @@ import json
 import base58
 import aiohttp
 import requests
-from solders.signature import Signature
-from solders.pubkey import Pubkey
+from solders.signature import Signature # type: ignore
+from solders.pubkey import Pubkey   # type: ignore
 from solana.rpc.types import TokenAccountOpts
 from solana.rpc.async_api import AsyncClient
 from solana.rpc.commitment import Processed, Confirmed, Finalized

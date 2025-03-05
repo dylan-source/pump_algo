@@ -1,7 +1,7 @@
 import websockets
 import asyncio
 import json
-from solders.pubkey import Pubkey
+from solders.pubkey import Pubkey   # type: ignore
 from datetime import datetime, timezone
 from config import MIGRATION_ADDRESS, WS_URL, RPC_URL, RELAY_DELAY, migrations_logger
 from storage_utils import store_token_address, fetch_token_address
@@ -22,7 +22,7 @@ async def process_initialize2_transaction(data, redis_client_tokens, queue):
                 await queue.put((token_address, pair_address))
                 timestamp_str = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
                 await store_token_address(redis_client_tokens, timestamp_str, signature, token_address)
-                migrations_logger.info(f'New token cached - Address: {token_address}0')
+                migrations_logger.info(f'New token cached - Address: {token_address}')
         else:
             migrations_logger.error(f'Error: Not enough account keys (found {len(account_keys)})')
 

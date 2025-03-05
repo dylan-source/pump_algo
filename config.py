@@ -7,12 +7,14 @@ from dotenv import load_dotenv
 from cryptography.fernet import Fernet
 from solders.pubkey import Pubkey     # type: ignore
 from solders.keypair import Keypair   # type: ignore
+from solana.rpc.async_api import AsyncClient
 
 load_dotenv()
 
 # Load remaining environment varialbes
 WS_URL = os.getenv('WS_URL', '')
 RPC_URL = os.getenv('RPC_URL', '')
+QN_RPC_URL = os.getenv('QN_RPC_URL', '')
 METIS_RPC_URL = os.getenv('METIS_RPC_URL', '')
 WALLET_ADDRESS = os.getenv('WALLET_ADDRESS', '')
 COLD_WALLET_ADDRESS = os.getenv('COLD_WALLET_ADDRESS', '')
@@ -24,39 +26,48 @@ CSV_MIGRATIONS_FILE = 'migration_data.csv'
 CSV_TRADES_FILE = 'trade_data.csv'
 
 # Define trading parameters
-STOPLOSS = 0.25
-COMMITTMENT_LEVEL = 'finalized'
-RELAY_DELAY = 15
-TIME_TO_SLEEP = 15
-TIMEOUT = 30000
-HTTPX_TIMEOUT = 10
-MAX_TRADE_TIME_MINS = 8
-SELL_LOOP_DELAY = 10
-MONITOR_PRICE_DELAY = 2
-PRICE_LOOP_RETRIES = 5
-START_UP_SLEEP = 10
+STOPLOSS = 0.10                     # trailing stoploss value
+COMMITTMENT_LEVEL = 'finalized'     # level at which sol processing occurs
+RELAY_DELAY = 2                     # time when to reconnect to websocket after it drops
+TIME_TO_SLEEP = 15                  # sleep time between api calls for filters_utils functions
+TIMEOUT = 30000                     # sleep time between api calls for filters_utils functions -> mainly for scraping functions
+HTTPX_TIMEOUT = 10                  # timeout specifically for HTTPX
+MAX_TRADE_TIME_MINS = 3             # maximum trade duration
+SELL_LOOP_DELAY = 10                # delay between api calls in execute_sell function
+MONITOR_PRICE_DELAY = 3             # length of time between price API calls -> to prevent rate limit
+PRICE_LOOP_RETRIES = 5              # max number of times to attempt to fetch a rpice
+START_UP_SLEEP = 5                  # number of seconds after migration before attempting to buy -> often an error occurs if too soon
 
 # Define SOL constants
 SOL_DECIMALS = 9
-TRADE_AMOUNT_SOL = 0.0001
+TRADE_AMOUNT_SOL = 0.01
 SOL_AMOUNT_LAMPORTS = int(TRADE_AMOUNT_SOL * 10 ** SOL_DECIMALS)
 MIN_SOL_BALANCE = 0.1
 SOL_MIN_BALANCE_LAMPORTS = int(MIN_SOL_BALANCE * 10 ** SOL_DECIMALS)
 SOL_MINT = 'So11111111111111111111111111111111111111112'
 
 # Define priority fee ranges
-PRIORITY_FEE_NUM_BLOCKS = 50
-PRIORITY_FEE_MULTIPLIER = 1.2
-PRIORITY_FEE_MIN = 30000
-PRIORITY_FEE_MAX = 1000000
+FEE_LEVELS = ['50', '55', '60', '65', '70', '75', '85']
+PRIORITY_FEE_MIN=30_000
+PRIORITY_FEE_MAX=500_000
+PRIORITY_FEE_NUM_BLOCKS=100
+PRIORITY_FEE_MULTIPLIER=1.1
+PRIORITY_FEE_STOPLOSS_MULTIPLIER=1.5
+PRIORITY_FEE_DICT = {
+    "PRIORITY_FEE_MIN": 250_000,
+    "PRIORITY_FEE_MAX": 750_000,
+    "PRIORITY_FEE_NUM_BLOCKS": 100,
+    "PRIORITY_FEE_MULTIPLIER": 1.1,
+    "PRIORITY_FEE_STOPLOSS_MULTIPLIER": 1.5
+}
 
 # Define slippage dictionaries
-BUY_SLIPPAGE = {'MIN': 2000, 'MAX': 3500, 'INCREMENTS': 500}
-SELL_SLIPPAGE = {'MIN': 2000, 'MAX': 4500, 'INCREMENTS': 500}
-SELL_SLIPPAGE_DELAY = 10
+BUY_SLIPPAGE = {'MIN': 10, 'MAX': 20, 'INCREMENTS': 5}
+SELL_SLIPPAGE = {'MIN': 15, 'MAX': 30, 'INCREMENTS': 5, 'STOPLOSS_MIN': 20}
+SELL_SLIPPAGE_DELAY = 5 
 
 # Load the Jupiter URLs
-JUPITER_QUOTE_URL = 'https://api.jup.ag/swap/v1/quote'
+JUPITER_QUOTE_URL = "https://public.jupiterapi.com/quote"   # Direct URL: 'https://api.jup.ag/swap/v1/quote'
 JUPITER_SWAP_URL = 'https://api.jup.ag/swap/v1/swap'
 JUPITER_PRICE_URL = 'https://api.jup.ag/price/v2'
 
@@ -64,7 +75,7 @@ JUPITER_PRICE_URL = 'https://api.jup.ag/price/v2'
 MIGRATION_ADDRESS = '39azUYFWPz3VHgKCf3VChUwbpURdCHRxjWVowf5jUJjg'
 METADATA_PROGRAM_ID = Pubkey.from_string('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s')
 JUPITER_V6_ADDRESS = 'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4'
-RAYDIUM_ADDRESS = '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1'
+RAYDIUM_ADDRESS = '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8'   
 
 #----------------------
 #   DEFINE LOGGER
@@ -129,14 +140,12 @@ encrypted_private_key = os.getenv("ENCRYPTED_PRIVATE_KEY")
 if not encrypted_private_key:
     raise Exception("ENCRYPTED_PRIVATE_KEY not set in .env.")
 
-# Retrieve the master encryption key from a secure source - in production, use a secure vault or prompting the user.
-# encryption_key = os.getenv("ENCRYPTION_KEY")  -> relevant if Master Encryption Key is stored in .env or secure vault (e.g AWS Secrets Manager)
-# if not encryption_key:
+# Attempt to retrieve the master encryption key from an environment variable.
 encryption_key = getpass.getpass("Enter your master encryption key: ")
 if not encryption_key:
     raise Exception("Master encryption key is required.")
 
-# Decrypt the private key
+# Decrypt the private key using the master encryption key.
 cipher = Fernet(encryption_key.encode())
 decrypted_private_key = cipher.decrypt(encrypted_private_key.encode()).decode()
 
@@ -145,3 +154,17 @@ PRIVATE_KEY = Keypair.from_bytes(base58.b58decode(decrypted_private_key))
 
 # At this point, PRIVATE_KEY is ready to be used with solana.py.
 trade_logger.info("Private key successfully decrypted and loaded.")
+
+
+#-----------------------------
+#     RAYDIUM_PY CONFIGS
+#-----------------------------
+
+UNIT_BUDGET =  150_000      # max compute units to use - seems to average about 65k typically
+client = AsyncClient(RPC_URL)
+qn_client = AsyncClient(QN_RPC_URL)
+payer_keypair = PRIVATE_KEY
+
+
+
+
