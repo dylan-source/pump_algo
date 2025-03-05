@@ -5,8 +5,8 @@ import json
 import httpx
 import re
 import aiohttp
-from datetime import datetime
-from config import MIGRATION_ADDRESS, WS_URL, RPC_URL, RELAY_DELAY, migrations_logger, HTTPX_TIMEOUT, SELL_SLIPPAGE
+from datetime import datetime, timedelta
+from config import MIGRATION_ADDRESS, WS_URL, RPC_URL, RELAY_DELAY, migrations_logger, HTTPX_TIMEOUT, SELL_SLIPPAGE, WARM_UP
 from pprint import pprint
 
 from solders.signature import Signature  # type: ignore
@@ -44,6 +44,17 @@ async def fetch_transaction_details(signature, pending_trades, is_withdraw=True)
             data = json.loads(details.to_json())
         
         result = data.get("result")
+        
+        block_time = data['result']['blockTime']
+        print(block_time)
+        dt_block = datetime.fromtimestamp(block_time)
+        formatted_time = dt_block.strftime('%Y-%m-%d %H:%M:%S')
+        print("Block time:", formatted_time)
+                
+        entry_time = dt_block + timedelta(minutes=WARM_UP)
+        entry_time_str = entry_time.strftime('%Y-%m-%d %H:%M:%S')
+        print("Entry time:", entry_time_str)
+        
         if not result:
             migrations_logger.warning("No result in transaction details.")
             return None
@@ -58,6 +69,7 @@ async def fetch_transaction_details(signature, pending_trades, is_withdraw=True)
         if is_withdraw:
             if token_mint and token_mint not in pending_trades:
                 migrations_logger.info(f"Withdraw detected | token mint: {token_mint}")
+                
                 # Run the risk filters.
                 filters_result, data_to_save = await process_new_tokens(httpx_client, token_mint)
                 
@@ -83,12 +95,12 @@ async def fetch_transaction_details(signature, pending_trades, is_withdraw=True)
                     trade_info = pending_trades[token_mint]
                     if trade_info["passed"]:
                         migrations_logger.info(f"Token mint: {token_mint} | LP address: {liquidity_pool_address} - executing trade")
-                        asyncio.create_task(raydium_trade_wrapper(
-                                httpx_client=httpx_client, 
-                                redis_trades=redis_client_trades, 
-                                pair_address=liquidity_pool_address, 
-                                token_mint=token_mint)
-                                )
+                        # asyncio.create_task(raydium_trade_wrapper(
+                        #         httpx_client=httpx_client, 
+                        #         redis_trades=redis_client_trades, 
+                        #         pair_address=liquidity_pool_address, 
+                        #         token_mint=token_mint)
+                        #         )
                     else:
                         migrations_logger.info(f"Token mint: {token_mint} | LP address: {liquidity_pool_address} - risk filters did not pass.")
                     # Remove the token from pending trades after processing.
@@ -172,8 +184,10 @@ async def listen_logs():
             redis_client_trades = redis.Redis(host='localhost', port=6379, db=1)
             await asyncio.sleep(RELAY_DELAY)
 
+
 async def main():
     
+    # Sell any tokens that were not sold during the last run
     await startup_sell(rpc_client, redis_client_trades, sell_slippage=SELL_SLIPPAGE)
     
     try:
@@ -184,14 +198,4 @@ async def main():
         await asyncio.sleep(RELAY_DELAY)
 
 if __name__ == "__main__":
-    # token_mint = "MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5"
-    # liquidity_pool_address = "879F697iuDJGMevRkRcnW21fcXiAeLJK1ffsw2ATebce"
-
-    # asyncio.run(raydium_trade_wrapper(
-    #         httpx_client=httpx_client, 
-    #         redis_trades=redis_client_trades, 
-    #         pair_address=liquidity_pool_address, 
-    #         token_mint=token_mint)
-    #         )
-
     asyncio.run(main())

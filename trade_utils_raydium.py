@@ -22,7 +22,8 @@ from utils.pool_utils import (
 from raydium.amm_v4 import buy, sell
 from raydium.constants import TOKEN_PROGRAM_ID, WSOL
 from storage_utils import store_trade_data, write_trades_to_csv
-from config import client, trade_logger, RPC_URL, QN_RPC_URL, PRIORITY_FEE_DICT, TRADE_AMOUNT_SOL, BUY_SLIPPAGE, SELL_SLIPPAGE, MAX_TRADE_TIME_MINS, JUPITER_QUOTE_URL, WALLET_ADDRESS, FEE_LEVELS
+from config import (client, trade_logger, RPC_URL, QN_RPC_URL, PRIORITY_FEE_DICT, TRADE_AMOUNT_SOL, BUY_SLIPPAGE, SELL_SLIPPAGE, MAX_TRADE_TIME_MINS, 
+                    JUPITER_QUOTE_URL, WALLET_ADDRESS, FEE_LEVELS, STOPLOSS, TAKE_PROFIT)
 
 
 # Wrapper to house all trade logic and functions
@@ -36,8 +37,8 @@ async def raydium_trade_wrapper(httpx_client: httpx.AsyncClient, redis_trades: r
         
         # Calculate trade parameters
         trade_start_time = time.time()
-        take_profit_price = buy_price*(1 + 0.4)
-        stoploss_price = buy_price*(1 - 0.2)
+        take_profit_price = buy_price*(1 + TAKE_PROFIT)
+        stoploss_price = buy_price*(1 - STOPLOSS)
         while True:
             
             # Get current price
