@@ -167,6 +167,7 @@ async def fetch_token_details(httpx_client: httpx.AsyncClient, token_mint_addres
     # Make the GET request using the provided async client
     try:
         response = await httpx_client.get(tokens_url, headers=headers)
+        print(response)
         if response.status_code == 200:
             return response.json()
         else:
@@ -174,7 +175,7 @@ async def fetch_token_details(httpx_client: httpx.AsyncClient, token_mint_addres
             migrations_logger.error(f'Test to see json conversion: {response.json()}')
             return None
     except Exception as e:
-        migrations_logger.error(f'Error during API call: {str(e)}')
+        migrations_logger.error(f'fetch_token_details function error: {str(e)}')
         return None
 
 

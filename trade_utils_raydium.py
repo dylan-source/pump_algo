@@ -24,23 +24,33 @@ from raydium.amm_v4 import buy, sell
 from raydium.constants import TOKEN_PROGRAM_ID, WSOL
 from storage_utils import store_trade_data, write_trades_to_csv
 from config import (client, trade_logger, RPC_URL, QN_RPC_URL, PRIORITY_FEE_DICT, TRADE_AMOUNT_SOL, BUY_SLIPPAGE, SELL_SLIPPAGE, MAX_TRADE_TIME_MINS, 
-                    JUPITER_QUOTE_URL, WALLET_ADDRESS, FEE_LEVELS, STOPLOSS, TAKE_PROFIT, WARM_UP)
+                    JUPITER_QUOTE_URL, WALLET_ADDRESS, FEE_LEVELS, STOPLOSS, TAKE_PROFIT, WARM_UP, MAX_WARMUP_HIGH)
 
 
 # Wrapper to house all trade logic and functions
-async def raydium_trade_wrapper(httpx_client: httpx.AsyncClient, redis_trades: redis.Redis, pair_address: str, token_mint: str, tx_time: datetime) -> None:
+async def raydium_trade_wrapper(httpx_client: httpx.AsyncClient, redis_trades: redis.Redis, pair_address: str, token_mint: str, tx_time: datetime, launch_price: float) -> None:
     
     formatted_time = tx_time.strftime('%Y-%m-%d %H:%M:%S')
     entry_time = tx_time + timedelta(minutes=WARM_UP)
     entry_time_str = entry_time.strftime('%Y-%m-%d %H:%M:%S')
     
+    max_high_during_warmup = launch_price * MAX_WARMUP_HIGH
+    
     trade_logger.info(f"Block time for {pair_address}: {formatted_time}")
     trade_logger.info(f"Trade entry time for {pair_address}: {entry_time_str}")
+    trade_logger.info(f"Maximum high price during warmup: {max_high_during_warmup}")
     
     # Wait until after the warm-up period before executing the trade
     while datetime.now() < entry_time:
-        print(datetime.now())
-        await asyncio.sleep(2)
+        
+        # Cancel the trade if the price exceeds the maximum allowed high
+        current_price = await get_raydium_price(pair_address)
+        if current_price > max_high_during_warmup:
+            trade_logger.info(f"Price too high during warm-up for {pair_address} - aborting trade")
+            return None
+        trade_logger.info(f"Waiting for warm-up period to complete for {pair_address} | Current price: {current_price} | Max high: {max_high_during_warmup}")
+        # print(datetime.now())
+        await asyncio.sleep(1)
     
     trade_logger.info(f"Warm-up completed - executing trade for {pair_address}")
     buy_result, buy_price = await execute_buy(httpx_client=httpx_client, redis_client_trades=redis_trades, pair_address=pair_address, token_mint=token_mint)

@@ -6,7 +6,7 @@ import httpx
 import re
 import aiohttp
 from datetime import datetime, timedelta
-from config import MIGRATION_ADDRESS, WS_URL, RPC_URL, RELAY_DELAY, migrations_logger, HTTPX_TIMEOUT, SELL_SLIPPAGE, WARM_UP
+from config import MIGRATION_ADDRESS, WS_URL, RPC_URL, RELAY_DELAY, migrations_logger, HTTPX_TIMEOUT, SELL_SLIPPAGE, WARM_UP, SOL_MINT
 from pprint import pprint
 
 from solders.signature import Signature  # type: ignore
@@ -53,14 +53,34 @@ async def fetch_transaction_details(signature, pending_trades, is_withdraw=True)
             migrations_logger.warning("No result in transaction details.")
             return None
 
-        pprint(result)
-
         # Fetch token mint from postTokenBalances using the same logic for both cases.
         post_token_balances = result.get("meta", {}).get("postTokenBalances", [])
         token_mint = next(
             (tb.get("mint") for tb in post_token_balances if tb.get("owner") == MIGRATION_ADDRESS),
             None
         )
+        
+        # # Extract the uiAmount for the stable token (mint is always this constant)
+        # stable_token_amount = next(
+        #     (tb.get("uiTokenAmount", {}).get("uiAmount")
+        #     for tb in post_token_balances
+        #     if tb.get("mint") == SOL_MINT),
+        #     None
+        # )
+
+        # # Extract the uiAmount for the token whose mint matches token_mint
+        # token_mint_amount = next(
+        #     (tb.get("uiTokenAmount", {}).get("uiAmount")
+        #     for tb in post_token_balances
+        #     if tb.get("mint") == token_mint),
+        #     None
+        # )
+
+        # if stable_token_amount is not None and token_mint_amount:
+        #     token_launch_price = stable_token_amount / token_mint_amount
+        #     print("Token launch price:", token_launch_price)
+        # else:
+        #     print("One of the token amounts is missing.")
         
         if is_withdraw:
             if token_mint and token_mint not in pending_trades:
@@ -82,6 +102,31 @@ async def fetch_transaction_details(signature, pending_trades, is_withdraw=True)
                 return None
         
         else:
+            # For initialize2 events, also fetch the liquidity pool (pair) address and calculate the intiial price
+            
+            # Extract the SOL uiAmount
+            stable_token_amount = next(
+                (tb.get("uiTokenAmount", {}).get("uiAmount")
+                for tb in post_token_balances
+                if tb.get("mint") == SOL_MINT),
+                None
+            )
+
+            # Extract the uiAmount for the token whose mint matches token_mint
+            token_mint_amount = next(
+                (tb.get("uiTokenAmount", {}).get("uiAmount")
+                for tb in post_token_balances
+                if tb.get("mint") == token_mint),
+                None
+            )
+
+            if stable_token_amount is not None and token_mint_amount:
+                token_launch_price = stable_token_amount / token_mint_amount
+                migrations_logger.info(f"Token launch price: {token_launch_price}")
+            else:
+                migrations_logger.error("One of the token amounts is missing.")
+            
+            
             # For initialize2 events, also fetch the liquidity pool (pair) address.
             account_keys = result.get("transaction", {}).get("message", {}).get("accountKeys", [])
             if len(account_keys) > 2:
