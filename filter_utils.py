@@ -167,12 +167,14 @@ async def fetch_token_details(httpx_client: httpx.AsyncClient, token_mint_addres
     # Make the GET request using the provided async client
     try:
         response = await httpx_client.get(tokens_url, headers=headers)
-        print(response)
         if response.status_code == 200:
             return response.json()
+        elif response.status_code == 502:
+            migrations_logger.error(f'Rugcheck.xyz gateway down')
+            return None
         else:
             migrations_logger.error(f'Failed to fetch token details: {response.status_code} {response.text}')
-            migrations_logger.error(f'Test to see json conversion: {response.json()}')
+            # migrations_logger.error(f'Test to see json conversion: {response.json()}')
             return None
     except Exception as e:
         migrations_logger.error(f'fetch_token_details function error: {str(e)}')

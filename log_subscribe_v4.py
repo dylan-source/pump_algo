@@ -98,7 +98,6 @@ async def fetch_transaction_details(signature, pending_trades, is_withdraw=True)
                 None
             )
 
-            print(79/206_900_000)
             if stable_token_amount is not None and token_mint_amount:
                 token_launch_price = stable_token_amount / token_mint_amount
             else:
