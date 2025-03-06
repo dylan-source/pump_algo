@@ -31,7 +31,7 @@ from config import (client, trade_logger, RPC_URL, QN_RPC_URL, PRIORITY_FEE_DICT
 async def raydium_trade_wrapper(httpx_client: httpx.AsyncClient, redis_trades: redis.Redis, pair_address: str, token_mint: str, tx_time: datetime, launch_price: float) -> None:
     
     formatted_time = tx_time.strftime('%Y-%m-%d %H:%M:%S')
-    entry_time = tx_time + timedelta(minutes=WARM_UP)
+    entry_time = tx_time + timedelta(seconds=55)
     entry_time_str = entry_time.strftime('%Y-%m-%d %H:%M:%S')
     
     max_high_during_warmup = launch_price * MAX_WARMUP_HIGH
